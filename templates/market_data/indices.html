@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Market Indices - Stock Research Platform{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>Market Indices</h1>
+        <p class="subtitle">Live market indices data</p>
+    </div>
+
+    <div class="indices-grid">
+        {% for index in indices %}
+        <div class="index-card">
+            <h3 class="index-name">{{ index.name }}</h3>
+            <div class="index-price">₹{{ index.current_price|floatformat:2 }}</div>
+            <div class="index-change {% if index.change >= 0 %}positive{% else %}negative{% endif %}">
+                <span class="change-value">{{ index.change|floatformat:2 }}</span>
+                <span class="change-percent">({{ index.change_percent|floatformat:2 }}%)</span>
+            </div>
+            <div class="index-details">
+                <div class="detail-row">
+                    <span>Open:</span>
+                    <span>₹{{ index.open_price|floatformat:2 }}</span>
+                </div>
+                <div class="detail-row">
+                    <span>High:</span>
+                    <span>₹{{ index.high|floatformat:2 }}</span>
+                </div>
+                <div class="detail-row">
+                    <span>Low:</span>
+                    <span>₹{{ index.low|floatformat:2 }}</span>
+                </div>
+            </div>
+            <div class="index-footer">
+                <small>Updated: {{ index.updated_at|timesince }} ago</small>
+            </div>
+        </div>
+        {% empty %}
+        <div class="no-data">
+            <p>No market data available. Run: <code>python manage.py setup_market_data</code></p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+.indices-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+    margin-top: 24px;
+}
+
+.index-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.index-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+
+.index-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #374151;
+    margin: 0 0 12px 0;
+}
+
+.index-price {
+    font-size: 32px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 8px;
+}
+
+.index-change {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+.index-change.positive {
+    color: #10b981;
+}
+
+.index-change.negative {
+    color: #ef4444;
+}
+
+.index-details {
+    background: #f9fafb;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    font-size: 14px;
+}
+
+.detail-row:last-child {
+    margin-bottom: 0;
+}
+
+.index-footer {
+    text-align: center;
+    color: #9ca3af;
+    font-size: 12px;
+}
+
+.no-data {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    color: #6b7280;
+}
+
+.no-data code {
+    background: #f3f4f6;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-family: monospace;
+}
+</style>
+{% endblock %}

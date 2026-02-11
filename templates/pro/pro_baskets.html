@@ -1,0 +1,249 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}PRO Trades - Premium Trading Insights{% endblock %}
+
+{% block extra_css %}
+<style>
+.pro-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 48px 24px;
+}
+
+.pro-header {
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.pro-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 16px;
+}
+
+.pro-title {
+    font-size: 48px;
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 16px;
+}
+
+.pro-subtitle {
+    font-size: 20px;
+    color: #6b7280;
+    margin-bottom: 32px;
+}
+
+.pro-features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    margin-bottom: 48px;
+}
+
+.feature-card {
+    background: white;
+    padding: 32px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    text-align: center;
+}
+
+.feature-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+}
+
+.feature-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 12px;
+}
+
+.feature-description {
+    color: #6b7280;
+    line-height: 1.6;
+}
+
+.pricing-card {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    color: white;
+    padding: 48px;
+    border-radius: 16px;
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.pricing-title {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.pricing-price {
+    font-size: 56px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.pricing-period {
+    font-size: 18px;
+    opacity: 0.9;
+    margin-bottom: 32px;
+}
+
+.pricing-features {
+    text-align: left;
+    margin-bottom: 32px;
+}
+
+.pricing-feature {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    font-size: 16px;
+}
+
+.btn-subscribe {
+    background: white;
+    color: #1e3a8a;
+    padding: 16px 48px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 18px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.btn-subscribe:hover {
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .pro-features {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pro-container">
+    <div class="pro-header">
+        <span class="pro-badge">PREMIUM</span>
+        <h1 class="pro-title">PRO Trades</h1>
+        <p class="pro-subtitle">Exclusive trading insights from top analysts</p>
+    </div>
+    
+    {% if is_pro %}
+    <!-- PRO User Content -->
+    <div style="text-align: center; padding: 60px 20px;">
+        <h2 style="font-size: 32px; font-weight: 700; color: #111827; margin-bottom: 16px;">
+            Welcome to PRO Trades!
+        </h2>
+        <p style="font-size: 18px; color: #6b7280; margin-bottom: 32px;">
+            You have access to exclusive premium trading insights.
+        </p>
+        <a href="/calls/" class="btn-subscribe">View PRO Trades</a>
+    </div>
+    {% else %}
+    <!-- Non-PRO User Content -->
+    <div class="pro-features">
+        <div class="feature-card">
+            <div class="feature-icon">🎯</div>
+            <h3 class="feature-title">Exclusive Calls</h3>
+            <p class="feature-description">
+                Get access to premium research calls from top-rated analysts before anyone else.
+            </p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3 class="feature-title">Advanced Analytics</h3>
+            <p class="feature-description">
+                Deep dive into market trends with advanced charts, indicators, and analysis tools.
+            </p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3 class="feature-title">Real-Time Alerts</h3>
+            <p class="feature-description">
+                Get instant notifications for new calls, target hits, and stop loss triggers.
+            </p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon">💎</div>
+            <h3 class="feature-title">Priority Support</h3>
+            <p class="feature-description">
+                24/7 priority customer support to help you make the most of your investments.
+            </p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon">📈</div>
+            <h3 class="feature-title">Portfolio Insights</h3>
+            <p class="feature-description">
+                Advanced portfolio analytics with performance tracking and risk assessment.
+            </p>
+        </div>
+        
+        <div class="feature-card">
+            <div class="feature-icon">🔒</div>
+            <h3 class="feature-title">Exclusive Community</h3>
+            <p class="feature-description">
+                Join our private community of PRO traders and learn from the best.
+            </p>
+        </div>
+    </div>
+    
+    <div class="pricing-card">
+        <h2 class="pricing-title">Upgrade to PRO</h2>
+        <div class="pricing-price">₹999</div>
+        <div class="pricing-period">per month</div>
+        
+        <div class="pricing-features">
+            <div class="pricing-feature">
+                <span>✓</span>
+                <span>Unlimited access to PRO trades</span>
+            </div>
+            <div class="pricing-feature">
+                <span>✓</span>
+                <span>Advanced analytics & charts</span>
+            </div>
+            <div class="pricing-feature">
+                <span>✓</span>
+                <span>Real-time alerts & notifications</span>
+            </div>
+            <div class="pricing-feature">
+                <span>✓</span>
+                <span>Priority customer support</span>
+            </div>
+            <div class="pricing-feature">
+                <span>✓</span>
+                <span>Exclusive community access</span>
+            </div>
+            <div class="pricing-feature">
+                <span>✓</span>
+                <span>Cancel anytime</span>
+            </div>
+        </div>
+        
+        <button class="btn-subscribe" onclick="alert('Payment gateway integration coming soon!')">
+            Subscribe Now
+        </button>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

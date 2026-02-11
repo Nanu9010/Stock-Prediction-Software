@@ -1,0 +1,134 @@
+/* Stock Sidebar Styles */
+.stock-sidebar {
+    position: fixed;
+    right: 0;
+    top: 80px;
+    width: 320px;
+    height: calc(100vh - 80px);
+    background: white;
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+}
+
+.stock-sidebar.collapsed {
+    transform: translateX(280px);
+}
+
+.sidebar-header {
+    padding: 16px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.sidebar-toggle {
+    background: #f3f4f6;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 20px;
+    transition: all 0.2s;
+}
+
+.sidebar-toggle:hover {
+    background: #e5e7eb;
+}
+
+.stock-sidebar.collapsed .sidebar-toggle {
+    transform: rotate(180deg);
+}
+
+.sidebar-content {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.stock-list {
+    padding: 8px;
+}
+
+.stock-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px;
+    border-bottom: 1px solid #f3f4f6;
+    transition: background 0.2s;
+}
+
+.stock-item:hover {
+    background: #f9fafb;
+}
+
+.stock-info {
+    flex: 1;
+}
+
+.stock-symbol {
+    font-weight: 600;
+    font-size: 14px;
+    color: #111827;
+}
+
+.stock-name {
+    font-size: 11px;
+    color: #6b7280;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
+
+.stock-price {
+    text-align: right;
+}
+
+.stock-price .price {
+    font-weight: 600;
+    font-size: 14px;
+    color: #111827;
+}
+
+.stock-price .change {
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+.stock-price .change.positive {
+    color: #10b981;
+}
+
+.stock-price .change.negative {
+    color: #ef4444;
+}
+
+.loading,
+.no-stocks {
+    text-align: center;
+    padding: 40px 20px;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+@media (max-width: 768px) {
+    .stock-sidebar {
+        width: 280px;
+    }
+
+    .stock-sidebar.collapsed {
+        transform: translateX(240px);
+    }
+}

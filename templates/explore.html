@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Explore - StockPro{% endblock %}
+
+{% block extra_css %}
+<style>
+.explore-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 48px 24px;
+}
+
+.explore-header {
+    text-align: center;
+    margin-bottom: 64px;
+}
+
+.explore-title {
+    font-size: 48px;
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 16px;
+}
+
+.explore-subtitle {
+    font-size: 20px;
+    color: #6b7280;
+}
+
+.explore-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+}
+
+.explore-card {
+    background: white;
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: all 0.3s;
+    text-align: center;
+}
+
+.explore-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.15);
+}
+
+.explore-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 24px;
+    background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+}
+
+.explore-card-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 12px;
+}
+
+.explore-card-description {
+    color: #6b7280;
+    line-height: 1.6;
+    margin-bottom: 24px;
+}
+
+.btn-explore {
+    padding: 12px 24px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: background 0.2s;
+}
+
+.btn-explore:hover {
+    background: #1d4ed8;
+}
+
+@media (max-width: 1024px) {
+    .explore-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .explore-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="explore-container">
+    <div class="explore-header">
+        <h1 class="explore-title">Explore StockPro</h1>
+        <p class="explore-subtitle">Discover all the tools and features to enhance your trading journey</p>
+    </div>
+    
+    <div class="explore-grid">
+        <div class="explore-card">
+            <div class="explore-icon">📊</div>
+            <h3 class="explore-card-title">Research Calls</h3>
+            <p class="explore-card-description">
+                Browse expert research calls from top brokers and analysts with proven track records.
+            </p>
+            <a href="/calls/" class="btn-explore">View Calls</a>
+        </div>
+        
+        <div class="explore-card">
+            <div class="explore-icon">💼</div>
+            <h3 class="explore-card-title">Portfolio Tracker</h3>
+            <p class="explore-card-description">
+                Track your investments with real-time P&L calculations and performance analytics.
+            </p>
+            <a href="/portfolio/" class="btn-explore">My Portfolio</a>
+        </div>
+        
+        <div class="explore-card">
+            <div class="explore-icon">⭐</div>
+            <h3 class="explore-card-title">Watchlist</h3>
+            <p class="explore-card-description">
+                Create custom watchlists to monitor your favorite stocks and get instant updates.
+            </p>
+            <a href="/watchlist/" class="btn-explore">My Watchlist</a>
+        </div>
+        
+        <div class="explore-card">
+            <div class="explore-icon">📈</div>
+            <h3 class="explore-card-title">Market Overview</h3>
+            <p class="explore-card-description">
+                Stay updated with live market indices, top gainers, losers, and market trends.
+            </p>
+            <a href="/markets/" class="btn-explore">View Markets</a>
+        </div>
+        
+        <div class="explore-card">
+            <div class="explore-icon">🎯</div>
+            <h3 class="explore-card-title">PRO Trades</h3>
+            <p class="explore-card-description">
+                Get exclusive access to premium research calls and advanced trading insights.
+            </p>
+            <a href="/pro-trades/" class="btn-explore">Explore PRO</a>
+        </div>
+        
+        <div class="explore-card">
+            <div class="explore-icon">📦</div>
+            <h3 class="explore-card-title">PRO Baskets</h3>
+            <p class="explore-card-description">
+                Invest in curated stock baskets based on themes, sectors, and strategies.
+            </p>
+            <a href="/pro-baskets/" class="btn-explore">View Baskets</a>
+        </div>
+        
+        <div class="explore-card">
+            <div class="explore-icon">🚀</div>
+            <h3 class="explore-card-title">IPO Center</h3>
+            <p class="explore-card-description">
+                Stay informed about upcoming and current IPOs with detailed analysis.
+            </p>
+            <a href="/ipo/" class="btn-explore">View IPOs</a>
+        </div>
+        
+        <div class="explore-card">
+            <div class="explore-icon">📚</div>
+            <h3 class="explore-card-title">Learning Center</h3>
+            <p class="explore-card-description">
+                Learn trading strategies, market analysis, and investment fundamentals.
+            </p>
+            <a href="#" class="btn-explore">Coming Soon</a>
+        </div>
+        
+        <div class="explore-card">
+            <div class="explore-icon">🔔</div>
+            <h3 class="explore-card-title">Alerts & Notifications</h3>
+            <p class="explore-card-description">
+                Set custom alerts for price targets, stop losses, and new research calls.
+            </p>
+            <a href="#" class="btn-explore">Coming Soon</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

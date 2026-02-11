@@ -1,0 +1,147 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block title %}Research Calls - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Research Calls Management</h1>
+    <div class="page-actions">
+        <a href="#" class="btn btn-outline-primary">
+            <span>📥</span>
+            Export
+        </a>
+        <a href="{% url 'admin_panel:call_create' %}" class="btn btn-primary">
+            <span>➕</span>
+            Add New Call
+        </a>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="filters-bar">
+    <form method="get" style="display: flex; align-items: center; gap: var(--spacing-4); flex: 1;">
+        <div class="filter-group">
+            <label>Status</label>
+            <select name="status" class="form-select" onchange="this.form.submit()">
+                <option value="">All Status</option>
+                <option value="PENDING" {% if selected_status == 'PENDING' %}selected{% endif %}>Pending</option>
+                <option value="ACTIVE" {% if selected_status == 'ACTIVE' %}selected{% endif %}>Active</option>
+                <option value="CLOSED" {% if selected_status == 'CLOSED' %}selected{% endif %}>Closed</option>
+                <option value="DRAFT" {% if selected_status == 'DRAFT' %}selected{% endif %}>Draft</option>
+            </select>
+        </div>
+        
+        <div class="filter-group">
+            <label>Broker</label>
+            <select name="broker" class="form-select" onchange="this.form.submit()">
+                <option value="">All Brokers</option>
+                {% for broker in brokers %}
+                <option value="{{ broker.id }}" {% if selected_broker == broker.id|stringformat:"s" %}selected{% endif %}>
+                    {{ broker.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="filter-group" style="flex: 1;">
+            <label>Search</label>
+            <input type="text" name="search" class="form-input" placeholder="Search symbol or broker..." value="{{ search_query }}">
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Search</button>
+        {% if selected_status or selected_broker or search_query %}
+        <a href="{% url 'admin_panel:calls_list' %}" class="btn btn-outline-secondary">Clear</a>
+        {% endif %}
+    </form>
+</div>
+
+<!-- Calls Table -->
+<div class="card">
+    <div class="data-table">
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Symbol</th>
+                        <th>Broker</th>
+                        <th>Action</th>
+                        <th>Entry Price</th>
+                        <th>Target</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for call in calls %}
+                    <tr>
+                        <td>#{{ call.id }}</td>
+                        <td>
+                            <a href="{% url 'admin_panel:call_detail' call.id %}" style="color: var(--color-primary); text-decoration: none; font-weight: 600;">
+                                {{ call.symbol }}
+                            </a>
+                        </td>
+                        <td>{{ call.broker.name }}</td>
+                        <td>
+                            <span class="badge {% if call.action == 'BUY' %}badge-success{% else %}badge-danger{% endif %}">
+                                {{ call.action }}
+                            </span>
+                        </td>
+                        <td>₹{{ call.entry_price }}</td>
+                        <td>₹{{ call.target_price }}</td>
+                        <td>
+                            {% if call.status == 'ACTIVE' %}
+                            <span class="badge badge-success">Active</span>
+                            {% elif call.status == 'PENDING' %}
+                            <span class="badge badge-warning">Pending</span>
+                            {% elif call.status == 'CLOSED' %}
+                            <span class="badge badge-gray">Closed</span>
+                            {% elif call.status == 'DRAFT' %}
+                            <span class="badge badge-info">Draft</span>
+                            {% else %}
+                            <span class="badge">{{ call.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ call.created_at|date:"M d, Y" }}</td>
+                        <td>
+                            <div style="display: flex; gap: var(--spacing-2);">
+                                <a href="{% url 'admin_panel:call_detail' call.id %}" class="btn btn-sm btn-outline-primary" title="View">👁️</a>
+                                {% if call.status == 'PENDING' %}
+                                <button class="btn btn-sm btn-success" title="Approve">✓</button>
+                                <button class="btn btn-sm btn-danger" title="Reject">✗</button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="10" style="text-align: center; padding: var(--spacing-8); color: var(--color-gray-600);">
+                            No research calls found
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    {% if is_paginated %}
+    <div class="card-footer">
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+            <a href="?page=1{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_broker %}&broker={{ selected_broker }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="pagination-item">«</a>
+            <a href="?page={{ page_obj.previous_page_number }}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_broker %}&broker={{ selected_broker }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="pagination-item">‹</a>
+            {% endif %}
+            
+            <span class="pagination-item is-active">{{ page_obj.number }}</span>
+            
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_broker %}&broker={{ selected_broker }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="pagination-item">›</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_broker %}&broker={{ selected_broker }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="pagination-item">»</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

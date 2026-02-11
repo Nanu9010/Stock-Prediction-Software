@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Portfolio - Stock Research Platform{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>My Portfolio</h1>
+        <div class="portfolio-value">
+            <span class="label">Total Value:</span>
+            <span class="value">₹{{ summary.total_current_value|floatformat:2 }}</span>
+        </div>
+    </div>
+
+    <!-- Portfolio Summary -->
+    <div class="summary-cards">
+        <div class="summary-card">
+            <div class="summary-icon">💰</div>
+            <div class="summary-content">
+                <h3>₹{{ summary.total_invested|floatformat:2 }}</h3>
+                <p>Total Invested</p>
+            </div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-icon">📈</div>
+            <div class="summary-content">
+                <h3 class="{% if summary.unrealized_pnl >= 0 %}text-success{% else %}text-danger{% endif %}">
+                    ₹{{ summary.unrealized_pnl|floatformat:2 }}
+                </h3>
+                <p>Unrealized P&L</p>
+            </div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-icon">💵</div>
+            <div class="summary-content">
+                <h3 class="{% if summary.realized_pnl >= 0 %}text-success{% else %}text-danger{% endif %}">
+                    ₹{{ summary.realized_pnl|floatformat:2 }}
+                </h3>
+                <p>Realized P&L</p>
+            </div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-icon">🎯</div>
+            <div class="summary-content">
+                <h3>{{ summary.win_rate }}%</h3>
+                <p>Win Rate</p>
+                <small>{{ summary.winning_trades }}/{{ summary.closed_positions }} trades</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Positions -->
+    <div class="portfolio-section">
+        <h2>Active Positions ({{ summary.active_positions }})</h2>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Symbol</th>
+                        <th>Entry Price</th>
+                        <th>Quantity</th>
+                        <th>Invested</th>
+                        <th>Current Value</th>
+                        <th>P&L</th>
+                        <th>P&L %</th>
+                        <th>Entry Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in active_items %}
+                    <tr>
+                        <td>
+                            <strong>{{ item.research_call.symbol }}</strong>
+                            <br><small>{{ item.research_call.broker.name }}</small>
+                        </td>
+                        <td>₹{{ item.entry_price }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>₹{{ item.invested_amount|floatformat:2 }}</td>
+                        <td>₹{{ item.current_value|floatformat:2|default:"--" }}</td>
+                        <td class="{% if item.pnl_amount >= 0 %}text-success{% else %}text-danger{% endif %}">
+                            {% if item.pnl_amount %}₹{{ item.pnl_amount|floatformat:2 }}{% else %}--{% endif %}
+                        </td>
+                        <td class="{% if item.pnl_percentage >= 0 %}text-success{% else %}text-danger{% endif %}">
+                            {% if item.pnl_percentage %}{{ item.pnl_percentage|floatformat:2 }}%{% else %}--{% endif %}
+                        </td>
+                        <td>{{ item.entry_date|date:"M d, Y" }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-danger" onclick="exitPosition({{ item.id }})">Exit</button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-center">No active positions</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Closed Positions -->
+    <div class="portfolio-section">
+        <h2>Recent Closed Positions</h2>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Symbol</th>
+                        <th>Entry</th>
+                        <th>Exit</th>
+                        <th>Quantity</th>
+                        <th>P&L</th>
+                        <th>P&L %</th>
+                        <th>Duration</th>
+                        <th>Exit Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in closed_items %}
+                    <tr>
+                        <td><strong>{{ item.research_call.symbol }}</strong></td>
+                        <td>₹{{ item.entry_price }}</td>
+                        <td>₹{{ item.exit_price }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td class="{% if item.pnl_amount >= 0 %}text-success{% else %}text-danger{% endif %}">
+                            ₹{{ item.pnl_amount|floatformat:2 }}
+                        </td>
+                        <td class="{% if item.pnl_percentage >= 0 %}text-success{% else %}text-danger{% endif %}">
+                            {{ item.pnl_percentage|floatformat:2 }}%
+                        </td>
+                        <td>{{ item.holding_days }} days</td>
+                        <td>{{ item.exit_date|date:"M d, Y" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center">No closed positions</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.portfolio-value {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.portfolio-value .label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.portfolio-value .value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.summary-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.summary-icon {
+    font-size: 2.5rem;
+}
+
+.summary-content h3 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.summary-content p {
+    margin: 0.25rem 0 0 0;
+    color: var(--text-secondary);
+}
+
+.summary-content small {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.portfolio-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
+}
+
+.portfolio-section h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+</style>
+{% endblock %}

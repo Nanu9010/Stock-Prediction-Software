@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Analyst Dashboard - Stock Research Platform{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>Analyst Dashboard</h1>
+        <a href="#" class="btn btn-primary">Create New Call</a>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">⏳</div>
+            <div class="stat-content">
+                <h3>{{ pending_calls }}</h3>
+                <p>Pending Approval</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">✅</div>
+            <div class="stat-content">
+                <h3>{{ active_calls }}</h3>
+                <p>Active Calls</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">📊</div>
+            <div class="stat-content">
+                <h3>{{ closed_calls }}</h3>
+                <p>Closed Calls</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">🎯</div>
+            <div class="stat-content">
+                <h3>--</h3>
+                <p>Accuracy Rate</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Calls -->
+    <div class="dashboard-section">
+        <div class="section-header">
+            <h2>My Recent Calls</h2>
+        </div>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Symbol</th>
+                        <th>Action</th>
+                        <th>Type</th>
+                        <th>Entry</th>
+                        <th>Target</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for call in my_calls %}
+                    <tr>
+                        <td><strong>{{ call.symbol }}</strong></td>
+                        <td><span class="badge badge-{{ call.action|lower }}">{{ call.action }}</span></td>
+                        <td><span class="badge badge-{{ call.call_type|lower }}">{{ call.call_type }}</span></td>
+                        <td>₹{{ call.entry_price }}</td>
+                        <td>₹{{ call.target_1 }}</td>
+                        <td><span class="badge badge-{{ call.status|lower }}">{{ call.status }}</span></td>
+                        <td>{{ call.created_at|date:"M d, Y" }}</td>
+                        <td>
+                            <a href="#" class="btn btn-sm btn-outline">View</a>
+                            {% if call.status == 'DRAFT' %}
+                            <a href="#" class="btn btn-sm btn-primary">Edit</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center">No calls created yet</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+.table-responsive {
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th {
+    background: var(--bg-secondary);
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.data-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.data-table tr:hover {
+    background: var(--bg-secondary);
+}
+</style>
+{% endblock %}

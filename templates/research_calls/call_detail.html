@@ -1,0 +1,310 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ call.symbol }} - Research Call Details{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="breadcrumb">
+        <a href="{% url 'research_calls:list' %}">Research Calls</a> / {{ call.symbol }}
+    </div>
+
+    <div class="call-detail-container">
+        <!-- Main Call Info -->
+        <div class="call-main-section">
+            <div class="call-header-detail">
+                <div>
+                    <h1>{{ call.symbol }}</h1>
+                    <div class="badges">
+                        <span class="badge badge-{{ call.action|lower }}">{{ call.action }}</span>
+                        <span class="badge badge-{{ call.call_type|lower }}">{{ call.call_type }}</span>
+                        <span class="badge badge-{{ call.status|lower }}">{{ call.status }}</span>
+                    </div>
+                </div>
+                <div class="call-meta-detail">
+                    <p><strong>Broker:</strong> {{ call.broker.name }}</p>
+                    <p><strong>Published:</strong> {{ call.published_at|date:"M d, Y H:i" }}</p>
+                </div>
+            </div>
+
+            <!-- Price Levels -->
+            <div class="price-levels-section">
+                <h2>Price Levels</h2>
+                <div class="price-levels-grid">
+                    <div class="level-card entry">
+                        <label>Entry Price</label>
+                        <span class="level-price">₹{{ call.entry_price }}</span>
+                    </div>
+                    <div class="level-card target">
+                        <label>Target 1</label>
+                        <span class="level-price">₹{{ call.target_1 }}</span>
+                    </div>
+                    {% if call.target_2 %}
+                    <div class="level-card target">
+                        <label>Target 2</label>
+                        <span class="level-price">₹{{ call.target_2 }}</span>
+                    </div>
+                    {% endif %}
+                    {% if call.target_3 %}
+                    <div class="level-card target">
+                        <label>Target 3</label>
+                        <span class="level-price">₹{{ call.target_3 }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="level-card stoploss">
+                        <label>Stop Loss</label>
+                        <span class="level-price">₹{{ call.stop_loss }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Call Metrics -->
+            <div class="metrics-section">
+                <h2>Call Metrics</h2>
+                <div class="metrics-grid">
+                    <div class="metric-item">
+                        <label>Expected Return</label>
+                        <span class="metric-value text-success">{{ call.expected_return_percentage }}%</span>
+                    </div>
+                    <div class="metric-item">
+                        <label>Risk/Reward Ratio</label>
+                        <span class="metric-value">{{ call.risk_reward_ratio }}</span>
+                    </div>
+                    <div class="metric-item">
+                        <label>Duration</label>
+                        <span class="metric-value">{{ call.duration_days }} days</span>
+                    </div>
+                    <div class="metric-item">
+                        <label>Expiry Date</label>
+                        <span class="metric-value">{{ call.expiry_date|date:"M d, Y" }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rationale -->
+            {% if call.rationale %}
+            <div class="rationale-section">
+                <h2>Rationale</h2>
+                <p>{{ call.rationale }}</p>
+            </div>
+            {% endif %}
+
+            <!-- Actions -->
+            <div class="call-actions-detail">
+                {% if user.role == 'CUSTOMER' %}
+                <button class="btn btn-primary" onclick="addToPortfolio({{ call.id }})">Add to Portfolio</button>
+                <button class="btn btn-outline" onclick="addToWatchlist({{ call.id }})">Add to Watchlist</button>
+                {% endif %}
+                {% if user.role == 'ADMIN' %}
+                    {% if call.status == 'PENDING_APPROVAL' %}
+                    <a href="{% url 'research_calls:approve' call.pk %}" class="btn btn-success">Approve Call</a>
+                    {% endif %}
+                    {% if call.status == 'APPROVED' %}
+                    <a href="{% url 'research_calls:publish' call.pk %}" class="btn btn-primary">Publish Call</a>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="call-sidebar">
+            <!-- Event History -->
+            <div class="events-section">
+                <h3>Event History</h3>
+                <div class="events-timeline">
+                    {% for event in events %}
+                    <div class="event-item">
+                        <div class="event-icon">
+                            {% if event.event_type == 'CREATED' %}📝
+                            {% elif event.event_type == 'APPROVED' %}✅
+                            {% elif event.event_type == 'PUBLISHED' %}📢
+                            {% elif event.event_type == 'TARGET_HIT' %}🎯
+                            {% elif event.event_type == 'STOP_LOSS_HIT' %}🛑
+                            {% elif event.event_type == 'CLOSED' %}🔒
+                            {% else %}📌{% endif %}
+                        </div>
+                        <div class="event-content">
+                            <strong>{{ event.get_event_type_display }}</strong>
+                            <p>{{ event.notes }}</p>
+                            <small>{{ event.timestamp|date:"M d, Y H:i" }}</small>
+                            {% if event.triggered_by %}
+                            <small>by {{ event.triggered_by.get_full_name }}</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-secondary">No events recorded</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.breadcrumb {
+    margin-bottom: 1.5rem;
+    color: var(--text-secondary);
+}
+
+.breadcrumb a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.call-detail-container {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+}
+
+.call-main-section, .call-sidebar {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.call-header-detail {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.call-header-detail h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0 0 1rem 0;
+}
+
+.badges {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.call-meta-detail p {
+    margin: 0.5rem 0;
+}
+
+.price-levels-section, .metrics-section, .rationale-section {
+    margin-bottom: 2rem;
+}
+
+.price-levels-section h2, .metrics-section h2, .rationale-section h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.price-levels-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.level-card {
+    padding: 1.5rem;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.level-card.entry {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.level-card.target {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+}
+
+.level-card.stoploss {
+    background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+    color: white;
+}
+
+.level-card label {
+    display: block;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+    opacity: 0.9;
+}
+
+.level-price {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.metric-item {
+    padding: 1rem;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+}
+
+.metric-item label {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.metric-value {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.call-actions-detail {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.events-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.event-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+}
+
+.event-icon {
+    font-size: 1.5rem;
+}
+
+.event-content strong {
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.event-content p {
+    margin: 0.25rem 0;
+    font-size: 0.875rem;
+}
+
+.event-content small {
+    display: block;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+}
+
+@media (max-width: 768px) {
+    .call-detail-container {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}

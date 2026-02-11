@@ -1,0 +1,181 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block title %}{{ call.symbol }} - Call Details{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <a href="{% url 'admin_panel:calls_list' %}" style="color: var(--color-gray-600); text-decoration: none; font-size: var(--font-size-sm); margin-bottom: var(--spacing-2); display: inline-block;">
+            ← Back to Calls
+        </a>
+        <h1 class="page-title">{{ call.symbol }} - {{ call.get_action_display }}</h1>
+    </div>
+    <div class="page-actions">
+        {% if call.status == 'PENDING' %}
+        <button class="btn btn-success">✓ Approve</button>
+        <button class="btn btn-danger">✗ Reject</button>
+        {% endif %}
+        <a href="{% url 'admin_panel:call_update' call.id %}" class="btn btn-outline-primary">✏️ Edit</a>
+    </div>
+</div>
+
+<div class="grid grid-cols-3" style="gap: var(--spacing-6);">
+    <!-- Main Details -->
+    <div style="grid-column: span 2;">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Call Details</h3>
+            </div>
+            <div class="card-body">
+                <div class="grid grid-cols-2" style="gap: var(--spacing-6);">
+                    <div>
+                        <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-1);">Symbol</label>
+                        <p style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin: 0;">{{ call.symbol }}</p>
+                    </div>
+                    
+                    <div>
+                        <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-1);">Action</label>
+                        <span class="badge {% if call.action == 'BUY' %}badge-success{% else %}badge-danger{% endif %}" style="font-size: var(--font-size-base);">
+                            {{ call.action }}
+                        </span>
+                    </div>
+                    
+                    <div>
+                        <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-1);">Entry Price</label>
+                        <p style="font-size: var(--font-size-lg); font-weight: var(--font-weight-semibold); margin: 0;">₹{{ call.entry_price }}</p>
+                    </div>
+                    
+                    <div>
+                        <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-1);">Target Price</label>
+                        <p style="font-size: var(--font-size-lg); font-weight: var(--font-weight-semibold); color: var(--color-success); margin: 0;">₹{{ call.target_price }}</p>
+                    </div>
+                    
+                    <div>
+                        <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-1);">Stop Loss</label>
+                        <p style="font-size: var(--font-size-lg); font-weight: var(--font-weight-semibold); color: var(--color-danger); margin: 0;">₹{{ call.stop_loss }}</p>
+                    </div>
+                    
+                    <div>
+                        <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-1);">Potential Return</label>
+                        <p style="font-size: var(--font-size-lg); font-weight: var(--font-weight-semibold); color: var(--color-success); margin: 0;">{{ call.potential_return_percentage|floatformat:2 }}%</p>
+                    </div>
+                </div>
+                
+                {% if call.rationale %}
+                <div style="margin-top: var(--spacing-6); padding-top: var(--spacing-6); border-top: 1px solid var(--color-gray-200);">
+                    <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-2);">Rationale</label>
+                    <p style="margin: 0; line-height: 1.6;">{{ call.rationale }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Performance -->
+        {% if call.status == 'CLOSED' %}
+        <div class="card" style="margin-top: var(--spacing-6);">
+            <div class="card-header">
+                <h3 class="card-title">Performance</h3>
+            </div>
+            <div class="card-body">
+                <div class="grid grid-cols-3">
+                    <div>
+                        <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-1);">Exit Price</label>
+                        <p style="font-size: var(--font-size-lg); font-weight: var(--font-weight-semibold); margin: 0;">₹{{ call.exit_price|default:"-" }}</p>
+                    </div>
+                    
+                    <div>
+                        <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-1);">Actual Return</label>
+                        <p style="font-size: var(--font-size-lg); font-weight: var(--font-weight-semibold); {% if call.actual_return_percentage > 0 %}color: var(--color-success);{% else %}color: var(--color-danger);{% endif %} margin: 0;">
+                            {{ call.actual_return_percentage|floatformat:2 }}%
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-1);">Result</label>
+                        {% if call.actual_return_percentage > 0 %}
+                        <span class="badge badge-success">Success</span>
+                        {% else %}
+                        <span class="badge badge-danger">Loss</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Sidebar -->
+    <div>
+        <!-- Status Card -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Status</h3>
+            </div>
+            <div class="card-body">
+                <div style="margin-bottom: var(--spacing-4);">
+                    <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-2);">Current Status</label>
+                    {% if call.status == 'ACTIVE' %}
+                    <span class="badge badge-success" style="font-size: var(--font-size-base);">Active</span>
+                    {% elif call.status == 'PENDING' %}
+                    <span class="badge badge-warning" style="font-size: var(--font-size-base);">Pending Approval</span>
+                    {% elif call.status == 'CLOSED' %}
+                    <span class="badge badge-gray" style="font-size: var(--font-size-base);">Closed</span>
+                    {% else %}
+                    <span class="badge badge-info" style="font-size: var(--font-size-base);">{{ call.status }}</span>
+                    {% endif %}
+                </div>
+                
+                <div style="margin-bottom: var(--spacing-4);">
+                    <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-2);">Call Type</label>
+                    <span class="badge badge-primary">{{ call.call_type }}</span>
+                </div>
+                
+                <div style="margin-bottom: var(--spacing-4);">
+                    <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-2);">Timeframe</label>
+                    <p style="margin: 0;">{{ call.timeframe }}</p>
+                </div>
+                
+                {% if call.expiry_date %}
+                <div>
+                    <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-2);">Expiry Date</label>
+                    <p style="margin: 0;">{{ call.expiry_date|date:"M d, Y" }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Broker & Analyst -->
+        <div class="card" style="margin-top: var(--spacing-6);">
+            <div class="card-header">
+                <h3 class="card-title">Broker & Analyst</h3>
+            </div>
+            <div class="card-body">
+                <div style="margin-bottom: var(--spacing-4);">
+                    <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-2);">Broker</label>
+                    <a href="{% url 'admin_panel:broker_detail' call.broker.id %}" style="color: var(--color-primary); text-decoration: none; font-weight: 600;">
+                        {{ call.broker.name }}
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Timestamps -->
+        <div class="card" style="margin-top: var(--spacing-6);">
+            <div class="card-header">
+                <h3 class="card-title">Timeline</h3>
+            </div>
+            <div class="card-body">
+                <div style="margin-bottom: var(--spacing-3);">
+                    <label style="font-size: var(--font-size-xs); color: var(--color-gray-600); display: block;">Created</label>
+                    <p style="margin: 0; font-size: var(--font-size-sm);">{{ call.created_at|date:"M d, Y H:i" }}</p>
+                </div>
+                
+                <div>
+                    <label style="font-size: var(--font-size-xs); color: var(--color-gray-600); display: block;">Last Updated</label>
+                    <p style="margin: 0; font-size: var(--font-size-sm);">{{ call.updated_at|date:"M d, Y H:i" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

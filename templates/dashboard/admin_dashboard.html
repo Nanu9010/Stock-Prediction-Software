@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Admin Dashboard - Stock Research Platform{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>Admin Dashboard</h1>
+        <p class="text-secondary">System Overview & Management</p>
+    </div>
+
+    <!-- System Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-content">
+                <h3>{{ total_users }}</h3>
+                <p>Total Users</p>
+                <small>{{ customers}} customers</small>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">🏢</div>
+            <div class="stat-content">
+                <h3>{{ total_brokers }}</h3>
+                <p>Active Brokers</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">📞</div>
+            <div class="stat-content">
+                <h3>{{ total_calls }}</h3>
+                <p>Total Calls</p>
+                <small>{{ active_calls }} active</small>
+            </div>
+        </div>
+        <div class="stat-card alert">
+            <div class="stat-icon">⏳</div>
+            <div class="stat-content">
+                <h3>{{ pending_approvals.count }}</h3>
+                <p>Pending Approvals</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        <!-- Pending Approvals -->
+        <div class="dashboard-section full-width">
+            <div class="section-header">
+                <h2>Pending Call Approvals</h2>
+            </div>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Broker</th>
+                            <th>Action</th>
+                            <th>Entry</th>
+                            <th>Target</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for call in pending_approvals %}
+                        <tr>
+                            <td><strong>{{ call.symbol }}</strong></td>
+                            <td>{{ call.broker.name }}</td>
+                            <td><span class="badge badge-{{ call.action|lower }}">{{ call.action }}</span></td>
+                            <td>₹{{ call.entry_price }}</td>
+                            <td>₹{{ call.target_1 }}</td>
+                            <td>{{ call.created_at|date:"M d, H:i" }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-success" onclick="approveCall({{ call.id }})">Approve</button>
+                                <button class="btn btn-sm btn-danger" onclick="rejectCall({{ call.id }})">Reject</button>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center">No pending approvals</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Recent Calls -->
+        <div class="dashboard-section full-width">
+            <div class="section-header">
+                <h2>Recent Calls</h2>
+            </div>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Broker</th>
+                            <th>Status</th>
+                            <th>Published</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for call in recent_calls %}
+                        <tr>
+                            <td><strong>{{ call.symbol }}</strong></td>
+                            <td>{{ call.broker.name }}</td>
+                            <td><span class="badge badge-{{ call.status|lower }}">{{ call.status }}</span></td>
+                            <td>{{ call.published_at|date:"M d, Y H:i"|default:"Not published" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center">No recent calls</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.full-width {
+    grid-column: 1 / -1;
+}
+
+.stat-card.alert {
+    border-left: 4px solid var(--warning-color);
+}
+</style>
+
+<script>
+function approveCall(callId) {
+    if (confirm('Approve this research call?')) {
+        // TODO: Implement approval
+        alert('Approval functionality - Call ID: ' + callId);
+    }
+}
+
+function rejectCall(callId) {
+    if (confirm('Reject this research call?')) {
+        // TODO: Implement rejection
+        alert('Rejection functionality - Call ID: ' + callId);
+    }
+}
+</script>
+{% endblock %}

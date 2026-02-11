@@ -1,0 +1,196 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block title %}{{ broker.name }} - Broker Details{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <a href="{% url 'admin_panel:brokers_list' %}" style="color: var(--color-gray-600); text-decoration: none; font-size: var(--font-size-sm); margin-bottom: var(--spacing-2); display: inline-block;">
+            ← Back to Brokers
+        </a>
+        <h1 class="page-title">{{ broker.name }}</h1>
+    </div>
+    <div class="page-actions">
+        {% if not broker.is_verified %}
+        <button class="btn btn-success">✓ Verify Broker</button>
+        {% endif %}
+        <button class="btn btn-outline-primary">✏️ Edit</button>
+    </div>
+</div>
+
+<div class="grid grid-cols-3" style="gap: var(--spacing-6);">
+    <!-- Main Details -->
+    <div style="grid-column: span 2;">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Broker Information</h3>
+            </div>
+            <div class="card-body">
+                <div class="grid grid-cols-2" style="gap: var(--spacing-6);">
+                    <div>
+                        <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-1);">Broker Name</label>
+                        <p style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin: 0;">{{ broker.name }}</p>
+                    </div>
+                    
+                    <div>
+                        <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-1);">SEBI Registration</label>
+                        <p style="font-size: var(--font-size-lg); font-weight: var(--font-weight-semibold); margin: 0;">{{ broker.sebi_registration_no|default:"-" }}</p>
+                    </div>
+                    
+                    <div>
+                        <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-1);">Overall Accuracy</label>
+                        <p style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--color-success); margin: 0;">
+                            {{ broker.overall_accuracy|floatformat:2 }}%
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-1);">Total Calls</label>
+                        <p style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); margin: 0;">
+                            {{ broker.research_calls.count }}
+                        </p>
+                    </div>
+                </div>
+                
+                {% if broker.description %}
+                <div style="margin-top: var(--spacing-6); padding-top: var(--spacing-6); border-top: 1px solid var(--color-gray-200);">
+                    <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-2);">Description</label>
+                    <p style="margin: 0; line-height: 1.6;">{{ broker.description }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Recent Calls -->
+        <div class="card" style="margin-top: var(--spacing-6);">
+            <div class="card-header">
+                <h3 class="card-title">Recent Research Calls</h3>
+            </div>
+            <div class="card-body">
+                {% if broker.research_calls.all %}
+                <div class="data-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Symbol</th>
+                                <th>Action</th>
+                                <th>Entry</th>
+                                <th>Target</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for call in broker.research_calls.all|slice:":10" %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'admin_panel:call_detail' call.id %}" style="color: var(--color-primary); text-decoration: none; font-weight: 600;">
+                                        {{ call.symbol }}
+                                    </a>
+                                </td>
+                                <td>
+                                    <span class="badge {% if call.action == 'BUY' %}badge-success{% else %}badge-danger{% endif %}">
+                                        {{ call.action }}
+                                    </span>
+                                </td>
+                                <td>₹{{ call.entry_price }}</td>
+                                <td>₹{{ call.target_price }}</td>
+                                <td>
+                                    {% if call.status == 'ACTIVE' %}
+                                    <span class="badge badge-success">Active</span>
+                                    {% elif call.status == 'PENDING' %}
+                                    <span class="badge badge-warning">Pending</span>
+                                    {% else %}
+                                    <span class="badge badge-gray">{{ call.status }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ call.created_at|date:"M d" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p style="text-align: center; color: var(--color-gray-600); padding: var(--spacing-8);">No calls yet</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sidebar -->
+    <div>
+        <!-- Status Card -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Status</h3>
+            </div>
+            <div class="card-body">
+                <div style="margin-bottom: var(--spacing-4);">
+                    <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-2);">Verification Status</label>
+                    {% if broker.is_verified %}
+                    <span class="badge badge-success" style="font-size: var(--font-size-base);">✓ Verified</span>
+                    {% else %}
+                    <span class="badge badge-warning" style="font-size: var(--font-size-base);">⏳ Pending Verification</span>
+                    {% endif %}
+                </div>
+                
+                <div>
+                    <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-2);">Active Status</label>
+                    {% if broker.is_active %}
+                    <span class="badge badge-success">Active</span>
+                    {% else %}
+                    <span class="badge badge-danger">Inactive</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Performance Stats -->
+        <div class="card" style="margin-top: var(--spacing-6);">
+            <div class="card-header">
+                <h3 class="card-title">Performance</h3>
+            </div>
+            <div class="card-body">
+                <div style="margin-bottom: var(--spacing-4);">
+                    <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-1);">Short Term</label>
+                    <p style="font-size: var(--font-size-lg); font-weight: var(--font-weight-semibold); color: var(--color-success); margin: 0;">
+                        {{ broker.short_term_accuracy|floatformat:1 }}%
+                    </p>
+                </div>
+                
+                <div style="margin-bottom: var(--spacing-4);">
+                    <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-1);">Medium Term</label>
+                    <p style="font-size: var(--font-size-lg); font-weight: var(--font-weight-semibold); color: var(--color-success); margin: 0;">
+                        {{ broker.medium_term_accuracy|floatformat:1 }}%
+                    </p>
+                </div>
+                
+                <div>
+                    <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-1);">Long Term</label>
+                    <p style="font-size: var(--font-size-lg); font-weight: var(--font-weight-semibold); color: var(--color-success); margin: 0;">
+                        {{ broker.long_term_accuracy|floatformat:1 }}%
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Timestamps -->
+        <div class="card" style="margin-top: var(--spacing-6);">
+            <div class="card-header">
+                <h3 class="card-title">Timeline</h3>
+            </div>
+            <div class="card-body">
+                <div style="margin-bottom: var(--spacing-3);">
+                    <label style="font-size: var(--font-size-xs); color: var(--color-gray-600); display: block;">Created</label>
+                    <p style="margin: 0; font-size: var(--font-size-sm);">{{ broker.created_at|date:"M d, Y H:i" }}</p>
+                </div>
+                
+                <div>
+                    <label style="font-size: var(--font-size-xs); color: var(--color-gray-600); display: block;">Last Updated</label>
+                    <p style="margin: 0; font-size: var(--font-size-sm);">{{ broker.updated_at|date:"M d, Y H:i" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

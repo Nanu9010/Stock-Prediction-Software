@@ -1,0 +1,450 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Markets - Stock Prediction System{% endblock %}
+
+{% block extra_css %}
+<style>
+    .markets-container {
+        padding: 32px 0;
+        background-color: #f8f9fa;
+        min-height: 100vh;
+    }
+    
+    .section-header {
+        margin-bottom: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .section-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1f2937;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .live-indicator {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        background-color: #ef4444;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+        70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    /* Market Heatmap Grid */
+    .market-heatmap {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        margin-bottom: 48px;
+    }
+    
+    .heatmap-card {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    
+    .heatmap-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .heatmap-title {
+        font-size: 18px;
+        font-weight: 600;
+    }
+    
+    .heatmap-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+    }
+    
+    .stock-box {
+        padding: 12px;
+        border-radius: 8px;
+        color: white;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-height: 80px;
+        transition: transform 0.2s;
+        cursor: pointer;
+    }
+    
+    .stock-box:hover {
+        transform: scale(1.05);
+        z-index: 10;
+    }
+    
+    .stock-symbol {
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+    
+    .stock-change {
+        font-size: 14px;
+        font-weight: 600;
+    }
+    
+    /* Gainer/Loser Colors */
+    .bg-green-1 { background-color: #059669; } /* Strong Buy */
+    .bg-green-2 { background-color: #10b981; }
+    .bg-green-3 { background-color: #34d399; }
+    
+    .bg-red-1 { background-color: #dc2626; } /* Strong Sell */
+    .bg-red-2 { background-color: #ef4444; }
+    .bg-red-3 { background-color: #f87171; }
+
+    /* Vertical Widgets Section */
+    .widgets-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 24px;
+    }
+    
+    .widget-card {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .widget-header {
+        padding: 20px;
+        font-weight: 700;
+        font-size: 18px;
+        color: white;
+    }
+    
+    .header-commodity { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    .header-ipo { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+    .header-etf { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+    
+    .widget-list {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+    }
+    
+    .widget-item {
+        padding: 16px 20px;
+        border-bottom: 1px solid #f3f4f6;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: background 0.2s;
+    }
+    
+    .widget-item:last-child {
+        border-bottom: none;
+    }
+    
+    .widget-item:hover {
+        background-color: #f9fafb;
+    }
+    
+    .item-name {
+        font-weight: 600;
+        color: #374151;
+        display: block;
+    }
+    
+    .item-sub {
+        font-size: 12px;
+        color: #6b7280;
+    }
+    
+    .item-value {
+        text-align: right;
+        font-weight: 600;
+    }
+    
+    .text-green { color: #059669; }
+    .text-red { color: #dc2626; }
+    
+    @media (max-width: 1024px) {
+        .market-heatmap {
+            grid-template-columns: 1fr;
+        }
+        
+        .widgets-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="markets-container">
+    <div class="container">
+        <!-- Introduction -->
+        <div class="section-header">
+            <h1 class="section-title">
+                Market Overview
+                <span class="live-indicator" title="Live Market Data"></span>
+            </h1>
+            <div class="text-muted">{{ now|date:"l, d F Y" }}</div>
+        </div>
+
+        <!-- Heatmap Section -->
+        <div class="market-heatmap">
+            <!-- Top Gainers -->
+            <div class="heatmap-card">
+                <div class="heatmap-header">
+                    <div class="heatmap-title text-success">Top Gainers (NIFTY 50)</div>
+                    <span class="badge bg-success bg-opacity-10 text-success">Bullish</span>
+                </div>
+                <div class="heatmap-grid">
+                    <div class="stock-box bg-green-1">
+                        <span class="stock-symbol">RELIANCE</span>
+                        <span class="stock-change">+4.2%</span>
+                    </div>
+                    <div class="stock-box bg-green-1">
+                        <span class="stock-symbol">HDFCBANK</span>
+                        <span class="stock-change">+3.8%</span>
+                    </div>
+                    <div class="stock-box bg-green-2">
+                        <span class="stock-symbol">INFY</span>
+                        <span class="stock-change">+2.5%</span>
+                    </div>
+                    <div class="stock-box bg-green-2">
+                        <span class="stock-symbol">ICICIBANK</span>
+                        <span class="stock-change">+2.1%</span>
+                    </div>
+                    <div class="stock-box bg-green-2">
+                        <span class="stock-symbol">TCS</span>
+                        <span class="stock-change">+1.9%</span>
+                    </div>
+                    <div class="stock-box bg-green-3">
+                        <span class="stock-symbol">ITC</span>
+                        <span class="stock-change">+1.5%</span>
+                    </div>
+                    <div class="stock-box bg-green-3">
+                        <span class="stock-symbol">SBIN</span>
+                        <span class="stock-change">+1.2%</span>
+                    </div>
+                    <div class="stock-box bg-green-3">
+                        <span class="stock-symbol">LT</span>
+                        <span class="stock-change">+1.1%</span>
+                    </div>
+                    <!-- More placeholders for grid effect -->
+                    <div class="stock-box bg-green-3"><span class="stock-symbol">BHARTI</span><span class="stock-change">+0.9%</span></div>
+                    <div class="stock-box bg-green-3"><span class="stock-symbol">KOTAK</span><span class="stock-change">+0.8%</span></div>
+                    <div class="stock-box bg-green-3"><span class="stock-symbol">WIPRO</span><span class="stock-change">+0.7%</span></div>
+                    <div class="stock-box bg-green-3"><span class="stock-symbol">HCLTECH</span><span class="stock-change">+0.5%</span></div>
+                </div>
+            </div>
+
+            <!-- Top Losers -->
+            <div class="heatmap-card">
+                <div class="heatmap-header">
+                    <div class="heatmap-title text-danger">Top Losers (NIFTY 50)</div>
+                    <span class="badge bg-danger bg-opacity-10 text-danger">Bearish</span>
+                </div>
+                <div class="heatmap-grid">
+                    <div class="stock-box bg-red-1">
+                        <span class="stock-symbol">ADANIENT</span>
+                        <span class="stock-change">-5.2%</span>
+                    </div>
+                    <div class="stock-box bg-red-1">
+                        <span class="stock-symbol">TATAMOTORS</span>
+                        <span class="stock-change">-4.1%</span>
+                    </div>
+                    <div class="stock-box bg-red-2">
+                        <span class="stock-symbol">MARUTI</span>
+                        <span class="stock-change">-3.5%</span>
+                    </div>
+                    <div class="stock-box bg-red-2">
+                        <span class="stock-symbol">M&M</span>
+                        <span class="stock-change">-2.8%</span>
+                    </div>
+                    <div class="stock-box bg-red-2">
+                        <span class="stock-symbol">SUNPHARMA</span>
+                        <span class="stock-change">-2.2%</span>
+                    </div>
+                    <div class="stock-box bg-red-3">
+                        <span class="stock-symbol">CIPLA</span>
+                        <span class="stock-change">-1.8%</span>
+                    </div>
+                    <div class="stock-box bg-red-3">
+                        <span class="stock-symbol">DRREDDY</span>
+                        <span class="stock-change">-1.5%</span>
+                    </div>
+                    <div class="stock-box bg-red-3">
+                        <span class="stock-symbol">DIVISLAB</span>
+                        <span class="stock-change">-1.2%</span>
+                    </div>
+                    <!-- More placeholders -->
+                    <div class="stock-box bg-red-3"><span class="stock-symbol">POWERGRID</span><span class="stock-change">-0.9%</span></div>
+                    <div class="stock-box bg-red-3"><span class="stock-symbol">NTPC</span><span class="stock-change">-0.8%</span></div>
+                    <div class="stock-box bg-red-3"><span class="stock-symbol">ONGC</span><span class="stock-change">-0.7%</span></div>
+                    <div class="stock-box bg-red-3"><span class="stock-symbol">BPCL</span><span class="stock-change">-0.5%</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Widgets Section -->
+        <div class="widgets-grid">
+            <!-- Commodity Widget -->
+            <div class="widget-card">
+                <div class="widget-header header-commodity">
+                    Commodity Snapshot
+                </div>
+                <ul class="widget-list">
+                    <li class="widget-item">
+                        <div>
+                            <span class="item-name">Gold (10g)</span>
+                            <span class="item-sub">MCX Future</span>
+                        </div>
+                        <div class="item-value text-green">
+                            <div>₹62,450</div>
+                            <small>+0.45%</small>
+                        </div>
+                    </li>
+                    <li class="widget-item">
+                        <div>
+                            <span class="item-name">Silver (1kg)</span>
+                            <span class="item-sub">MCX Future</span>
+                        </div>
+                        <div class="item-value text-red">
+                            <div>₹74,200</div>
+                            <small>-0.12%</small>
+                        </div>
+                    </li>
+                    <li class="widget-item">
+                        <div>
+                            <span class="item-name">Crude Oil</span>
+                            <span class="item-sub">Brent</span>
+                        </div>
+                        <div class="item-value text-green">
+                            <div>$82.40</div>
+                            <small>+1.2%</small>
+                        </div>
+                    </li>
+                    <li class="widget-item">
+                        <div>
+                            <span class="item-name">Natural Gas</span>
+                            <span class="item-sub">MCX</span>
+                        </div>
+                        <div class="item-value text-red">
+                            <div>₹145.2</div>
+                            <small>-2.5%</small>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- IPO Widget -->
+            <div class="widget-card">
+                <div class="widget-header header-ipo">
+                    Upcoming IPOs
+                </div>
+                <ul class="widget-list">
+                    <li class="widget-item">
+                        <div>
+                            <span class="item-name">Tata Technologies</span>
+                            <span class="item-sub">Tech / Auto</span>
+                        </div>
+                        <div class="item-value">
+                            <div>₹475 - ₹500</div>
+                            <small class="text-muted">Opens 22 Nov</small>
+                        </div>
+                    </li>
+                    <li class="widget-item">
+                        <div>
+                            <span class="item-name">Mamaearth</span>
+                            <span class="item-sub">Consumer Goods</span>
+                        </div>
+                        <div class="item-value">
+                            <div>₹308 - ₹324</div>
+                            <small class="text-muted">Closes 24 Nov</small>
+                        </div>
+                    </li>
+                    <li class="widget-item">
+                        <div>
+                            <span class="item-name">Ideaforge</span>
+                            <span class="item-sub">Drone Tech</span>
+                        </div>
+                        <div class="item-value">
+                            <div>₹638 - ₹672</div>
+                            <small class="text-muted">Listed</small>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- ETF Widget -->
+            <div class="widget-card">
+                <div class="widget-header header-etf">
+                    Popular ETFs
+                </div>
+                <ul class="widget-list">
+                    <li class="widget-item">
+                        <div>
+                            <span class="item-name">NIFTYBEES</span>
+                            <span class="item-sub">Nippon India</span>
+                        </div>
+                        <div class="item-value text-green">
+                            <div>₹234.50</div>
+                            <small>+0.8%</small>
+                        </div>
+                    </li>
+                    <li class="widget-item">
+                        <div>
+                            <span class="item-name">BANKBEES</span>
+                            <span class="item-sub">Nippon India</span>
+                        </div>
+                        <div class="item-value text-green">
+                            <div>₹468.20</div>
+                            <small>+1.1%</small>
+                        </div>
+                    </li>
+                    <li class="widget-item">
+                        <div>
+                            <span class="item-name">GOLDBEES</span>
+                            <span class="item-sub">Nippon India</span>
+                        </div>
+                        <div class="item-value text-green">
+                            <div>₹54.30</div>
+                            <small>+0.3%</small>
+                        </div>
+                    </li>
+                     <li class="widget-item">
+                        <div>
+                            <span class="item-name">SILVERBEES</span>
+                            <span class="item-sub">Nippon India</span>
+                        </div>
+                        <div class="item-value text-red">
+                            <div>₹72.10</div>
+                            <small>-0.2%</small>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,195 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block title %}Dashboard - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Dashboard Overview</h1>
+    <div class="page-actions">
+        <button class="btn btn-primary">
+            <span>📊</span>
+            Generate Report
+        </button>
+    </div>
+</div>
+
+<!-- Stats Grid -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon" style="background: #dbeafe; color: #2563eb;">👥</div>
+        </div>
+        <div class="stat-value">{{ total_users|default:0 }}</div>
+        <div class="stat-label">Total Users</div>
+        <div class="stat-change positive">
+            <span>↑</span>
+            <span>+{{ new_users_30d|default:0 }} this month</span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon" style="background: #d1fae5; color: #059669;">📈</div>
+        <div class="stat-value">{{ total_calls|default:0 }}</div>
+        <div class="stat-label">Research Calls</div>
+        <div class="stat-change positive">
+            <span>↑</span>
+            <span>{{ active_calls|default:0 }} active</span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon" style="background: #fef3c7; color: #d97706;">⏳</div>
+        <div class="stat-value">{{ pending_calls|default:0 }}</div>
+        <div class="stat-label">Pending Approvals</div>
+        {% if pending_calls > 0 %}
+        <div class="stat-change negative">
+            <span>!</span>
+            <span>Requires attention</span>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon" style="background: #d1fae5; color: #059669;">✓</div>
+        <div class="stat-value">{{ success_rate|floatformat:1 }}%</div>
+        <div class="stat-label">Success Rate</div>
+        <div class="stat-change positive">
+            <span>↑</span>
+            <span>All time</span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon" style="background: #dbeafe; color: #2563eb;">🏢</div>
+        <div class="stat-value">{{ total_brokers|default:0 }}</div>
+        <div class="stat-label">Total Brokers</div>
+        <div class="stat-change">
+            <span>✓</span>
+            <span>{{ verified_brokers|default:0 }} verified</span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon" style="background: #fef3c7; color: #d97706;">👨‍💼</div>
+        <div class="stat-value">{{ active_users|default:0 }}</div>
+        <div class="stat-label">Active Users</div>
+        <div class="stat-change positive">
+            <span>↑</span>
+            <span>Last 30 days</span>
+        </div>
+    </div>
+</div>
+
+<!-- Content Grid -->
+<div class="grid grid-cols-2" style="gap: var(--spacing-6); margin-top: var(--spacing-8);">
+    <!-- Top Brokers -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Top Performing Brokers</h3>
+        </div>
+        <div class="card-body">
+            {% if top_brokers %}
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Broker</th>
+                            <th>Accuracy</th>
+                            <th>Total Calls</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for broker in top_brokers %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'admin_panel:broker_detail' broker.id %}" style="color: var(--color-primary); text-decoration: none; font-weight: 600;">
+                                    {{ broker.name }}
+                                </a>
+                            </td>
+                            <td>
+                                <span class="badge badge-success">{{ broker.overall_accuracy|floatformat:1 }}%</span>
+                            </td>
+                            <td>{{ broker.research_calls.count }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p style="text-align: center; color: var(--color-gray-600); padding: var(--spacing-8);">No brokers found</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Recent Calls -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Recent Research Calls</h3>
+        </div>
+        <div class="card-body">
+            {% if recent_calls %}
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Broker</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for call in recent_calls %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'admin_panel:call_detail' call.id %}" style="color: var(--color-primary); text-decoration: none; font-weight: 600;">
+                                    {{ call.symbol }}
+                                </a>
+                            </td>
+                            <td>{{ call.broker.name }}</td>
+                            <td>
+                                {% if call.status == 'ACTIVE' %}
+                                <span class="badge badge-success">Active</span>
+                                {% elif call.status == 'PENDING' %}
+                                <span class="badge badge-warning">Pending</span>
+                                {% elif call.status == 'CLOSED' %}
+                                <span class="badge badge-gray">Closed</span>
+                                {% else %}
+                                <span class="badge badge-info">{{ call.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge {% if call.action == 'BUY' %}badge-success{% else %}badge-danger{% endif %}">
+                                    {{ call.action }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p style="text-align: center; color: var(--color-gray-600); padding: var(--spacing-8);">No recent calls</p>
+            {% endif %}
+        </div>
+        <div class="card-footer">
+            <a href="{% url 'admin_panel:calls_list' %}" class="btn btn-outline-primary btn-sm">View All Calls →</a>
+        </div>
+    </div>
+</div>
+
+<!-- Pending Approvals -->
+{% if pending_approvals > 0 %}
+<div class="card" style="margin-top: var(--spacing-6); border-left: 4px solid var(--color-warning);">
+    <div class="card-header">
+        <h3 class="card-title">⚠️ Pending Approvals</h3>
+    </div>
+    <div class="card-body">
+        <p>You have <strong>{{ pending_approvals }}</strong> research calls waiting for approval.</p>
+        <a href="{% url 'admin_panel:calls_list' %}?status=PENDING" class="btn btn-warning" style="margin-top: var(--spacing-4);">
+            Review Pending Calls
+        </a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

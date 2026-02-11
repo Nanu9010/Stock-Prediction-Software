@@ -1,0 +1,125 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block title %}Users - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Users Management</h1>
+    <div class="page-actions">
+        <a href="#" class="btn btn-outline-primary">
+            <span>📥</span>
+            Export
+        </a>
+        <a href="#" class="btn btn-primary">
+            <span>➕</span>
+            Add User
+        </a>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="filters-bar">
+    <form method="get" style="display: flex; align-items: center; gap: var(--spacing-4); flex: 1;">
+        <div class="filter-group">
+            <label>Role</label>
+            <select name="role" class="form-select" onchange="this.form.submit()">
+                <option value="">All Roles</option>
+                <option value="CUSTOMER" {% if request.GET.role == 'CUSTOMER' %}selected{% endif %}>Customer</option>
+                <option value="ANALYST" {% if request.GET.role == 'ANALYST' %}selected{% endif %}>Analyst</option>
+                <option value="ADMIN" {% if request.GET.role == 'ADMIN' %}selected{% endif %}>Admin</option>
+            </select>
+        </div>
+        
+        <div class="filter-group" style="flex: 1;">
+            <label>Search</label>
+            <input type="text" name="search" class="form-input" placeholder="Search email or name..." value="{{ request.GET.search }}">
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Search</button>
+        {% if request.GET.role or request.GET.search %}
+        <a href="{% url 'admin_panel:users_list' %}" class="btn btn-outline-secondary">Clear</a>
+        {% endif %}
+    </form>
+</div>
+
+<!-- Users Table -->
+<div class="card">
+    <div class="data-table">
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Joined</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>#{{ user.id }}</td>
+                        <td>
+                            <a href="{% url 'admin_panel:user_detail' user.id %}" style="color: var(--color-primary); text-decoration: none; font-weight: 600;">
+                                {{ user.get_full_name }}
+                            </a>
+                        </td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            {% if user.role == 'ADMIN' %}
+                            <span class="badge badge-danger">Admin</span>
+                            {% elif user.role == 'ANALYST' %}
+                            <span class="badge badge-info">Analyst</span>
+                            {% else %}
+                            <span class="badge badge-primary">Customer</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if user.is_active %}
+                            <span class="badge badge-success">Active</span>
+                            {% else %}
+                            <span class="badge badge-gray">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ user.created_at|date:"M d, Y" }}</td>
+                        <td>
+                            <div style="display: flex; gap: var(--spacing-2);">
+                                <a href="{% url 'admin_panel:user_detail' user.id %}" class="btn btn-sm btn-outline-primary" title="View">👁️</a>
+                                <button class="btn btn-sm btn-outline-secondary" title="Edit">✏️</button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: var(--spacing-8); color: var(--color-gray-600);">
+                            No users found
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    {% if is_paginated %}
+    <div class="card-footer">
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+            <a href="?page=1{% if request.GET.role %}&role={{ request.GET.role }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" class="pagination-item">«</a>
+            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.role %}&role={{ request.GET.role }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" class="pagination-item">‹</a>
+            {% endif %}
+            
+            <span class="pagination-item is-active">{{ page_obj.number }}</span>
+            
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.role %}&role={{ request.GET.role }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" class="pagination-item">›</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.role %}&role={{ request.GET.role }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" class="pagination-item">»</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

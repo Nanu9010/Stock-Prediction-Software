@@ -1,0 +1,200 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block title %}{{ user_detail.get_full_name }} - User Details{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <a href="{% url 'admin_panel:users_list' %}" style="color: var(--color-gray-600); text-decoration: none; font-size: var(--font-size-sm); margin-bottom: var(--spacing-2); display: inline-block;">
+            ← Back to Users
+        </a>
+        <h1 class="page-title">{{ user_detail.get_full_name }}</h1>
+    </div>
+    <div class="page-actions">
+        <button class="btn btn-outline-primary">✏️ Edit</button>
+        {% if user_detail.is_active %}
+        <button class="btn btn-danger">🚫 Suspend</button>
+        {% else %}
+        <button class="btn btn-success">✓ Activate</button>
+        {% endif %}
+    </div>
+</div>
+
+<div class="grid grid-cols-3" style="gap: var(--spacing-6);">
+    <!-- Main Details -->
+    <div style="grid-column: span 2;">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">User Information</h3>
+            </div>
+            <div class="card-body">
+                <div class="grid grid-cols-2" style="gap: var(--spacing-6);">
+                    <div>
+                        <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-1);">Full Name</label>
+                        <p style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin: 0;">{{ user_detail.get_full_name }}</p>
+                    </div>
+                    
+                    <div>
+                        <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-1);">Email</label>
+                        <p style="font-size: var(--font-size-lg); margin: 0;">{{ user_detail.email }}</p>
+                    </div>
+                    
+                    <div>
+                        <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-1);">Phone</label>
+                        <p style="font-size: var(--font-size-base); margin: 0;">{{ user_detail.phone_number|default:"-" }}</p>
+                    </div>
+                    
+                    <div>
+                        <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-1);">Role</label>
+                        {% if user_detail.role == 'ADMIN' %}
+                        <span class="badge badge-danger" style="font-size: var(--font-size-base);">Admin</span>
+                        {% elif user_detail.role == 'ANALYST' %}
+                        <span class="badge badge-info" style="font-size: var(--font-size-base);">Analyst</span>
+                        {% else %}
+                        <span class="badge badge-primary" style="font-size: var(--font-size-base);">Customer</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Portfolio Summary -->
+        {% if portfolio %}
+        <div class="card" style="margin-top: var(--spacing-6);">
+            <div class="card-header">
+                <h3 class="card-title">Portfolio Summary</h3>
+            </div>
+            <div class="card-body">
+                <div class="grid grid-cols-3" style="gap: var(--spacing-6); margin-bottom: var(--spacing-6);">
+                    <div>
+                        <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-1);">Total Invested</label>
+                        <p style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin: 0;">₹{{ portfolio.total_invested|floatformat:2 }}</p>
+                    </div>
+                    
+                    <div>
+                        <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-1);">Current Value</label>
+                        <p style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin: 0;">₹{{ portfolio.current_value|floatformat:2 }}</p>
+                    </div>
+                    
+                    <div>
+                        <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-1);">Total P&L</label>
+                        <p style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); {% if portfolio.total_profit_loss >= 0 %}color: var(--color-success);{% else %}color: var(--color-danger);{% endif %} margin: 0;">
+                            ₹{{ portfolio.total_profit_loss|floatformat:2 }}
+                        </p>
+                    </div>
+                </div>
+                
+                {% if portfolio_items %}
+                <div class="data-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Symbol</th>
+                                <th>Quantity</th>
+                                <th>Entry</th>
+                                <th>Current</th>
+                                <th>P&L</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in portfolio_items %}
+                            <tr>
+                                <td style="font-weight: 600;">{{ item.research_call.symbol }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>₹{{ item.entry_price }}</td>
+                                <td>₹{{ item.current_price|default:"-" }}</td>
+                                <td style="{% if item.profit_loss >= 0 %}color: var(--color-success);{% else %}color: var(--color-danger);{% endif %} font-weight: 600;">
+                                    ₹{{ item.profit_loss|floatformat:2 }}
+                                </td>
+                                <td>
+                                    {% if item.status == 'ACTIVE' %}
+                                    <span class="badge badge-success">Active</span>
+                                    {% else %}
+                                    <span class="badge badge-gray">Closed</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Sidebar -->
+    <div>
+        <!-- Status Card -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Account Status</h3>
+            </div>
+            <div class="card-body">
+                <div style="margin-bottom: var(--spacing-4);">
+                    <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-2);">Status</label>
+                    {% if user_detail.is_active %}
+                    <span class="badge badge-success" style="font-size: var(--font-size-base);">Active</span>
+                    {% else %}
+                    <span class="badge badge-danger" style="font-size: var(--font-size-base);">Inactive</span>
+                    {% endif %}
+                </div>
+                
+                <div style="margin-bottom: var(--spacing-4);">
+                    <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-2);">Email Verified</label>
+                    {% if user_detail.email_verified %}
+                    <span class="badge badge-success">✓ Verified</span>
+                    {% else %}
+                    <span class="badge badge-warning">⏳ Pending</span>
+                    {% endif %}
+                </div>
+                
+                <div>
+                    <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-2);">Last Login</label>
+                    <p style="margin: 0; font-size: var(--font-size-sm);">
+                        {{ user_detail.last_login|date:"M d, Y H:i"|default:"Never" }}
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Timestamps -->
+        <div class="card" style="margin-top: var(--spacing-6);">
+            <div class="card-header">
+                <h3 class="card-title">Timeline</h3>
+            </div>
+            <div class="card-body">
+                <div style="margin-bottom: var(--spacing-3);">
+                    <label style="font-size: var(--font-size-xs); color: var(--color-gray-600); display: block;">Joined</label>
+                    <p style="margin: 0; font-size: var(--font-size-sm);">{{ user_detail.created_at|date:"M d, Y H:i" }}</p>
+                </div>
+                
+                <div>
+                    <label style="font-size: var(--font-size-xs); color: var(--color-gray-600); display: block;">Last Updated</label>
+                    <p style="margin: 0; font-size: var(--font-size-sm);">{{ user_detail.updated_at|date:"M d, Y H:i" }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="card" style="margin-top: var(--spacing-6);">
+            <div class="card-header">
+                <h3 class="card-title">Quick Actions</h3>
+            </div>
+            <div class="card-body">
+                <button class="btn btn-outline-primary btn-sm" style="width: 100%; margin-bottom: var(--spacing-2);">
+                    📧 Send Email
+                </button>
+                <button class="btn btn-outline-secondary btn-sm" style="width: 100%; margin-bottom: var(--spacing-2);">
+                    🔑 Reset Password
+                </button>
+                <button class="btn btn-outline-warning btn-sm" style="width: 100%;">
+                    📊 View Activity Log
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

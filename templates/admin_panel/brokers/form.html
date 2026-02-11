@@ -1,0 +1,277 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block title %}
+    {% if form.instance.pk %}Edit Broker{% else %}New Broker{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="modern-form-container">
+    <div class="form-header">
+        <h1 class="form-title">{% if form.instance.pk %}Edit Broker{% else %}Create Broker{% endif %}</h1>
+        <p class="form-subtitle">Manage broker information and verification</p>
+    </div>
+
+    <form method="post" class="modern-form" novalidate>
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+        <div class="alert-error">
+            {% for error in form.non_field_errors %}
+                {{ error }}
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <!-- Basic Information -->
+        <div class="form-section">
+            <div class="section-label">Basic Information</div>
+            <div class="form-grid">
+                <div class="form-field span-2">
+                    <label>Broker Name<span class="required">*</span></label>
+                    {{ form.name }}
+                    {% if form.name.errors %}<span class="field-error">{{ form.name.errors.0 }}</span>{% endif %}
+                </div>
+                
+                <div class="form-field">
+                    <label>Website URL</label>
+                    {{ form.website_url }}
+                    {% if form.website_url.errors %}<span class="field-error">{{ form.website_url.errors.0 }}</span>{% endif %}
+                </div>
+                
+                <div class="form-field">
+                    <label>SEBI Registration No.</label>
+                    {{ form.sebi_registration_no }}
+                    {% if form.sebi_registration_no.errors %}<span class="field-error">{{ form.sebi_registration_no.errors.0 }}</span>{% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Description -->
+        <div class="form-section">
+            <div class="section-label">Description</div>
+            <div class="form-field">
+                <label>About the Broker</label>
+                {{ form.description }}
+                {% if form.description.errors %}<span class="field-error">{{ form.description.errors.0 }}</span>{% endif %}
+            </div>
+        </div>
+
+        <!-- Status -->
+        <div class="form-section">
+            <div class="section-label">Status</div>
+            <div class="form-grid">
+                <div class="form-field">
+                    <label class="checkbox-label">
+                        {{ form.is_active }}
+                        <span>Active</span>
+                    </label>
+                    {% if form.is_active.errors %}<span class="field-error">{{ form.is_active.errors.0 }}</span>{% endif %}
+                </div>
+                
+                <div class="form-field">
+                    <label class="checkbox-label">
+                        {{ form.is_verified }}
+                        <span>Verified</span>
+                    </label>
+                    {% if form.is_verified.errors %}<span class="field-error">{{ form.is_verified.errors.0 }}</span>{% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="form-actions">
+            <a href="{% url 'admin_panel:brokers_list' %}" class="btn-secondary">Cancel</a>
+            <button type="submit" class="btn-primary">
+                {% if form.instance.pk %}Update Broker{% else %}Create Broker{% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+
+<style>
+.modern-form-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0;
+}
+
+.form-header {
+    margin-bottom: 32px;
+}
+
+.form-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 8px 0;
+}
+
+.form-subtitle {
+    font-size: 15px;
+    color: #6b7280;
+    margin: 0;
+}
+
+.modern-form {
+    background: white;
+    border-radius: 12px;
+    padding: 32px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.alert-error {
+    background: #fee2e2;
+    border-left: 4px solid #ef4444;
+    padding: 16px;
+    border-radius: 8px;
+    color: #991b1b;
+    margin-bottom: 24px;
+    font-size: 14px;
+}
+
+.form-section {
+    margin-bottom: 32px;
+}
+
+.section-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #f3f4f6;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-field.span-2 {
+    grid-column: span 2;
+}
+
+.form-field label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 8px;
+}
+
+.checkbox-label {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.required {
+    color: #ef4444;
+    font-size: 14px;
+}
+
+.form-field input[type="text"],
+.form-field input[type="url"],
+.form-field select,
+.form-field textarea {
+    padding: 10px 14px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #1f2937;
+    transition: all 0.2s;
+    background: white;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-field textarea {
+    min-height: 120px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+.field-error {
+    font-size: 13px;
+    color: #ef4444;
+    margin-top: 6px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.btn-primary,
+.btn-secondary {
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-primary {
+    background: #3b82f6;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-secondary {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.btn-secondary:hover {
+    background: #e5e7eb;
+}
+
+@media (max-width: 768px) {
+    .modern-form {
+        padding: 24px;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-field.span-2 {
+        grid-column: span 1;
+    }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,346 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Profile - Stock Research Platform{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>My Profile</h1>
+    </div>
+
+    <div class="profile-container">
+        <div class="profile-card">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    {{ user.first_name.0 }}{{ user.last_name.0 }}
+                </div>
+                <div class="profile-info">
+                    <h2>{{ user.get_full_name }}</h2>
+                    <p>{{ user.email }}</p>
+                    <span class="badge badge-{{ user.role|lower }}">{{ user.get_role_display }}</span>
+                </div>
+            </div>
+
+            <div class="profile-details">
+                <h3>Account Information</h3>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <label>First Name</label>
+                        <span>{{ user.first_name }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Last Name</label>
+                        <span>{{ user.last_name }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Email</label>
+                        <span>{{ user.email }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Role</label>
+                        <span>{{ user.get_role_display }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Account Status</label>
+                        <span class="{% if user.is_active %}text-success{% else %}text-danger{% endif %}">
+                            {% if user.is_active %}Active{% else %}Inactive{% endif %}
+                        </span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Member Since</label>
+                        <span>{{ user.created_at|date:"M d, Y" }}</span>
+                    </div>
+                    {% if user.last_login_at %}
+                    <div class="detail-item">
+                        <label>Last Login</label>
+                        <span>{{ user.last_login_at|date:"M d, Y H:i" }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="profile-actions">
+                <button class="btn btn-primary" onclick="openEditModal()">
+                    Edit Profile
+                </button>
+                <button class="btn btn-outline" onclick="alert('Change password functionality coming soon!')">
+                    Change Password
+                </button>
+            </div>
+        </div>
+
+        <!-- Subscription Details Card -->
+        <div class="profile-card mt-4">
+            <div class="profile-header" style="border-bottom: none; padding-bottom: 0; margin-bottom: 1rem;">
+                <div class="header-content">
+                    <h2>Subscription Details</h2>
+                    <p>Manage your plan and billing</p>
+                </div>
+                {% if current_subscription and current_subscription.is_active %}
+                    <span class="badge badge-success">Active</span>
+                {% else %}
+                    <span class="badge badge-secondary">Free Plan</span>
+                {% endif %}
+            </div>
+            
+            <div class="subscription-content">
+                {% if current_subscription and current_subscription.is_active %}
+                    <div class="current-plan">
+                        <div class="plan-info">
+                            <h3>{{ current_subscription.plan_type }} Plan</h3>
+                            <p class="text-muted">Billing Cycle: {{ current_subscription.get_billing_cycle_display }}</p>
+                        </div>
+                        <div class="plan-price">
+                            ₹{{ current_subscription.amount }}
+                        </div>
+                    </div>
+                    
+                    <div class="detail-grid mt-4">
+                        <div class="detail-item">
+                            <label>Start Date</label>
+                            <span>{{ current_subscription.start_date|date:"M d, Y" }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Renews On</label>
+                            <span>{{ current_subscription.end_date|date:"M d, Y" }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Status</label>
+                            <span class="text-success">Active</span>
+                        </div>
+                        <div class="detail-item">
+                            <label>Payment Method</label>
+                            <span>{{ current_subscription.payment.payment_method|default:"Razorpay" }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="subscription-actions mt-4">
+                        <button class="btn btn-outline-danger" onclick="alert('Cancel subscription functionality coming soon!')">Cancel Subscription</button>
+                        <button class="btn btn-primary" onclick="window.location.href='{% url 'payments:membership' %}'">Change Plan</button>
+                    </div>
+                {% else %}
+                    <div class="no-subscription text-center py-4">
+                        <div class="mb-3">
+                            <i class="bi bi-star" style="font-size: 3rem; color: #fbbf24;"></i>
+                        </div>
+                        <h3>Upgrade to PRO</h3>
+                        <p class="mb-4">Get access to premium research calls, real-time alerts, and expert analysis.</p>
+                        <a href="{% url 'payments:membership' %}" class="btn btn-primary btn-lg">View Plans & Upgrade</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div id="editProfileModal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2>Edit Profile</h2>
+                <button class="close-btn" onclick="closeEditModal()">&times;</button>
+            </div>
+            <form method="post" class="edit-form">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label>First Name</label>
+                    {{ form.first_name }}
+                </div>
+                <div class="form-group">
+                    <label>Last Name</label>
+                    {{ form.last_name }}
+                </div>
+                <div class="form-group">
+                    <label>Mobile Number</label>
+                    {{ form.mobile }}
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-outline" onclick="closeEditModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.profile-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.profile-card {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: 2rem;
+}
+
+.profile-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.profile-info h2 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+.profile-info p {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-secondary);
+}
+
+.profile-details h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-item label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.25rem;
+}
+
+.detail-item span {
+    font-weight: 500;
+}
+
+.profile-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+@media (max-width: 768px) {
+    .detail-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .profile-header {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+/* Modal Styles */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-container {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 500px;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: #64748b;
+    padding: 0;
+    line-height: 1;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+</style>
+
+<script>
+function openEditModal() {
+    document.getElementById('editProfileModal').style.display = 'flex';
+}
+
+function closeEditModal() {
+    document.getElementById('editProfileModal').style.display = 'none';
+}
+
+// Close outside click
+window.onclick = function(event) {
+    const modal = document.getElementById('editProfileModal');
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+</script>
+{% endblock %}

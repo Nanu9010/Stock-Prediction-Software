@@ -1,0 +1,389 @@
+/* Modern UI Components matching the new design */
+
+:root {
+    --color-pro-blue: #e0f2fe;
+    --color-pro-dark: #1e293b;
+    --color-pro-green: #10b981;
+    --card-radius: 16px;
+}
+
+/* ============================================
+   PRO TRADE CARD (Live Trades)
+   ============================================ */
+.pro-trade-card {
+    background: #e0f2fe;
+    /* Light blue background */
+    border-radius: 20px;
+    padding: 16px;
+    position: relative;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+    border: 1px solid #bae6fd;
+}
+
+.pro-trade-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.pro-card-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #64748b;
+    margin-bottom: 12px;
+    font-weight: 500;
+}
+
+.duration-badge {
+    background: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid #cbd5e1;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: #0f172a;
+}
+
+.pro-banner {
+    background: white;
+    border-radius: 50px;
+    text-align: center;
+    padding: 8px;
+    font-weight: 700;
+    color: #0f172a;
+    font-size: 14px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.pro-visual-container {
+    background: #334155;
+    /* Dark gray/slate */
+    border-radius: 16px;
+    height: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Decorative circles */
+.pro-visual-container::before {
+    content: '';
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    border: 20px solid rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+}
+
+.potential-badge {
+    background: #16a34a;
+    /* Green */
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 16px;
+    margin-bottom: 16px;
+    z-index: 1;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.btn-subscribe-lock {
+    background: white;
+    color: #0f172a;
+    padding: 8px 20px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 14px;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    z-index: 1;
+    text-decoration: none;
+}
+
+.btn-subscribe-lock:hover {
+    transform: scale(1.05);
+    background: #f8fafc;
+}
+
+/* ============================================
+   CLOSED TRADE CARD
+   ============================================ */
+.closed-trade-card-modern {
+    background: white;
+    border-radius: 20px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.closed-card-header {
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.company-info {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.company-logo {
+    width: 48px;
+    height: 48px;
+    background: #f1f5f9;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: #64748b;
+    font-size: 20px;
+}
+
+.company-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.profit-status {
+    color: #16a34a;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.trade-time-badge {
+    background: white;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 11px;
+    color: #64748b;
+    position: absolute;
+    top: -10px;
+    right: 20px;
+}
+
+.trade-table {
+    width: 100%;
+    padding: 0 20px 20px 20px;
+}
+
+.trade-row {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1.5fr;
+    padding: 12px 0;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 13px;
+    color: #334155;
+}
+
+.trade-row:last-child {
+    border-bottom: none;
+}
+
+.trade-head {
+    font-weight: 700;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.badge-action {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 11px;
+    display: inline-block;
+}
+
+.badge-buy {
+    border: 1px solid #16a34a;
+    color: #16a34a;
+}
+
+.badge-exit {
+    border: 1px solid #3b82f6;
+    color: #3b82f6;
+}
+
+.net-gain-bar {
+    background: #16a34a;
+    color: white;
+    text-align: center;
+    padding: 8px;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+/* Actions sidebar in closed card */
+.card-sidebar-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 20px;
+}
+
+.btn-icon-action {
+    width: 32px;
+    height: 32px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    background: white;
+    cursor: pointer;
+}
+
+.btn-exit-trade {
+    background: #1e40af;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.btn-about-trade {
+    background: white;
+    border: 1px solid #cbd5e1;
+    color: #0f172a;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 13px;
+    display: block;
+    text-align: center;
+    margin-top: 8px;
+}
+
+/* ============================================
+   PERFORMANCE BANNER
+   ============================================ */
+.perf-banner {
+    background: #1e293b;
+    border-radius: 20px;
+    padding: 24px;
+    color: white;
+    margin-bottom: 32px;
+}
+
+.perf-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.perf-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.perf-filters {
+    display: flex;
+    gap: 8px;
+}
+
+.perf-pill {
+    background: white;
+    color: #0f172a;
+    padding: 6px 16px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.perf-pill.active {
+    background: #f59e0b;
+    /* Amber */
+    color: #fff;
+}
+
+.perf-pill:hover {
+    opacity: 0.9;
+}
+
+.progress-container {
+    background: #334155;
+    height: 12px;
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 12px;
+}
+
+.progress-bar {
+    background: #16a34a;
+    height: 100%;
+    border-radius: 6px;
+}
+
+.progress-miss {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    background: #ef4444;
+}
+
+.perf-stats {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.stat-hit {
+    color: white;
+}
+
+.stat-acc {
+    color: #f59e0b;
+}
+
+.stat-miss {
+    color: white;
+}
+
+.btn-subscribe-dark {
+    background: white;
+    color: #0f172a;
+    font-weight: 700;
+    padding: 10px 24px;
+    border-radius: 50px;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 16px;
+}
+
+.dark-center {
+    text-align: center;
+}

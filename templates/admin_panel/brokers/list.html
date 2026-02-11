@@ -1,0 +1,123 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block title %}Brokers - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">Brokers Management</h1>
+    <div class="page-actions">
+        <a href="#" class="btn btn-outline-primary">
+            <span>📥</span>
+            Export
+        </a>
+        <a href="{% url 'admin_panel:broker_create' %}" class="btn btn-primary">
+            <span>➕</span>
+            Add Broker
+        </a>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="filters-bar">
+    <form method="get" style="display: flex; align-items: center; gap: var(--spacing-4); flex: 1;">
+        <div class="filter-group">
+            <label>Verification</label>
+            <select name="verified" class="form-select" onchange="this.form.submit()">
+                <option value="">All Brokers</option>
+                <option value="true" {% if request.GET.verified == 'true' %}selected{% endif %}>Verified Only</option>
+                <option value="false" {% if request.GET.verified == 'false' %}selected{% endif %}>Unverified Only</option>
+            </select>
+        </div>
+        
+        <div class="filter-group" style="flex: 1;">
+            <label>Search</label>
+            <input type="text" name="search" class="form-input" placeholder="Search name or SEBI number..." value="{{ request.GET.search }}">
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Search</button>
+        {% if request.GET.verified or request.GET.search %}
+        <a href="{% url 'admin_panel:brokers_list' %}" class="btn btn-outline-secondary">Clear</a>
+        {% endif %}
+    </form>
+</div>
+
+<!-- Brokers Table -->
+<div class="card">
+    <div class="data-table">
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>SEBI Registration</th>
+                        <th>Accuracy</th>
+                        <th>Total Calls</th>
+                        <th>Verified</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for broker in brokers %}
+                    <tr>
+                        <td>#{{ broker.id }}</td>
+                        <td>
+                            <a href="{% url 'admin_panel:broker_detail' broker.id %}" style="color: var(--color-primary); text-decoration: none; font-weight: 600;">
+                                {{ broker.name }}
+                            </a>
+                        </td>
+                        <td>{{ broker.sebi_registration_no|default:"-" }}</td>
+                        <td>
+                            <span class="badge badge-success">{{ broker.overall_accuracy|floatformat:1 }}%</span>
+                        </td>
+                        <td>{{ broker.total_calls|default:0 }}</td>
+                        <td>
+                            {% if broker.is_verified %}
+                            <span class="badge badge-success">✓ Verified</span>
+                            {% else %}
+                            <span class="badge badge-warning">⏳ Pending</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ broker.created_at|date:"M d, Y" }}</td>
+                        <td>
+                            <div style="display: flex; gap: var(--spacing-2);">
+                                <a href="{% url 'admin_panel:broker_detail' broker.id %}" class="btn btn-sm btn-outline-primary" title="View">👁️</a>
+                                <a href="{% url 'admin_panel:broker_update' broker.id %}" class="btn btn-sm btn-outline-secondary" title="Edit">✏️</a>
+                                {% if not broker.is_verified %}
+                                <button class="btn btn-sm btn-success" title="Verify">✓</button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: var(--spacing-8); color: var(--color-gray-600);">
+                            No brokers found
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    {% if is_paginated %}
+    <div class="card-footer">
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+            <a href="?page=1{% if request.GET.verified %}&verified={{ request.GET.verified }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" class="pagination-item">«</a>
+            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.verified %}&verified={{ request.GET.verified }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" class="pagination-item">‹</a>
+            {% endif %}
+            
+            <span class="pagination-item is-active">{{ page_obj.number }}</span>
+            
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.verified %}&verified={{ request.GET.verified }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" class="pagination-item">›</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.verified %}&verified={{ request.GET.verified }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" class="pagination-item">»</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

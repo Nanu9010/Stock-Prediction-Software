@@ -1,0 +1,351 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Membership Plans - Stock Research Platform{% endblock %}
+
+{% block extra_css %}
+<style>
+.membership-container {
+    padding: 60px 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+
+.membership-header {
+    text-align: center;
+    color: white;
+    margin-bottom: 48px;
+}
+
+.membership-header h1 {
+    font-size: 48px;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.membership-header p {
+    font-size: 20px;
+    opacity: 0.9;
+}
+
+/* Billing Toggle */
+.billing-toggle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 48px;
+}
+
+.billing-toggle label {
+    color: white;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.toggle-switch {
+    position: relative;
+    width: 60px;
+    height: 30px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.toggle-switch.active {
+    background: rgba(255,255,255,0.5);
+}
+
+.toggle-slider {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 24px;
+    height: 24px;
+    background: white;
+    border-radius: 50%;
+    transition: all 0.3s;
+}
+
+.toggle-switch.active .toggle-slider {
+    left: 33px;
+}
+
+/* Pricing Cards */
+.pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.pricing-card {
+    background: white;
+    border-radius: 20px;
+    padding: 40px 32px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    transition: transform 0.3s;
+    position: relative;
+}
+
+.pricing-card:hover {
+    transform: translateY(-8px);
+}
+
+.pricing-card.featured {
+    border: 3px solid #fbbf24;
+    transform: scale(1.05);
+}
+
+.pricing-card.featured::before {
+    content: 'MOST POPULAR';
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fbbf24;
+    color: #78350f;
+    padding: 6px 20px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.plan-name {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 16px;
+}
+
+.plan-price {
+    margin-bottom: 24px;
+}
+
+.price-amount {
+    font-size: 48px;
+    font-weight: 700;
+    color: #667eea;
+}
+
+.price-period {
+    font-size: 16px;
+    color: #6b7280;
+}
+
+.price-yearly {
+    display: none;
+}
+
+.plan-features {
+    list-style: none;
+    padding: 0;
+    margin: 32px 0;
+}
+
+.plan-features li {
+    padding: 12px 0;
+    color: #374151;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.plan-features li::before {
+    content: '✓';
+    color: #10b981;
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.subscribe-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.subscribe-btn:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.subscribe-btn.featured {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    color: #78350f;
+}
+
+.current-plan {
+    background: #10b981;
+    color: white;
+}
+
+.current-plan:hover {
+    transform: none;
+    cursor: default;
+}
+
+@media (max-width: 768px) {
+    .pricing-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .pricing-card.featured {
+        transform: scale(1);
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="membership-container">
+    <div class="container">
+        <!-- Header -->
+        <div class="membership-header">
+            <h1>Choose Your Plan</h1>
+            <p>Unlock premium research calls and advanced features</p>
+        </div>
+
+        <!-- Billing Toggle -->
+        <div class="billing-toggle">
+            <label>Monthly</label>
+            <div class="toggle-switch" id="billingToggle">
+                <div class="toggle-slider"></div>
+            </div>
+            <label>Yearly <span style="background: rgba(255,255,255,0.2); padding: 4px 8px; border-radius: 8px; font-size: 12px;">Save 17%</span></label>
+        </div>
+
+        <!-- Pricing Cards -->
+        <div class="pricing-grid">
+            {% for plan in plans %}
+            <div class="pricing-card {% if plan.plan_type == 'PRO' %}featured{% endif %}">
+                <h3 class="plan-name">{{ plan.name }}</h3>
+                
+                <div class="plan-price">
+                    <div class="price-monthly">
+                        <span class="price-amount">₹{{ plan.price_monthly|floatformat:0 }}</span>
+                        <span class="price-period">/month</span>
+                    </div>
+                    <div class="price-yearly" style="display: none;">
+                        <span class="price-amount">₹{{ plan.price_yearly|floatformat:0 }}</span>
+                        <span class="price-period">/year</span>
+                    </div>
+                </div>
+
+                <ul class="plan-features">
+                    {% for feature in plan.features %}
+                    <li>{{ feature }}</li>
+                    {% endfor %}
+                </ul>
+
+                {% if current_subscription and current_subscription.plan_type == plan.plan_type %}
+                <button class="subscribe-btn current-plan" disabled>Current Plan</button>
+                {% else %}
+                <button class="subscribe-btn {% if plan.plan_type == 'PRO' %}featured{% endif %}" 
+                        onclick="initiatePayment('{{ plan.plan_type }}')">
+                    Subscribe Now
+                </button>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+// Billing toggle
+const billingToggle = document.getElementById('billingToggle');
+const monthlyPrices = document.querySelectorAll('.price-monthly');
+const yearlyPrices = document.querySelectorAll('.price-yearly');
+let isYearly = false;
+
+billingToggle.addEventListener('click', function() {
+    isYearly = !isYearly;
+    this.classList.toggle('active');
+    
+    monthlyPrices.forEach(el => el.style.display = isYearly ? 'none' : 'block');
+    yearlyPrices.forEach(el => el.style.display = isYearly ? 'block' : 'none');
+});
+
+// Payment initiation
+function initiatePayment(planType) {
+    const billingCycle = isYearly ? 'YEARLY' : 'MONTHLY';
+    
+    // Create order
+    fetch('{% url "payments:create_order" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: `plan_type=${planType}&billing_cycle=${billingCycle}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert('Error: ' + data.error);
+            return;
+        }
+        
+        // Open Razorpay checkout
+        const options = {
+            key: data.key,
+            amount: data.amount * 100,
+            currency: data.currency,
+            name: data.name,
+            description: data.description,
+            order_id: data.order_id,
+            prefill: data.prefill,
+            theme: {
+                color: '#667eea'
+            },
+            handler: function(response) {
+                // Verify payment
+                verifyPayment(response);
+            }
+        };
+        
+        const rzp = new Razorpay(options);
+        rzp.open();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to initiate payment');
+    });
+}
+
+function verifyPayment(response) {
+    fetch('{% url "payments:verify_payment" %}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify(response)
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.message);
+            window.location.href = '/';
+        } else {
+            alert('Payment verification failed: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Payment verification failed');
+    });
+}
+</script>
+{% endblock %}

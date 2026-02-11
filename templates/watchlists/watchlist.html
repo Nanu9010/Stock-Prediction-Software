@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Watchlist - Stock Research Platform{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>My Watchlist</h1>
+        <span class="badge badge-primary">{{ items.count }} calls</span>
+    </div>
+
+    <div class="watchlist-grid">
+        {% for item in items %}
+        <div class="watchlist-card">
+            <div class="card-header">
+                <div>
+                    <h3>{{ item.research_call.symbol }}</h3>
+                    <span class="badge badge-{{ item.research_call.action|lower }}">{{ item.research_call.action }}</span>
+                    <span class="badge badge-{{ item.research_call.status|lower }}">{{ item.research_call.status }}</span>
+                </div>
+                <button class="btn-icon" onclick="removeFromWatchlist({{ item.id }})" title="Remove">
+                    ❌
+                </button>
+            </div>
+            
+            <div class="card-body">
+                <div class="info-row">
+                    <span class="label">Broker:</span>
+                    <span>{{ item.research_call.broker.name }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Entry:</span>
+                    <span>₹{{ item.research_call.entry_price }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Target:</span>
+                    <span class="text-success">₹{{ item.research_call.target_1 }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Stop Loss:</span>
+                    <span class="text-danger">₹{{ item.research_call.stop_loss }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Expected Return:</span>
+                    <span class="text-success">{{ item.research_call.expected_return_percentage }}%</span>
+                </div>
+                <div class="info-row">
+                    <span class="label">Added:</span>
+                    <span>{{ item.added_at|date:"M d, Y" }}</span>
+                </div>
+            </div>
+            
+            <div class="card-actions">
+                <a href="{% url 'research_calls:detail' item.research_call.pk %}" class="btn btn-sm btn-outline">View Details</a>
+                <button class="btn btn-sm btn-primary" onclick="addToPortfolio({{ item.research_call.id }})">Add to Portfolio</button>
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-state">
+            <p>Your watchlist is empty</p>
+            <a href="{% url 'research_calls:list' %}" class="btn btn-primary">Browse Research Calls</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+.watchlist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+}
+
+.watchlist-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.card-header h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+}
+
+.btn-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.25rem;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+
+.btn-icon:hover {
+    opacity: 1;
+}
+
+.card-body {
+    margin-bottom: 1rem;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.info-row .label {
+    color: var(--text-secondary);
+}
+
+.card-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+</style>
+
+<script>
+async function removeFromWatchlist(itemId) {
+    if (!confirm('Remove this call from watchlist?')) return;
+    
+    try {
+        const response = await fetch(`/watchlist/${itemId}/remove/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken,
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showNotification('Removed from watchlist', 'success');
+            setTimeout(() => window.location.reload(), 500);
+        } else {
+            showNotification('Failed to remove from watchlist', 'danger');
+        }
+    } catch (error) {
+        showNotification('An error occurred', 'danger');
+    }
+}
+</script>
+{% endblock %}

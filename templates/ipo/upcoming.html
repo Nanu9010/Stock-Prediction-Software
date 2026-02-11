@@ -1,0 +1,297 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}IPO - Upcoming & Current IPOs{% endblock %}
+
+{% block extra_css %}
+<style>
+.ipo-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 32px 24px;
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.page-title {
+    font-size: 40px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 16px;
+}
+
+.page-subtitle {
+    font-size: 18px;
+    color: #6b7280;
+}
+
+.ipo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 24px;
+}
+
+.ipo-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: all 0.3s;
+}
+
+.ipo-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+
+.ipo-status {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.ipo-status.upcoming {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.ipo-status.open {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.ipo-company {
+    font-size: 24px;
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 8px;
+}
+
+.ipo-sector {
+    font-size: 14px;
+    color: #6b7280;
+    margin-bottom: 16px;
+}
+
+.ipo-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.detail-item {
+    padding: 12px;
+    background: #f9fafb;
+    border-radius: 8px;
+}
+
+.detail-label {
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 4px;
+}
+
+.detail-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.ipo-dates {
+    padding: 16px;
+    background: #f3f4f6;
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+
+.date-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.date-row:last-child {
+    margin-bottom: 0;
+}
+
+.btn-apply {
+    width: 100%;
+    padding: 12px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-apply:hover {
+    background: #1d4ed8;
+}
+
+.no-ipos {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6b7280;
+}
+
+@media (max-width: 768px) {
+    .ipo-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ipo-container">
+    <div class="page-header">
+        <h1 class="page-title">IPO Center</h1>
+        <p class="page-subtitle">Upcoming and current Initial Public Offerings</p>
+    </div>
+    
+    <div class="ipo-grid">
+        <!-- Sample IPO Cards -->
+        <div class="ipo-card">
+            <span class="ipo-status open">OPEN NOW</span>
+            <h3 class="ipo-company">TechCorp India Ltd</h3>
+            <p class="ipo-sector">Technology / Software</p>
+            
+            <div class="ipo-details">
+                <div class="detail-item">
+                    <div class="detail-label">Price Band</div>
+                    <div class="detail-value">₹450-480</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Lot Size</div>
+                    <div class="detail-value">31 shares</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Min Investment</div>
+                    <div class="detail-value">₹14,880</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Issue Size</div>
+                    <div class="detail-value">₹3,500 Cr</div>
+                </div>
+            </div>
+            
+            <div class="ipo-dates">
+                <div class="date-row">
+                    <span>Open Date:</span>
+                    <strong>Feb 10, 2026</strong>
+                </div>
+                <div class="date-row">
+                    <span>Close Date:</span>
+                    <strong>Feb 14, 2026</strong>
+                </div>
+                <div class="date-row">
+                    <span>Listing Date:</span>
+                    <strong>Feb 20, 2026</strong>
+                </div>
+            </div>
+            
+            <button class="btn-apply" onclick="alert('IPO application feature coming soon!')">
+                Apply for IPO
+            </button>
+        </div>
+        
+        <div class="ipo-card">
+            <span class="ipo-status upcoming">UPCOMING</span>
+            <h3 class="ipo-company">GreenEnergy Solutions</h3>
+            <p class="ipo-sector">Renewable Energy</p>
+            
+            <div class="ipo-details">
+                <div class="detail-item">
+                    <div class="detail-label">Price Band</div>
+                    <div class="detail-value">₹320-350</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Lot Size</div>
+                    <div class="detail-value">42 shares</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Min Investment</div>
+                    <div class="detail-value">₹14,700</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Issue Size</div>
+                    <div class="detail-value">₹2,800 Cr</div>
+                </div>
+            </div>
+            
+            <div class="ipo-dates">
+                <div class="date-row">
+                    <span>Open Date:</span>
+                    <strong>Feb 17, 2026</strong>
+                </div>
+                <div class="date-row">
+                    <span>Close Date:</span>
+                    <strong>Feb 21, 2026</strong>
+                </div>
+                <div class="date-row">
+                    <span>Listing Date:</span>
+                    <strong>Feb 27, 2026</strong>
+                </div>
+            </div>
+            
+            <button class="btn-apply" disabled style="opacity: 0.5; cursor: not-allowed;">
+                Opens Feb 17
+            </button>
+        </div>
+        
+        <div class="ipo-card">
+            <span class="ipo-status upcoming">UPCOMING</span>
+            <h3 class="ipo-company">FinTech Innovations</h3>
+            <p class="ipo-sector">Financial Services / Technology</p>
+            
+            <div class="ipo-details">
+                <div class="detail-item">
+                    <div class="detail-label">Price Band</div>
+                    <div class="detail-value">₹580-620</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Lot Size</div>
+                    <div class="detail-value">24 shares</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Min Investment</div>
+                    <div class="detail-value">₹14,880</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Issue Size</div>
+                    <div class="detail-value">₹4,200 Cr</div>
+                </div>
+            </div>
+            
+            <div class="ipo-dates">
+                <div class="date-row">
+                    <span>Open Date:</span>
+                    <strong>Feb 24, 2026</strong>
+                </div>
+                <div class="date-row">
+                    <span>Close Date:</span>
+                    <strong>Feb 28, 2026</strong>
+                </div>
+                <div class="date-row">
+                    <span>Listing Date:</span>
+                    <strong>Mar 6, 2026</strong>
+                </div>
+            </div>
+            
+            <button class="btn-apply" disabled style="opacity: 0.5; cursor: not-allowed;">
+                Opens Feb 24
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}

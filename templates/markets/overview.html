@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Markets Overview - StockPro{% endblock %}
+
+{% block extra_css %}
+<style>
+.markets-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 32px 24px;
+}
+
+.section-header {
+    margin-bottom: 24px;
+}
+
+.section-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 8px;
+}
+
+.indices-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    margin-bottom: 48px;
+}
+
+.index-card {
+    background: white;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: all 0.3s;
+}
+
+.index-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+
+.index-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #6b7280;
+    margin-bottom: 12px;
+}
+
+.index-price {
+    font-size: 32px;
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 8px;
+}
+
+.index-change {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.index-change.positive {
+    color: #10b981;
+}
+
+.index-change.negative {
+    color: #ef4444;
+}
+
+.stocks-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+.stocks-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.stock-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.stock-item:last-child {
+    border-bottom: none;
+}
+
+.stock-info {
+    flex: 1;
+}
+
+.stock-symbol {
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 4px;
+}
+
+.stock-name {
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.stock-price {
+    text-align: right;
+}
+
+.stock-value {
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 4px;
+}
+
+.stock-change {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .stocks-section {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="markets-container">
+    <!-- Market Indices -->
+    <div class="section-header">
+        <h2 class="section-title">Market Indices</h2>
+    </div>
+    
+    <div class="indices-grid">
+        {% for index in indices %}
+        <div class="index-card">
+            <div class="index-name">{{ index.name }}</div>
+            <div class="index-price">₹{{ index.current_price|floatformat:2 }}</div>
+            <div class="index-change {% if index.change >= 0 %}positive{% else %}negative{% endif %}">
+                {{ index.change|floatformat:2 }} ({{ index.change_percent|floatformat:2 }}%)
+            </div>
+        </div>
+        {% empty %}
+        <div class="index-card">
+            <div class="index-name">NIFTY 50</div>
+            <div class="index-price">₹25,867.30</div>
+            <div class="index-change positive">+173.86 (0.68%)</div>
+        </div>
+        <div class="index-card">
+            <div class="index-name">SENSEX</div>
+            <div class="index-price">₹84,065.75</div>
+            <div class="index-change positive">+488.15 (0.58%)</div>
+        </div>
+        <div class="index-card">
+            <div class="index-name">BANKNIFTY</div>
+            <div class="index-price">₹54,234.20</div>
+            <div class="index-change negative">-234.50 (-0.43%)</div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Top Gainers & Losers -->
+    <div class="stocks-section">
+        <div class="stocks-card">
+            <div class="section-header">
+                <h3 class="section-title">Top Gainers</h3>
+            </div>
+            {% for stock in top_gainers %}
+            <div class="stock-item">
+                <div class="stock-info">
+                    <div class="stock-symbol">{{ stock.symbol }}</div>
+                    <div class="stock-name">{{ stock.company_name }}</div>
+                </div>
+                <div class="stock-price">
+                    <div class="stock-value">₹{{ stock.current_price|floatformat:2 }}</div>
+                    <div class="stock-change positive">+{{ stock.change_percent|floatformat:2 }}%</div>
+                </div>
+            </div>
+            {% empty %}
+            <p style="text-align: center; color: #6b7280; padding: 20px;">No data available</p>
+            {% endfor %}
+        </div>
+        
+        <div class="stocks-card">
+            <div class="section-header">
+                <h3 class="section-title">Top Losers</h3>
+            </div>
+            {% for stock in top_losers %}
+            <div class="stock-item">
+                <div class="stock-info">
+                    <div class="stock-symbol">{{ stock.symbol }}</div>
+                    <div class="stock-name">{{ stock.company_name }}</div>
+                </div>
+                <div class="stock-price">
+                    <div class="stock-value">₹{{ stock.current_price|floatformat:2 }}</div>
+                    <div class="stock-change negative">{{ stock.change_percent|floatformat:2 }}%</div>
+                </div>
+            </div>
+            {% empty %}
+            <p style="text-align: center; color: #6b7280; padding: 20px;">No data available</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

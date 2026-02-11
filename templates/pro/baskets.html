@@ -1,0 +1,252 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}PRO Baskets - Stock Prediction System{% endblock %}
+
+{% block extra_css %}
+<style>
+    .baskets-container {
+        padding: 40px 0;
+        background-color: #f8f9fa;
+        min-height: 100vh;
+    }
+    
+    .baskets-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    
+    .baskets-header h1 {
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 12px;
+    }
+    
+    .baskets-header p {
+        color: #6b7280;
+        font-size: 1.1rem;
+    }
+
+    .basket-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 24px;
+        padding: 0 16px;
+    }
+
+    .basket-card {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        transition: transform 0.2s, box-shadow 0.2s;
+        border: 1px solid #e5e7eb;
+        position: relative;
+    }
+
+    .basket-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    .basket-header {
+        padding: 24px;
+        color: white;
+    }
+
+    .basket-header.bluechip { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
+    .basket-header.dividends { background: linear-gradient(135deg, #059669, #047857); }
+    .basket-header.wealth { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
+    .basket-header.pharma { background: linear-gradient(135deg, #db2777, #be185d); }
+
+    .basket-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+
+    .basket-subtitle {
+        font-size: 0.875rem;
+        opacity: 0.9;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .volatility-badge {
+        padding: 2px 8px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 12px;
+        font-size: 0.75rem;
+    }
+
+    .basket-body {
+        padding: 24px;
+    }
+
+    .metric-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 16px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .metric-label {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-bottom: 4px;
+    }
+
+    .metric-value {
+        font-weight: 600;
+        color: #111827;
+        font-size: 1rem;
+    }
+
+    .cagr-value {
+        color: #059669;
+        font-weight: 700;
+        font-size: 1.25rem;
+    }
+
+    .view-btn {
+        display: block;
+        width: 100%;
+        padding: 12px;
+        background-color: #f3f4f6;
+        color: #374151;
+        text-align: center;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .view-btn:hover {
+        background-color: #e5e7eb;
+        color: #1f2937;
+    }
+    
+    .pro-badge {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: rgba(0,0,0,0.3);
+        color: #fbbf24;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="baskets-container">
+    <div class="container">
+        <div class="baskets-header">
+            <h1>PRO Baskets</h1>
+            <p>Curated portfolios of top-performing stocks for long-term wealth creation</p>
+        </div>
+
+        <div class="basket-grid">
+            <!-- NIFTY Bluechip -->
+            <div class="basket-card">
+                <div class="basket-header bluechip">
+                    <span class="pro-badge">PRO</span>
+                    <div class="basket-title">NIFTY Bluechip</div>
+                    <div class="basket-subtitle">
+                        <span class="volatility-badge">Mid Volatile</span>
+                    </div>
+                </div>
+                <div class="basket-body">
+                    <div class="metric-row">
+                        <div>
+                            <div class="metric-label">Min Amount</div>
+                            <div class="metric-value">₹1,20,399</div>
+                        </div>
+                        <div class="text-end">
+                            <div class="metric-label">3Y CAGR</div>
+                            <div class="cagr-value">+40.58%</div>
+                        </div>
+                    </div>
+                    <a href="#" class="view-btn">View Details</a>
+                </div>
+            </div>
+
+            <!-- High Dividends -->
+            <div class="basket-card">
+                <div class="basket-header dividends">
+                    <span class="pro-badge">PRO</span>
+                    <div class="basket-title">High Dividends</div>
+                    <div class="basket-subtitle">
+                        <span class="volatility-badge">Low Volatile</span>
+                    </div>
+                </div>
+                <div class="basket-body">
+                    <div class="metric-row">
+                        <div>
+                            <div class="metric-label">Min Amount</div>
+                            <div class="metric-value">₹1,73,211</div>
+                        </div>
+                        <div class="text-end">
+                            <div class="metric-label">3Y CAGR</div>
+                            <div class="cagr-value">+23.1%</div>
+                        </div>
+                    </div>
+                    <a href="#" class="view-btn">View Details</a>
+                </div>
+            </div>
+
+            <!-- Wealth Multiplier -->
+            <div class="basket-card">
+                <div class="basket-header wealth">
+                    <span class="pro-badge">PRO</span>
+                    <div class="basket-title">Wealth Multiplier</div>
+                    <div class="basket-subtitle">
+                        <span class="volatility-badge">High Volatile</span>
+                    </div>
+                </div>
+                <div class="basket-body">
+                    <div class="metric-row">
+                        <div>
+                            <div class="metric-label">Min Amount</div>
+                            <div class="metric-value">₹1,02,773</div>
+                        </div>
+                        <div class="text-end">
+                            <div class="metric-label">3Y CAGR</div>
+                            <div class="cagr-value">+41.83%</div>
+                        </div>
+                    </div>
+                    <a href="#" class="view-btn">View Details</a>
+                </div>
+            </div>
+
+            <!-- Pharma Health Vision -->
+            <div class="basket-card">
+                <div class="basket-header pharma">
+                    <span class="pro-badge">PRO</span>
+                    <div class="basket-title">Pharma Health Vision</div>
+                    <div class="basket-subtitle">
+                        <span class="volatility-badge">Mid Volatile</span>
+                    </div>
+                </div>
+                <div class="basket-body">
+                    <div class="metric-row">
+                        <div>
+                            <div class="metric-label">Min Amount</div>
+                            <div class="metric-value">₹48,266</div>
+                        </div>
+                        <div class="text-end">
+                            <div class="metric-label">3Y CAGR</div>
+                            <div class="cagr-value">+28.95%</div>
+                        </div>
+                    </div>
+                    <a href="#" class="view-btn">View Details</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

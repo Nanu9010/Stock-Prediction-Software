@@ -1,0 +1,367 @@
+{% extends 'base_modern.html' %}
+{% load static %}
+
+{% block title %}{{ trade_type }} Trades - StockPro{% endblock %}
+
+{% block extra_css %}
+<style>
+.page-header {
+    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+    padding: 40px 0;
+    margin-bottom: 32px;
+}
+
+.header-content {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.page-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 8px;
+}
+
+.page-description {
+    font-size: 16px;
+    color: #6b7280;
+}
+
+.content-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 24px 48px;
+}
+
+.filters-bar {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    margin-bottom: 24px;
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.filter-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+}
+
+.filter-select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 14px;
+    background: white;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: #2563eb;
+}
+
+.trades-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 24px;
+}
+
+.trade-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: all 0.3s;
+    border-left: 4px solid #e5e7eb;
+}
+
+.trade-card.trade-buy {
+    border-left-color: #10b981;
+}
+
+.trade-card.trade-sell {
+    border-left-color: #ef4444;
+}
+
+.trade-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+
+.broker-badge {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.broker-name {
+    font-weight: 700;
+    color: #111827;
+    font-size: 14px;
+}
+
+.broker-accuracy {
+    font-size: 12px;
+    color: #10b981;
+    font-weight: 600;
+}
+
+.trade-symbol {
+    font-size: 24px;
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 8px;
+}
+
+.action-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-left: 12px;
+}
+
+.action-badge.buy {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.action-badge.sell {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.trade-prices {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 16px 0;
+}
+
+.price-item {
+    text-align: center;
+}
+
+.price-label {
+    font-size: 11px;
+    color: #6b7280;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.price-value {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.price-value.entry {
+    color: #111827;
+}
+
+.price-value.target {
+    color: #10b981;
+}
+
+.price-value.stoploss {
+    color: #ef4444;
+}
+
+.potential-gain {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    margin: 16px 0;
+}
+
+.gain-label {
+    font-size: 11px;
+    opacity: 0.9;
+    margin-bottom: 4px;
+}
+
+.gain-value {
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.trade-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #6b7280;
+    margin-bottom: 16px;
+}
+
+.trade-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn {
+    flex: 1;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-secondary {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.btn-secondary:hover {
+    background: #e5e7eb;
+}
+
+.btn-success {
+    background: #10b981;
+    color: white;
+}
+
+.btn-success:hover {
+    background: #059669;
+}
+
+.no-results {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6b7280;
+}
+
+@media (max-width: 768px) {
+    .trades-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="header-content">
+        <h1 class="page-title">{{ trade_type }} Trades</h1>
+        <p class="page-description">{{ trade_description }}</p>
+    </div>
+</div>
+
+<div class="content-container">
+    <!-- Filters -->
+    <form method="get" class="filters-bar">
+        <div class="filter-group">
+            <label class="filter-label">Broker</label>
+            <select name="broker" class="filter-select" onchange="this.form.submit()">
+                <option value="">All Brokers</option>
+                {% for broker in brokers %}
+                <option value="{{ broker.id }}" {% if selected_broker == broker.id|stringformat:"s" %}selected{% endif %}>
+                    {{ broker.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="filter-group">
+            <label class="filter-label">Action</label>
+            <select name="action" class="filter-select" onchange="this.form.submit()">
+                <option value="">All Actions</option>
+                <option value="BUY" {% if selected_action == 'BUY' %}selected{% endif %}>Buy</option>
+                <option value="SELL" {% if selected_action == 'SELL' %}selected{% endif %}>Sell</option>
+            </select>
+        </div>
+        
+        <div class="filter-group">
+            <label class="filter-label">Search</label>
+            <input type="text" name="search" class="filter-select" placeholder="Search symbol..." 
+                   value="{{ search_query }}" onchange="this.form.submit()">
+        </div>
+    </form>
+    
+    <!-- Trades Grid -->
+    <div class="trades-grid">
+        {% for call in calls %}
+        <div class="trade-card {% if call.action == 'BUY' %}trade-buy{% else %}trade-sell{% endif %}">
+            <div class="broker-badge">
+                <span class="broker-name">{{ call.broker.name }}</span>
+                {% if call.broker.accuracy %}
+                <span class="broker-accuracy">{{ call.broker.accuracy|floatformat:1 }}% Accuracy</span>
+                {% endif %}
+            </div>
+            
+            <div class="trade-symbol">
+                {{ call.symbol }}
+                <span class="action-badge {% if call.action == 'BUY' %}buy{% else %}sell{% endif %}">
+                    {{ call.action }}
+                </span>
+            </div>
+            
+            <div class="trade-prices">
+                <div class="price-item">
+                    <div class="price-label">Entry</div>
+                    <div class="price-value entry">₹{{ call.entry_price }}</div>
+                </div>
+                <div class="price-item">
+                    <div class="price-label">Target</div>
+                    <div class="price-value target">₹{{ call.target_price }}</div>
+                </div>
+                <div class="price-item">
+                    <div class="price-label">Stop Loss</div>
+                    <div class="price-value stoploss">₹{{ call.stop_loss }}</div>
+                </div>
+            </div>
+            
+            <div class="potential-gain">
+                <div class="gain-label">Potential Gain</div>
+                <div class="gain-value">{{ call.expected_return_percentage|floatformat:1 }}%</div>
+            </div>
+            
+            <div class="trade-meta">
+                <span>{{ call.call_type|title }}</span>
+                <span>{{ call.duration }} days</span>
+            </div>
+            
+            <div class="trade-actions">
+                <a href="{% url 'research_calls:call_detail' call.id %}" class="btn btn-secondary">View Details</a>
+                {% if user.role == 'CUSTOMER' %}
+                <button onclick="addToPortfolio({{ call.id }})" class="btn btn-success">Add to Portfolio</button>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="no-results">
+            <p>No {{ trade_type|lower }} trades found matching your filters.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+function addToPortfolio(callId) {
+    // Add to portfolio functionality
+    alert('Adding to portfolio: ' + callId);
+}
+</script>
+{% endblock %}
