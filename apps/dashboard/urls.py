@@ -11,4 +11,13 @@ urlpatterns = [
     path('pro-baskets/', views.pro_baskets_view, name='pro_baskets'),
     path('ipo/', views.ipo_view, name='ipo'),
     path('explore/', views.explore_view, name='explore'),
+
+    # New market sections
+    path('sip/', views.sip_view, name='sip'),
+    path('mutual-funds/', views.mutual_funds_view, name='mutual_funds'),
+    path('etf/', views.etf_view, name='etf'),
+    path('bonds/', views.bonds_view, name='bonds'),
+    path('liquidity/', views.liquidity_view, name='liquidity'),
+    path('commodity/', views.commodity_view, name='commodity'),
+    path('trades-dashboard/', views.trades_dashboard_view, name='trades_dashboard'),
 ]

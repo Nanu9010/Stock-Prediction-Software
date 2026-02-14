@@ -1,9 +1,10 @@
-{% extends 'base_modern.html' %}
+{% extends 'base.html' %}
 {% load static %}
 
 {% block title %}{{ trade_type }} Trades - StockPro{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/market_hero.css' %}">
 <style>
 .page-header {
     background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
@@ -216,7 +217,7 @@
     gap: 8px;
 }
 
-.btn {
+.trade-actions .btn {
     flex: 1;
     padding: 10px 16px;
     border-radius: 6px;
@@ -306,8 +307,8 @@
         <div class="trade-card {% if call.action == 'BUY' %}trade-buy{% else %}trade-sell{% endif %}">
             <div class="broker-badge">
                 <span class="broker-name">{{ call.broker.name }}</span>
-                {% if call.broker.accuracy %}
-                <span class="broker-accuracy">{{ call.broker.accuracy|floatformat:1 }}% Accuracy</span>
+                {% if call.broker.overall_accuracy %}
+                <span class="broker-accuracy">{{ call.broker.overall_accuracy|floatformat:1 }}% Accuracy</span>
                 {% endif %}
             </div>
             
@@ -360,7 +361,6 @@
 
 <script>
 function addToPortfolio(callId) {
-    // Add to portfolio functionality
     alert('Adding to portfolio: ' + callId);
 }
 </script>

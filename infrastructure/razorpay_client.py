@@ -8,7 +8,7 @@ from django.conf import settings
 from django.utils import timezone
 
 
-class RazorpayService:
+class RazorpayClient:
     """Service for Razorpay payment integration"""
     
     def __init__(self):

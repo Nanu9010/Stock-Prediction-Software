@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/market_hero.css' %}">{% endblock %}
+
+{% block content %}
+<div class="market-section-page">
+  <div class="section-page-container">
+    <a href="{% url 'dashboard:home' %}" class="back-link">← Back to Market Hero</a>
+    <div class="section-page-header">
+      <div class="section-page-title">📋 Trades Dashboard</div>
+      <div class="section-page-desc">All active research calls across categories.</div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="trades-tabs">
+      <a href="?tab=all" class="tab-btn {% if active_tab == 'all' %}active{% endif %}">All</a>
+      <a href="?tab=intraday" class="tab-btn {% if active_tab == 'intraday' %}active{% endif %}">Intraday</a>
+      <a href="?tab=short" class="tab-btn {% if active_tab == 'short' %}active{% endif %}">Short Term</a>
+      <a href="?tab=medium" class="tab-btn {% if active_tab == 'medium' %}active{% endif %}">Medium Term</a>
+      <a href="?tab=long" class="tab-btn {% if active_tab == 'long' %}active{% endif %}">Long Term</a>
+      <a href="?tab=futures" class="tab-btn {% if active_tab == 'futures' %}active{% endif %}">Futures</a>
+      <a href="?tab=options" class="tab-btn {% if active_tab == 'options' %}active{% endif %}">Options</a>
+      <a href="?tab=commodity" class="tab-btn {% if active_tab == 'commodity' %}active{% endif %}">Commodity</a>
+    </div>
+
+    <!-- Calls Table -->
+    <div class="widget-card-hero">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Symbol</th>
+            <th>Action</th>
+            <th>Type</th>
+            <th>Instrument</th>
+            <th>Entry</th>
+            <th>Target 1</th>
+            <th>Stop Loss</th>
+            <th>R:R</th>
+            <th>Broker</th>
+            <th>Published</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for call in calls %}
+          <tr>
+            <td style="font-weight: 700;">{{ call.symbol }}</td>
+            <td>
+              <span class="ipo-status {% if call.action == 'BUY' %}ipo-open{% else %}ipo-closed{% endif %}">
+                {{ call.action }}
+              </span>
+            </td>
+            <td>{{ call.get_call_type_display }}</td>
+            <td>{{ call.get_instrument_type_display }}</td>
+            <td>₹{{ call.entry_price }}</td>
+            <td class="text-gain">₹{{ call.target_1 }}</td>
+            <td class="text-loss">₹{{ call.stop_loss }}</td>
+            <td>{{ call.risk_reward_ratio|default:"-" }}</td>
+            <td>{{ call.broker.name }}</td>
+            <td style="color: var(--text-muted); font-size: 12px;">
+              {% if call.published_at %}{{ call.published_at|date:"d M, H:i" }}{% else %}—{% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="10" style="text-align: center; padding: 40px; color: var(--text-muted);">
+              No active calls in this category. Check back later!
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

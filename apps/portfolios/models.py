@@ -76,15 +76,31 @@ class PortfolioItem(models.Model):
     def __str__(self):
         return f"{self.research_call.symbol} - {self.quantity} @ {self.entry_price}"
     
-    def save(self, *args, **kwargs):
-        # Calculate invested amount
-        self.invested_amount = self.entry_price * self.quantity
-        
-        # Calculate current value and P&L if current price is available
-        if self.current_price:
+    def calculate_pnl(self):
+        """Calculate P&L based on status"""
+        if self.status == 'CLOSED' and self.exit_price:
+            exit_value = self.exit_price * self.quantity
+            self.profit_loss = exit_value - self.invested_amount
+            if self.invested_amount > 0:
+                self.profit_loss_percentage = (self.profit_loss / self.invested_amount) * 100
+        elif self.current_price:
             self.current_value = self.current_price * self.quantity
             self.profit_loss = self.current_value - self.invested_amount
             if self.invested_amount > 0:
                 self.profit_loss_percentage = (self.profit_loss / self.invested_amount) * 100
+
+    def save(self, *args, **kwargs):
+        # Calculate invested amount
+        if not self.invested_amount and self.entry_price and self.quantity:
+            self.invested_amount = self.entry_price * self.quantity
+        
+        # Calculate P&L if not explicitly called (auto-update on save)
+        # Only update based on current_price if NOT closed
+        if self.status != 'CLOSED':
+            if self.current_price:
+                self.current_value = self.current_price * self.quantity
+                self.profit_loss = self.current_value - self.invested_amount
+                if self.invested_amount > 0:
+                    self.profit_loss_percentage = (self.profit_loss / self.invested_amount) * 100
         
         super().save(*args, **kwargs)

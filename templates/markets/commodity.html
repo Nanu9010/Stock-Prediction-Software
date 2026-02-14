@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/market_hero.css' %}">{% endblock %}
+
+{% block content %}
+<div class="market-section-page">
+  <div class="section-page-container">
+    <a href="{% url 'dashboard:home' %}" class="back-link">← Back to Market Hero</a>
+    <div class="section-page-header">
+      <div class="section-page-title">🛢️ Commodities</div>
+      <div class="section-page-desc">Live commodity prices — Gold, Silver, Crude Oil, Natural Gas, and more.</div>
+    </div>
+
+    <!-- Indian Commodity Prices (INR) -->
+    <div class="section-header-hero">
+      <div class="section-title-hero"><span class="icon">🇮🇳</span> Indian Market (MCX)</div>
+    </div>
+    <div class="widgets-row" style="margin-bottom: 32px;">
+      {% for item in indian_commodities %}
+      <div class="widget-card-hero">
+        <div class="widget-item-hero" style="border: none; padding: 24px;">
+          <div class="item-info">
+            <div style="font-size: 28px; margin-bottom: 8px;">{{ item.icon }}</div>
+            <div class="item-name-hero" style="font-size: 16px;">{{ item.name }}</div>
+          </div>
+          <div class="item-value-hero">
+            <div class="item-price" style="font-size: 20px;">{{ item.unit }}{{ item.price|floatformat:2 }}</div>
+            <div class="item-change-hero {% if item.change_pct >= 0 %}text-gain{% else %}text-loss{% endif %}" style="font-size: 14px;">
+              {% if item.change_pct >= 0 %}+{% endif %}{{ item.change_pct }}%
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Global Commodity Prices (USD) -->
+    <div class="section-header-hero">
+      <div class="section-title-hero"><span class="icon">🌐</span> Global Market (USD)</div>
+    </div>
+    <div class="widget-card-hero">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Commodity</th>
+            <th>Price</th>
+            <th>Change</th>
+            <th>Change %</th>
+            <th>Unit</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in global_commodities %}
+          <tr>
+            <td style="font-size: 20px;">{{ item.icon }}</td>
+            <td style="font-weight: 600;">{{ item.name }}</td>
+            <td style="font-weight: 700;">${{ item.price|floatformat:2 }}</td>
+            <td class="{% if item.change >= 0 %}text-gain{% else %}text-loss{% endif %}">
+              {% if item.change >= 0 %}+{% endif %}{{ item.change|floatformat:2 }}
+            </td>
+            <td class="{% if item.change_pct >= 0 %}text-gain{% else %}text-loss{% endif %}">
+              {% if item.change_pct >= 0 %}+{% endif %}{{ item.change_pct }}%
+            </td>
+            <td style="color: var(--text-muted);">{{ item.unit }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

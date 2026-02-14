@@ -1,450 +1,402 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Markets - Stock Prediction System{% endblock %}
-
 {% block extra_css %}
-<style>
-    .markets-container {
-        padding: 32px 0;
-        background-color: #f8f9fa;
-        min-height: 100vh;
-    }
-    
-    .section-header {
-        margin-bottom: 24px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    
-    .section-title {
-        font-size: 24px;
-        font-weight: 700;
-        color: #1f2937;
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-    
-    .live-indicator {
-        display: inline-block;
-        width: 10px;
-        height: 10px;
-        background-color: #ef4444;
-        border-radius: 50%;
-        animation: pulse 2s infinite;
-    }
-    
-    @keyframes pulse {
-        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-        70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
-        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-    }
-
-    /* Market Heatmap Grid */
-    .market-heatmap {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 24px;
-        margin-bottom: 48px;
-    }
-    
-    .heatmap-card {
-        background: white;
-        border-radius: 16px;
-        padding: 24px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    }
-    
-    .heatmap-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-        padding-bottom: 12px;
-        border-bottom: 1px solid #e5e7eb;
-    }
-    
-    .heatmap-title {
-        font-size: 18px;
-        font-weight: 600;
-    }
-    
-    .heatmap-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 12px;
-    }
-    
-    .stock-box {
-        padding: 12px;
-        border-radius: 8px;
-        color: white;
-        text-align: center;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        min-height: 80px;
-        transition: transform 0.2s;
-        cursor: pointer;
-    }
-    
-    .stock-box:hover {
-        transform: scale(1.05);
-        z-index: 10;
-    }
-    
-    .stock-symbol {
-        font-size: 12px;
-        font-weight: 700;
-        margin-bottom: 4px;
-    }
-    
-    .stock-change {
-        font-size: 14px;
-        font-weight: 600;
-    }
-    
-    /* Gainer/Loser Colors */
-    .bg-green-1 { background-color: #059669; } /* Strong Buy */
-    .bg-green-2 { background-color: #10b981; }
-    .bg-green-3 { background-color: #34d399; }
-    
-    .bg-red-1 { background-color: #dc2626; } /* Strong Sell */
-    .bg-red-2 { background-color: #ef4444; }
-    .bg-red-3 { background-color: #f87171; }
-
-    /* Vertical Widgets Section */
-    .widgets-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 24px;
-    }
-    
-    .widget-card {
-        background: white;
-        border-radius: 16px;
-        overflow: hidden;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        display: flex;
-        flex-direction: column;
-    }
-    
-    .widget-header {
-        padding: 20px;
-        font-weight: 700;
-        font-size: 18px;
-        color: white;
-    }
-    
-    .header-commodity { background: linear-gradient(135deg, #f59e0b, #d97706); }
-    .header-ipo { background: linear-gradient(135deg, #3b82f6, #2563eb); }
-    .header-etf { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
-    
-    .widget-list {
-        padding: 0;
-        margin: 0;
-        list-style: none;
-    }
-    
-    .widget-item {
-        padding: 16px 20px;
-        border-bottom: 1px solid #f3f4f6;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        transition: background 0.2s;
-    }
-    
-    .widget-item:last-child {
-        border-bottom: none;
-    }
-    
-    .widget-item:hover {
-        background-color: #f9fafb;
-    }
-    
-    .item-name {
-        font-weight: 600;
-        color: #374151;
-        display: block;
-    }
-    
-    .item-sub {
-        font-size: 12px;
-        color: #6b7280;
-    }
-    
-    .item-value {
-        text-align: right;
-        font-weight: 600;
-    }
-    
-    .text-green { color: #059669; }
-    .text-red { color: #dc2626; }
-    
-    @media (max-width: 1024px) {
-        .market-heatmap {
-            grid-template-columns: 1fr;
-        }
-        
-        .widgets-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-</style>
+<link rel="stylesheet" href="{% static 'css/market_hero.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="markets-container">
-    <div class="container">
-        <!-- Introduction -->
-        <div class="section-header">
-            <h1 class="section-title">
-                Market Overview
-                <span class="live-indicator" title="Live Market Data"></span>
-            </h1>
-            <div class="text-muted">{{ now|date:"l, d F Y" }}</div>
+<div class="market-hero">
+  <div class="hero-container">
+
+    <!-- ═══ Hero Banner ═══ -->
+    <div class="hero-banner">
+      <div>
+        <div class="hero-title">📊 Market Hero</div>
+        <div class="hero-subtitle">Multi-Stockbroker Pro Research & Live Market Data</div>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-value">{{ active_calls|default:"0" }}</div>
+          <div class="stat-label">Active Calls</div>
         </div>
-
-        <!-- Heatmap Section -->
-        <div class="market-heatmap">
-            <!-- Top Gainers -->
-            <div class="heatmap-card">
-                <div class="heatmap-header">
-                    <div class="heatmap-title text-success">Top Gainers (NIFTY 50)</div>
-                    <span class="badge bg-success bg-opacity-10 text-success">Bullish</span>
-                </div>
-                <div class="heatmap-grid">
-                    <div class="stock-box bg-green-1">
-                        <span class="stock-symbol">RELIANCE</span>
-                        <span class="stock-change">+4.2%</span>
-                    </div>
-                    <div class="stock-box bg-green-1">
-                        <span class="stock-symbol">HDFCBANK</span>
-                        <span class="stock-change">+3.8%</span>
-                    </div>
-                    <div class="stock-box bg-green-2">
-                        <span class="stock-symbol">INFY</span>
-                        <span class="stock-change">+2.5%</span>
-                    </div>
-                    <div class="stock-box bg-green-2">
-                        <span class="stock-symbol">ICICIBANK</span>
-                        <span class="stock-change">+2.1%</span>
-                    </div>
-                    <div class="stock-box bg-green-2">
-                        <span class="stock-symbol">TCS</span>
-                        <span class="stock-change">+1.9%</span>
-                    </div>
-                    <div class="stock-box bg-green-3">
-                        <span class="stock-symbol">ITC</span>
-                        <span class="stock-change">+1.5%</span>
-                    </div>
-                    <div class="stock-box bg-green-3">
-                        <span class="stock-symbol">SBIN</span>
-                        <span class="stock-change">+1.2%</span>
-                    </div>
-                    <div class="stock-box bg-green-3">
-                        <span class="stock-symbol">LT</span>
-                        <span class="stock-change">+1.1%</span>
-                    </div>
-                    <!-- More placeholders for grid effect -->
-                    <div class="stock-box bg-green-3"><span class="stock-symbol">BHARTI</span><span class="stock-change">+0.9%</span></div>
-                    <div class="stock-box bg-green-3"><span class="stock-symbol">KOTAK</span><span class="stock-change">+0.8%</span></div>
-                    <div class="stock-box bg-green-3"><span class="stock-symbol">WIPRO</span><span class="stock-change">+0.7%</span></div>
-                    <div class="stock-box bg-green-3"><span class="stock-symbol">HCLTECH</span><span class="stock-change">+0.5%</span></div>
-                </div>
-            </div>
-
-            <!-- Top Losers -->
-            <div class="heatmap-card">
-                <div class="heatmap-header">
-                    <div class="heatmap-title text-danger">Top Losers (NIFTY 50)</div>
-                    <span class="badge bg-danger bg-opacity-10 text-danger">Bearish</span>
-                </div>
-                <div class="heatmap-grid">
-                    <div class="stock-box bg-red-1">
-                        <span class="stock-symbol">ADANIENT</span>
-                        <span class="stock-change">-5.2%</span>
-                    </div>
-                    <div class="stock-box bg-red-1">
-                        <span class="stock-symbol">TATAMOTORS</span>
-                        <span class="stock-change">-4.1%</span>
-                    </div>
-                    <div class="stock-box bg-red-2">
-                        <span class="stock-symbol">MARUTI</span>
-                        <span class="stock-change">-3.5%</span>
-                    </div>
-                    <div class="stock-box bg-red-2">
-                        <span class="stock-symbol">M&M</span>
-                        <span class="stock-change">-2.8%</span>
-                    </div>
-                    <div class="stock-box bg-red-2">
-                        <span class="stock-symbol">SUNPHARMA</span>
-                        <span class="stock-change">-2.2%</span>
-                    </div>
-                    <div class="stock-box bg-red-3">
-                        <span class="stock-symbol">CIPLA</span>
-                        <span class="stock-change">-1.8%</span>
-                    </div>
-                    <div class="stock-box bg-red-3">
-                        <span class="stock-symbol">DRREDDY</span>
-                        <span class="stock-change">-1.5%</span>
-                    </div>
-                    <div class="stock-box bg-red-3">
-                        <span class="stock-symbol">DIVISLAB</span>
-                        <span class="stock-change">-1.2%</span>
-                    </div>
-                    <!-- More placeholders -->
-                    <div class="stock-box bg-red-3"><span class="stock-symbol">POWERGRID</span><span class="stock-change">-0.9%</span></div>
-                    <div class="stock-box bg-red-3"><span class="stock-symbol">NTPC</span><span class="stock-change">-0.8%</span></div>
-                    <div class="stock-box bg-red-3"><span class="stock-symbol">ONGC</span><span class="stock-change">-0.7%</span></div>
-                    <div class="stock-box bg-red-3"><span class="stock-symbol">BPCL</span><span class="stock-change">-0.5%</span></div>
-                </div>
-            </div>
+        <div class="stat-item">
+          <div class="stat-value">{{ total_calls|default:"0" }}</div>
+          <div class="stat-label">Total Calls</div>
         </div>
-
-        <!-- Widgets Section -->
-        <div class="widgets-grid">
-            <!-- Commodity Widget -->
-            <div class="widget-card">
-                <div class="widget-header header-commodity">
-                    Commodity Snapshot
-                </div>
-                <ul class="widget-list">
-                    <li class="widget-item">
-                        <div>
-                            <span class="item-name">Gold (10g)</span>
-                            <span class="item-sub">MCX Future</span>
-                        </div>
-                        <div class="item-value text-green">
-                            <div>₹62,450</div>
-                            <small>+0.45%</small>
-                        </div>
-                    </li>
-                    <li class="widget-item">
-                        <div>
-                            <span class="item-name">Silver (1kg)</span>
-                            <span class="item-sub">MCX Future</span>
-                        </div>
-                        <div class="item-value text-red">
-                            <div>₹74,200</div>
-                            <small>-0.12%</small>
-                        </div>
-                    </li>
-                    <li class="widget-item">
-                        <div>
-                            <span class="item-name">Crude Oil</span>
-                            <span class="item-sub">Brent</span>
-                        </div>
-                        <div class="item-value text-green">
-                            <div>$82.40</div>
-                            <small>+1.2%</small>
-                        </div>
-                    </li>
-                    <li class="widget-item">
-                        <div>
-                            <span class="item-name">Natural Gas</span>
-                            <span class="item-sub">MCX</span>
-                        </div>
-                        <div class="item-value text-red">
-                            <div>₹145.2</div>
-                            <small>-2.5%</small>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-
-            <!-- IPO Widget -->
-            <div class="widget-card">
-                <div class="widget-header header-ipo">
-                    Upcoming IPOs
-                </div>
-                <ul class="widget-list">
-                    <li class="widget-item">
-                        <div>
-                            <span class="item-name">Tata Technologies</span>
-                            <span class="item-sub">Tech / Auto</span>
-                        </div>
-                        <div class="item-value">
-                            <div>₹475 - ₹500</div>
-                            <small class="text-muted">Opens 22 Nov</small>
-                        </div>
-                    </li>
-                    <li class="widget-item">
-                        <div>
-                            <span class="item-name">Mamaearth</span>
-                            <span class="item-sub">Consumer Goods</span>
-                        </div>
-                        <div class="item-value">
-                            <div>₹308 - ₹324</div>
-                            <small class="text-muted">Closes 24 Nov</small>
-                        </div>
-                    </li>
-                    <li class="widget-item">
-                        <div>
-                            <span class="item-name">Ideaforge</span>
-                            <span class="item-sub">Drone Tech</span>
-                        </div>
-                        <div class="item-value">
-                            <div>₹638 - ₹672</div>
-                            <small class="text-muted">Listed</small>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-
-            <!-- ETF Widget -->
-            <div class="widget-card">
-                <div class="widget-header header-etf">
-                    Popular ETFs
-                </div>
-                <ul class="widget-list">
-                    <li class="widget-item">
-                        <div>
-                            <span class="item-name">NIFTYBEES</span>
-                            <span class="item-sub">Nippon India</span>
-                        </div>
-                        <div class="item-value text-green">
-                            <div>₹234.50</div>
-                            <small>+0.8%</small>
-                        </div>
-                    </li>
-                    <li class="widget-item">
-                        <div>
-                            <span class="item-name">BANKBEES</span>
-                            <span class="item-sub">Nippon India</span>
-                        </div>
-                        <div class="item-value text-green">
-                            <div>₹468.20</div>
-                            <small>+1.1%</small>
-                        </div>
-                    </li>
-                    <li class="widget-item">
-                        <div>
-                            <span class="item-name">GOLDBEES</span>
-                            <span class="item-sub">Nippon India</span>
-                        </div>
-                        <div class="item-value text-green">
-                            <div>₹54.30</div>
-                            <small>+0.3%</small>
-                        </div>
-                    </li>
-                     <li class="widget-item">
-                        <div>
-                            <span class="item-name">SILVERBEES</span>
-                            <span class="item-sub">Nippon India</span>
-                        </div>
-                        <div class="item-value text-red">
-                            <div>₹72.10</div>
-                            <small>-0.2%</small>
-                        </div>
-                    </li>
-                </ul>
-            </div>
+        <div class="stat-item">
+          <div class="stat-value">{{ success_rate }}%</div>
+          <div class="stat-label">Success Rate</div>
         </div>
+      </div>
     </div>
+
+    <!-- ═══ Market Indices Strip ═══ -->
+    <div class="index-strip">
+      {% for idx in market_indices %}
+      <div class="index-card">
+        <div class="index-name">{{ idx.name }}</div>
+        <div class="index-price">₹{{ idx.price|floatformat:2 }}</div>
+        <div class="index-change {% if idx.change >= 0 %}positive{% else %}negative{% endif %}">
+          {% if idx.change >= 0 %}▲{% else %}▼{% endif %}
+          {{ idx.change|floatformat:2 }} ({{ idx.change_pct|floatformat:2 }}%)
+        </div>
+      </div>
+      {% empty %}
+      <div class="index-card">
+        <div class="index-name">NIFTY 50</div>
+        <div class="index-price">₹22,145.50</div>
+        <div class="index-change positive">▲ 85.30 (0.39%)</div>
+      </div>
+      <div class="index-card">
+        <div class="index-name">SENSEX</div>
+        <div class="index-price">₹72,980.20</div>
+        <div class="index-change positive">▲ 248.10 (0.34%)</div>
+      </div>
+      <div class="index-card">
+        <div class="index-name">BANK NIFTY</div>
+        <div class="index-price">₹47,125.80</div>
+        <div class="index-change negative">▼ 120.50 (-0.26%)</div>
+      </div>
+      <div class="index-card">
+        <div class="index-name">NIFTY IT</div>
+        <div class="index-price">₹37,450.40</div>
+        <div class="index-change positive">▲ 195.60 (0.52%)</div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- ═══ Market Sentiment ═══ -->
+    <div class="sentiment-bar">
+      <span class="sentiment-label">Market Sentiment</span>
+      <span class="sentiment-label text-gain">🐂 Buy {{ sentiment.buy_pct }}%</span>
+      <div class="sentiment-track">
+        <div class="sentiment-fill" style="width: {{ sentiment.buy_pct }}%"></div>
+      </div>
+      <span class="sentiment-label text-loss">🐻 Sell {{ sentiment.sell_pct }}%</span>
+      <span class="sentiment-text">({{ sentiment.total }} Active Calls)</span>
+    </div>
+
+    <!-- ═══ Today Top 10 Gainers / Losers Heatmap ═══ -->
+    <div class="section-header-hero">
+      <div class="section-title-hero">
+        <span class="icon">🔥</span> Today Top 10 Gainers & Losers
+        <span class="live-dot"></span>
+      </div>
+      <a href="{% url 'dashboard:markets' %}" class="view-all-link">View All →</a>
+    </div>
+
+    <div class="heatmap-section">
+      <!-- Gainers -->
+      <div class="heatmap-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <span style="font-weight: 700; color: var(--accent-green); font-size: 15px;">📈 Top Gainers</span>
+          <span class="ipo-status ipo-open">Bullish</span>
+        </div>
+        <div class="heatmap-grid">
+          {% for stock in today_gainers %}
+          <div class="stock-tile {% if stock.change_pct >= 2 %}gain-1{% elif stock.change_pct >= 1 %}gain-2{% else %}gain-3{% endif %}">
+            <span class="tile-symbol">{{ stock.symbol }}</span>
+            <span class="tile-change">+{{ stock.change_pct }}%</span>
+            <span class="tile-price">₹{{ stock.price }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Losers -->
+      <div class="heatmap-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <span style="font-weight: 700; color: var(--accent-red); font-size: 15px;">📉 Top Losers</span>
+          <span class="ipo-status" style="background: rgba(255,82,82,0.15); color: var(--accent-red);">Bearish</span>
+        </div>
+        <div class="heatmap-grid">
+          {% for stock in today_losers %}
+          <div class="stock-tile {% if stock.change_pct <= -2 %}loss-1{% elif stock.change_pct <= -1 %}loss-2{% else %}loss-3{% endif %}">
+            <span class="tile-symbol">{{ stock.symbol }}</span>
+            <span class="tile-change">{{ stock.change_pct }}%</span>
+            <span class="tile-price">₹{{ stock.price }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Weekly Top Gainers ═══ -->
+    <div class="weekly-section">
+      <div class="section-header-hero">
+        <div class="section-title-hero">
+          <span class="icon">📊</span> Weekly Top Gainers
+        </div>
+      </div>
+      <div class="weekly-scroll">
+        {% for stock in weekly_gainers %}
+        <div class="weekly-card">
+          <div class="weekly-symbol">{{ stock.symbol }}</div>
+          <div class="weekly-price">₹{{ stock.price }}</div>
+          <div class="weekly-change text-gain">+{{ stock.change_pct }}%</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- ═══ Weekly Top Losers ═══ -->
+    <div class="weekly-section">
+      <div class="section-header-hero">
+        <div class="section-title-hero">
+          <span class="icon">📉</span> Weekly Top Losers
+        </div>
+      </div>
+      <div class="weekly-scroll">
+        {% for stock in weekly_losers %}
+        <div class="weekly-card">
+          <div class="weekly-symbol">{{ stock.symbol }}</div>
+          <div class="weekly-price">₹{{ stock.price }}</div>
+          <div class="weekly-change text-loss">{{ stock.change_pct }}%</div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- ═══ Commodity / IPO / ETF Widgets Row ═══ -->
+    <div class="section-header-hero">
+      <div class="section-title-hero">
+        <span class="icon">💹</span> Market Snapshot
+      </div>
+    </div>
+
+    <div class="widgets-row">
+      <!-- Commodity Widget -->
+      <div class="widget-card-hero">
+        <div class="widget-header-hero header-commodity">🛢️ Commodities</div>
+        <ul class="widget-list-hero">
+          {% for item in commodities %}
+          <li class="widget-item-hero">
+            <div class="item-info">
+              <div class="item-name-hero">{{ item.icon }} {{ item.name }}</div>
+              <div class="item-sub-hero">{{ item.unit }}</div>
+            </div>
+            <div class="item-value-hero">
+              <div class="item-price">{{ item.price|floatformat:2 }}</div>
+              <div class="item-change-hero {% if item.change_pct >= 0 %}text-gain{% else %}text-loss{% endif %}">
+                {% if item.change_pct >= 0 %}+{% endif %}{{ item.change_pct }}%
+              </div>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <!-- IPO Widget -->
+      <div class="widget-card-hero">
+        <div class="widget-header-hero header-ipo">🏢 Upcoming IPOs</div>
+        <ul class="widget-list-hero">
+          {% for ipo in upcoming_ipos|slice:":4" %}
+          <li class="widget-item-hero">
+            <div class="item-info">
+              <div class="item-name-hero">{{ ipo.company }}</div>
+              <div class="item-sub-hero">{{ ipo.sector }} · {{ ipo.price_band }}</div>
+            </div>
+            <div class="item-value-hero">
+              <span class="ipo-status {% if ipo.status == 'OPEN' %}ipo-open{% elif ipo.status == 'UPCOMING' %}ipo-upcoming{% else %}ipo-closed{% endif %}">
+                {{ ipo.status }}
+              </span>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <!-- ETF Widget -->
+      <div class="widget-card-hero">
+        <div class="widget-header-hero header-etf">📦 Popular ETFs</div>
+        <ul class="widget-list-hero">
+          {% for etf in etfs|slice:":5" %}
+          <li class="widget-item-hero">
+            <div class="item-info">
+              <div class="item-name-hero">{{ etf.symbol }}</div>
+              <div class="item-sub-hero">{{ etf.category }}</div>
+            </div>
+            <div class="item-value-hero">
+              <div class="item-price">₹{{ etf.price }}</div>
+              <div class="item-change-hero {% if etf.change_pct >= 0 %}text-gain{% else %}text-loss{% endif %}">
+                {% if etf.change_pct >= 0 %}+{% endif %}{{ etf.change_pct }}%
+              </div>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+    <!-- ═══ SIP / Mutual Funds / Bonds Row ═══ -->
+    <div class="widgets-row">
+      <!-- SIP Widget -->
+      <div class="widget-card-hero">
+        <div class="widget-header-hero header-sip">💰 Top SIP Funds</div>
+        <ul class="widget-list-hero">
+          {% for sip in sip_funds|slice:":4" %}
+          <li class="widget-item-hero">
+            <div class="item-info">
+              <div class="item-name-hero">{{ sip.name }}</div>
+              <div class="item-sub-hero">{{ sip.category }} · Min ₹{{ sip.min_sip }}</div>
+            </div>
+            <div class="item-value-hero">
+              <div class="item-change-hero text-gain">{{ sip.returns_1y }}% <span style="font-size:10px; color: var(--text-muted);">1Y</span></div>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <!-- Mutual Funds Widget -->
+      <div class="widget-card-hero">
+        <div class="widget-header-hero header-mf">📈 Mutual Funds</div>
+        <ul class="widget-list-hero">
+          {% for mf in mutual_funds|slice:":4" %}
+          <li class="widget-item-hero">
+            <div class="item-info">
+              <div class="item-name-hero">{{ mf.name }}</div>
+              <div class="item-sub-hero">{{ mf.category }} · AUM {{ mf.aum }}</div>
+            </div>
+            <div class="item-value-hero">
+              <div class="item-change-hero text-gain">{{ mf.returns_1y }}% <span style="font-size:10px; color: var(--text-muted);">1Y</span></div>
+              <div class="star-rating">{% for i in "12345" %}{% if forloop.counter <= mf.rating %}★{% else %}☆{% endif %}{% endfor %}</div>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <!-- Bonds Widget -->
+      <div class="widget-card-hero">
+        <div class="widget-header-hero header-bonds">🏛️ Bonds</div>
+        <ul class="widget-list-hero">
+          {% for bond in bonds|slice:":4" %}
+          <li class="widget-item-hero">
+            <div class="item-info">
+              <div class="item-name-hero">{{ bond.name }}</div>
+              <div class="item-sub-hero">{{ bond.type }} · {{ bond.rating }}</div>
+            </div>
+            <div class="item-value-hero">
+              <div class="item-price">{{ bond.yield_pct }}%</div>
+              <div class="item-sub-hero">Yield · {{ bond.maturity }}</div>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+    <!-- ═══ Liquidity / Recently Listed Row ═══ -->
+    <div class="widgets-row">
+      <!-- Liquidity Widget -->
+      <div class="widget-card-hero">
+        <div class="widget-header-hero header-liquidity">💧 Money Market & Liquidity</div>
+        <ul class="widget-list-hero">
+          {% for rate in liquidity|slice:":5" %}
+          <li class="widget-item-hero">
+            <div class="item-info">
+              <div class="item-name-hero">{{ rate.name }}</div>
+              <div class="item-sub-hero">{{ rate.description }}</div>
+            </div>
+            <div class="item-value-hero">
+              <div class="item-price">{{ rate.rate }}%</div>
+              <div class="item-change-hero {% if rate.change > 0 %}text-gain{% elif rate.change < 0 %}text-loss{% else %}{% endif %}">
+                {% if rate.change > 0 %}+{% endif %}{% if rate.change != 0 %}{{ rate.change }}%{% else %}—{% endif %}
+              </div>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <!-- Recently Listed IPOs -->
+      <div class="widget-card-hero">
+        <div class="widget-header-hero header-ipo">🆕 Recently Listed</div>
+        <ul class="widget-list-hero">
+          {% for ipo in recently_listed %}
+          <li class="widget-item-hero">
+            <div class="item-info">
+              <div class="item-name-hero">{{ ipo.company }}</div>
+              <div class="item-sub-hero">{{ ipo.sector }} · Issue ₹{{ ipo.issue_price }}</div>
+            </div>
+            <div class="item-value-hero">
+              <div class="item-price">₹{{ ipo.current_price }}</div>
+              <div class="item-change-hero {% if ipo.return_pct >= 0 %}text-gain{% else %}text-loss{% endif %}">
+                {% if ipo.return_pct >= 0 %}+{% endif %}{{ ipo.return_pct }}%
+              </div>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <!-- Top Brokers Widget -->
+      <div class="widget-card-hero">
+        <div class="widget-header-hero" style="background: linear-gradient(135deg, #00695c, #00897b);">🏆 Top Performing Brokers</div>
+        <ul class="widget-list-hero">
+          {% for broker in top_brokers %}
+          <li class="widget-item-hero">
+            <div class="item-info">
+              <div class="item-name-hero">{{ broker.name }}</div>
+              <div class="item-sub-hero">{{ broker.total_calls }} calls published</div>
+            </div>
+            <div class="item-value-hero">
+              <div class="item-price text-gain">{{ broker.overall_accuracy|default:"N/A" }}%</div>
+              <div class="item-sub-hero">accuracy</div>
+            </div>
+          </li>
+          {% empty %}
+          <li class="widget-item-hero">
+            <div class="item-info">
+              <div class="item-name-hero">No brokers yet</div>
+              <div class="item-sub-hero">Add brokers from admin panel</div>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+    <!-- ═══ Quick Navigation ═══ -->
+    <div class="section-header-hero" style="margin-top: 20px;">
+      <div class="section-title-hero">
+        <span class="icon">🚀</span> Explore More
+      </div>
+    </div>
+
+    <div class="index-strip" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+      <a href="{% url 'dashboard:sip' %}" class="index-card" style="text-decoration: none; background: linear-gradient(135deg, rgba(0,105,92,0.3), rgba(0,137,123,0.1));">
+        <div class="index-name">💰 SIP</div>
+        <div style="color: var(--text-secondary); font-size: 12px;">Systematic Plans</div>
+      </a>
+      <a href="{% url 'dashboard:mutual_funds' %}" class="index-card" style="text-decoration: none; background: linear-gradient(135deg, rgba(40,53,147,0.3), rgba(57,73,171,0.1));">
+        <div class="index-name">📈 Mutual Funds</div>
+        <div style="color: var(--text-secondary); font-size: 12px;">Top Performers</div>
+      </a>
+      <a href="{% url 'dashboard:etf' %}" class="index-card" style="text-decoration: none; background: linear-gradient(135deg, rgba(106,27,154,0.3), rgba(123,31,162,0.1));">
+        <div class="index-name">📦 ETFs</div>
+        <div style="color: var(--text-secondary); font-size: 12px;">Exchange Traded</div>
+      </a>
+      <a href="{% url 'dashboard:bonds' %}" class="index-card" style="text-decoration: none; background: linear-gradient(135deg, rgba(78,52,46,0.3), rgba(93,64,55,0.1));">
+        <div class="index-name">🏛️ Bonds</div>
+        <div style="color: var(--text-secondary); font-size: 12px;">Fixed Income</div>
+      </a>
+      <a href="{% url 'dashboard:commodity' %}" class="index-card" style="text-decoration: none; background: linear-gradient(135deg, rgba(255,143,0,0.3), rgba(245,124,0,0.1));">
+        <div class="index-name">🛢️ Commodities</div>
+        <div style="color: var(--text-secondary); font-size: 12px;">Gold, Oil, More</div>
+      </a>
+      <a href="{% url 'dashboard:liquidity' %}" class="index-card" style="text-decoration: none; background: linear-gradient(135deg, rgba(55,71,79,0.3), rgba(69,90,100,0.1));">
+        <div class="index-name">💧 Liquidity</div>
+        <div style="color: var(--text-secondary); font-size: 12px;">Money Market</div>
+      </a>
+      <a href="{% url 'dashboard:trades_dashboard' %}" class="index-card" style="text-decoration: none; background: linear-gradient(135deg, rgba(68,138,255,0.3), rgba(68,138,255,0.1));">
+        <div class="index-name">📋 Trades</div>
+        <div style="color: var(--text-secondary); font-size: 12px;">All Categories</div>
+      </a>
+    </div>
+
+  </div>
 </div>
 {% endblock %}

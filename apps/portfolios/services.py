@@ -40,22 +40,27 @@ def add_to_portfolio(user, research_call, entry_price, quantity, entry_date=None
         raise ValueError('This call is already in your portfolio')
     
     # Create portfolio item
+    # Create portfolio item
+    entry_price = Decimal(str(entry_price))
+    quantity = int(quantity)
+    
     item = PortfolioItem.objects.create(
         portfolio=portfolio,
         research_call=research_call,
         entry_price=entry_price,
         quantity=quantity,
-        entry_date=entry_date or timezone.now().date(),
-        invested_amount=Decimal(str(entry_price)) * quantity
+        entry_date=entry_date or timezone.now().date()
+        # invested_amount will be calculated in save()
     )
     
     # Audit log
+    # Audit log
     AuditLog.objects.create(
         user=user,
-        action='ADD_TO_PORTFOLIO',
-        entity_type='PortfolioItem',
-        entity_id=item.id,
-        new_values={
+        action='CREATE',  # Changed from ADD_TO_PORTFOLIO to match choices
+        model_name='PortfolioItem',
+        object_id=item.id,
+        changes_json={
             'symbol': research_call.symbol,
             'entry_price': str(entry_price),
             'quantity': quantity
@@ -94,10 +99,10 @@ def exit_position(portfolio_item, exit_price, exit_date=None, exit_by=None):
     if exit_by:
         AuditLog.objects.create(
             user=exit_by,
-            action='EXIT_POSITION',
-            entity_type='PortfolioItem',
-            entity_id=portfolio_item.id,
-            new_values={
+            action='UPDATE',  # Changed from EXIT_POSITION to match choices
+            model_name='PortfolioItem',
+            object_id=portfolio_item.id,
+            changes_json={
                 'exit_price': str(exit_price),
                 'pnl': str(portfolio_item.profit_loss)
             }

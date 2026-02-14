@@ -69,9 +69,9 @@ def add_to_watchlist_view(request):
             if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({'success': False, 'error': str(e)})
             
-            return redirect('research_calls:list')
+            return redirect('research_calls:live_calls')
     
-    return redirect('research_calls:list')
+    return redirect('research_calls:live_calls')
 
 
 @login_required

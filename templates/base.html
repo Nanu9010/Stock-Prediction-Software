@@ -82,22 +82,33 @@
             <!-- Primary Menu -->
             <div class="navbar-menu">
                 <div class="menu-item">
-                    <a href="{% url 'dashboard:home' %}" class="menu-link">Markets</a>
+                    <a href="{% url 'dashboard:markets' %}" class="menu-link">Markets</a>
+                </div>
+                <div class="menu-item" style="position: relative;">
+                    <a href="{% url 'dashboard:trades_dashboard' %}" class="menu-link">Trades ▾</a>
+                    <div class="nav-dropdown" style="display: none; position: absolute; top: 100%; left: 0; background: #111932; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 8px 0; min-width: 180px; z-index: 1000;">
+                        <a href="{% url 'dashboard:trades_dashboard' %}?tab=intraday" style="display: block; padding: 8px 16px; color: #fff; text-decoration: none; font-size: 13px;">Intraday</a>
+                        <a href="{% url 'dashboard:trades_dashboard' %}?tab=short" style="display: block; padding: 8px 16px; color: #fff; text-decoration: none; font-size: 13px;">Short Term</a>
+                        <a href="{% url 'dashboard:trades_dashboard' %}?tab=medium" style="display: block; padding: 8px 16px; color: #fff; text-decoration: none; font-size: 13px;">Medium Term</a>
+                        <a href="{% url 'dashboard:trades_dashboard' %}?tab=long" style="display: block; padding: 8px 16px; color: #fff; text-decoration: none; font-size: 13px;">Long Term</a>
+                        <a href="{% url 'dashboard:trades_dashboard' %}?tab=futures" style="display: block; padding: 8px 16px; color: #fff; text-decoration: none; font-size: 13px;">Futures</a>
+                        <a href="{% url 'dashboard:trades_dashboard' %}?tab=options" style="display: block; padding: 8px 16px; color: #fff; text-decoration: none; font-size: 13px;">Options</a>
+                        <a href="{% url 'dashboard:trades_dashboard' %}?tab=commodity" style="display: block; padding: 8px 16px; color: #fff; text-decoration: none; font-size: 13px;">Commodity</a>
+                    </div>
                 </div>
                 <div class="menu-item">
-                    <a href="{% url 'research_calls:live_calls' %}" class="menu-link">
-                        PRO Trades
-                        <span class="pro-badge">PRO</span>
-                    </a>
+                    <a href="{% url 'dashboard:ipo' %}" class="menu-link">IPO</a>
                 </div>
-                <div class="menu-item">
-                    <a href="{% url 'research_calls:pro_baskets' %}" class="menu-link">
-                        PRO Baskets
-                        <span class="pro-badge">PRO</span>
-                    </a>
-                </div>
-                <div class="menu-item">
-                    <a href="/ipo/" class="menu-link">IPO</a>
+                <div class="menu-item" style="position: relative;">
+                    <a href="#" class="menu-link">Invest ▾</a>
+                    <div class="nav-dropdown" style="display: none; position: absolute; top: 100%; left: 0; background: #111932; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 8px 0; min-width: 180px; z-index: 1000;">
+                        <a href="{% url 'dashboard:sip' %}" style="display: block; padding: 8px 16px; color: #fff; text-decoration: none; font-size: 13px;">💰 SIP</a>
+                        <a href="{% url 'dashboard:mutual_funds' %}" style="display: block; padding: 8px 16px; color: #fff; text-decoration: none; font-size: 13px;">📈 Mutual Funds</a>
+                        <a href="{% url 'dashboard:etf' %}" style="display: block; padding: 8px 16px; color: #fff; text-decoration: none; font-size: 13px;">📦 ETFs</a>
+                        <a href="{% url 'dashboard:bonds' %}" style="display: block; padding: 8px 16px; color: #fff; text-decoration: none; font-size: 13px;">🏛️ Bonds</a>
+                        <a href="{% url 'dashboard:commodity' %}" style="display: block; padding: 8px 16px; color: #fff; text-decoration: none; font-size: 13px;">🛢️ Commodities</a>
+                        <a href="{% url 'dashboard:liquidity' %}" style="display: block; padding: 8px 16px; color: #fff; text-decoration: none; font-size: 13px;">💧 Liquidity</a>
+                    </div>
                 </div>
                 <div class="menu-item">
                     <a href="/explore/" class="menu-link">Explore</a>
@@ -162,12 +173,13 @@
                 <div class="footer-column">
                     <h4>Markets</h4>
                     <ul class="footer-links">
-                        <li><a href="/trades/short-term/">Short Term</a></li>
-                        <li><a href="/trades/medium-term/">Medium Term</a></li>
-                        <li><a href="/trades/long-term/">Long Term</a></li>
-                        <li><a href="/trades/futures/">Futures</a></li>
-                        <li><a href="/trades/options/">Options</a></li>
-                        <li><a href="/trades/commodity/">Commodity</a></li>
+                        <li><a href="/sip/">SIP</a></li>
+                        <li><a href="/mutual-funds/">Mutual Funds</a></li>
+                        <li><a href="/etf/">ETFs</a></li>
+                        <li><a href="/bonds/">Bonds</a></li>
+                        <li><a href="/commodity/">Commodities</a></li>
+                        <li><a href="/liquidity/">Liquidity</a></li>
+                        <li><a href="/trades-dashboard/">All Trades</a></li>
                     </ul>
                 </div>
                 
@@ -213,6 +225,15 @@
         // Mobile menu toggle
         document.querySelector('.mobile-menu-toggle')?.addEventListener('click', () => {
             document.querySelector('.navbar-menu').classList.toggle('active');
+        });
+
+        // Dropdown hover for nav menus
+        document.querySelectorAll('.menu-item').forEach(item => {
+            const dropdown = item.querySelector('.nav-dropdown');
+            if (dropdown) {
+                item.addEventListener('mouseenter', () => { dropdown.style.display = 'block'; });
+                item.addEventListener('mouseleave', () => { dropdown.style.display = 'none'; });
+            }
         });
     </script>
     {% block extra_js %}{% endblock %}

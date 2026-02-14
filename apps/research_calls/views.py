@@ -10,81 +10,7 @@ from apps.brokers.models import Broker
 from apps.authentication.decorators import role_required
 
 
-def call_list_view(request):
-    """Enhanced call list with card layout and filters"""
-    calls = ResearchCall.objects.filter(status='ACTIVE').select_related(
-        'broker', 'created_by'
-    ).order_by('-published_at')
-    
-    # Filtering
-    timeframe = request.GET.get('timeframe', 'all')
-    broker_id = request.GET.get('broker')
-    action = request.GET.get('action')
-    search = request.GET.get('search')
-    
-    if timeframe != 'all':
-        calls = calls.filter(call_type=timeframe.upper())
-    
-    if broker_id:
-        calls = calls.filter(broker_id=broker_id)
-    
-    if action:
-        calls = calls.filter(action=action.upper())
-    
-    if search:
-        calls = calls.filter(
-            Q(symbol__icontains=search) |
-            Q(broker__name__icontains=search)
-        )
-    
-    # Get brokers for filter
-    brokers = Broker.objects.all()
-    
-    context = {
-        'calls': calls,
-        'brokers': brokers,
-        'selected_timeframe': timeframe,
-        'selected_broker': broker_id,
-        'selected_action': action,
-        'search_query': search,
-    }
-    
-    return render(request, 'research_calls/call_list_cards.html', context)
 
-
-def closed_trades_view(request):
-    """Closed trades view with performance metrics"""
-    closed_calls = ResearchCall.objects.filter(
-        status='CLOSED'
-    ).select_related('broker', 'created_by').order_by('-closed_at')
-    
-    # Filtering
-    timeframe = request.GET.get('timeframe', 'all')
-    broker_id = request.GET.get('broker')
-    
-    if timeframe != 'all':
-        closed_calls = closed_calls.filter(call_type=timeframe.upper())
-    
-    if broker_id:
-        closed_calls = closed_calls.filter(broker_id=broker_id)
-    
-    # Calculate broker performance
-    broker_stats = Broker.objects.annotate(
-        total_calls=Count('research_calls', filter=Q(research_calls__status='CLOSED')),
-        avg_return=Avg('research_calls__expected_return_percentage', filter=Q(research_calls__status='CLOSED'))
-    ).filter(total_calls__gt=0)
-    
-    brokers = Broker.objects.all()
-    
-    context = {
-        'closed_calls': closed_calls,
-        'broker_stats': broker_stats,
-        'brokers': brokers,
-        'selected_timeframe': timeframe,
-        'selected_broker': broker_id,
-    }
-    
-    return render(request, 'research_calls/closed_trades.html', context)
 
 
 @login_required
@@ -210,21 +136,15 @@ def live_calls_view(request):
     # Category filter
     category = request.GET.get('category', 'all')
     if category != 'all':
-        calls = calls.filter(call_type=category.upper().replace(' ', '_'))
+        normalized_cat = category.upper().replace(' ', '_')
+        if normalized_cat in ['FUTURES', 'OPTIONS', 'COMMODITY']:
+            calls = calls.filter(instrument_type=normalized_cat)
+        else:
+            calls = calls.filter(call_type=normalized_cat)
     
-    # Group by category for display
-    categorized_calls = {
-        'short_term': calls.filter(call_type='SHORT_TERM'),
-        'medium_term': calls.filter(call_type='MEDIUM_TERM'),
-        'long_term': calls.filter(call_type='LONG_TERM'),
-        'futures': calls.filter(call_type='FUTURES'),
-        'options': calls.filter(call_type='OPTIONS'),
-        'commodity': calls.filter(call_type='COMMODITY'),
-    }
-    
+    # Context (categorized_calls removed as unused in new template)
     context = {
         'calls': calls,
-        'categorized_calls': categorized_calls,
         'selected_category': category,
         'total_count': calls.count(),
     }
@@ -236,9 +156,13 @@ def closed_calls_view(request):
     calls = ResearchCall.objects.filter(status='CLOSED').select_related('broker', 'created_by')
     
     # Category filter
-    category = request.GET.get('category', 'short')
+    category = request.GET.get('category', 'all')
     if category != 'all':
-        calls = calls.filter(call_type=category.upper().replace(' ', '_'))
+        normalized_cat = category.upper().replace(' ', '_')
+        if normalized_cat in ['FUTURES', 'OPTIONS', 'COMMODITY']:
+            calls = calls.filter(instrument_type=normalized_cat)
+        else:
+            calls = calls.filter(call_type=normalized_cat)
     
     # Search filter
     search_query = request.GET.get('search')
@@ -265,8 +189,3 @@ def closed_calls_view(request):
     }
     return render(request, 'research_calls/closed_trades.html', context)
 
-
-@login_required
-def pro_baskets_view(request):
-    """View for PRO Baskets"""
-    return render(request, 'pro/baskets.html')

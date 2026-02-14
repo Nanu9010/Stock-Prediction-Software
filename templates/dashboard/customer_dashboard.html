@@ -145,6 +145,65 @@
             </div>
         </div>
     </div>
+
+    <!-- Market Sentiment -->
+    {% if sentiment %}
+    <div class="sentiment-section" style="margin-top: 2rem; padding: 1.5rem; background: linear-gradient(135deg, #111932, #0d1a3a); border-radius: 16px;">
+        <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 12px;">
+            <h3 style="margin: 0; color: #fff; font-size: 1.1rem;">Market Sentiment</h3>
+            <span style="padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700;
+                {% if sentiment.sentiment == 'BULLISH' %}background: rgba(0,230,118,0.15); color: #00e676;
+                {% elif sentiment.sentiment == 'BEARISH' %}background: rgba(255,82,82,0.15); color: #ff5252;
+                {% else %}background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.6);{% endif %}">
+                {{ sentiment.sentiment }}
+            </span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <span style="color: #00e676; font-size: 13px; font-weight: 600; white-space: nowrap;">🐂 Buy {{ sentiment.buy_pct }}%</span>
+            <div style="flex: 1; height: 8px; background: #ff5252; border-radius: 4px; overflow: hidden;">
+                <div style="height: 100%; background: #00e676; border-radius: 4px; width: {{ sentiment.buy_pct }}%;"></div>
+            </div>
+            <span style="color: #ff5252; font-size: 13px; font-weight: 600; white-space: nowrap;">🐻 Sell {{ sentiment.sell_pct }}%</span>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Recommended For You -->
+    {% if recommendations %}
+    <div style="margin-top: 2rem;">
+        <div class="section-header" style="background: transparent; box-shadow: none; padding: 0; margin-bottom: 1.5rem; border-bottom: none;">
+            <h2 style="font-size: 1.25rem;">🎯 Recommended For You</h2>
+            <a href="{% url 'dashboard:trades_dashboard' %}" class="btn btn-sm btn-outline">View All Trades</a>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem;">
+            {% for rec in recommendations %}
+            <div style="background: white; border-radius: 12px; padding: 1.25rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-left: 4px solid {% if rec.type == 'top_broker' %}#448aff{% elif rec.type == 'sector_match' %}#00e676{% else %}#ffd740{% endif %};">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+                    <div>
+                        <h4 style="margin: 0; font-weight: 700; font-size: 1rem;">{{ rec.call.symbol }}</h4>
+                        <small style="color: #777;">{{ rec.call.get_call_type_display }} · {{ rec.call.get_instrument_type_display }}</small>
+                    </div>
+                    <span style="padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;
+                        {% if rec.call.action == 'BUY' %}background: rgba(0,230,118,0.12); color: #00c853;
+                        {% else %}background: rgba(255,82,82,0.12); color: #ff1744;{% endif %}">
+                        {{ rec.call.action }}
+                    </span>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px; margin-bottom: 0.75rem;">
+                    <div><span style="color: #888;">Entry:</span> <strong>₹{{ rec.call.entry_price }}</strong></div>
+                    <div><span style="color: #888;">Target:</span> <strong style="color: #00c853;">₹{{ rec.call.target_1 }}</strong></div>
+                    <div><span style="color: #888;">SL:</span> <strong style="color: #ff1744;">₹{{ rec.call.stop_loss }}</strong></div>
+                    <div><span style="color: #888;">R:R:</span> <strong>{{ rec.call.risk_reward_ratio|default:"-" }}</strong></div>
+                </div>
+                <div style="font-size: 12px; color: #888; padding-top: 8px; border-top: 1px solid #eee;">
+                    💡 {{ rec.reason }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
 </div>
 
 <style>

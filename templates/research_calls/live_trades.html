@@ -5,134 +5,176 @@
 
 {% block extra_css %}
 <style>
-.live-trades-container {
-    padding: 32px 0;
-}
+.trades-page { padding: 32px 0; max-width: 1280px; margin: 0 auto; padding: 0 24px 48px; }
 
-.page-header {
-    margin-bottom: 32px;
-}
+.page-header { margin-bottom: 24px; }
+.page-header h1 { font-size: 32px; font-weight: 700; color: #111827; margin-bottom: 4px; }
+.subtitle { color: #6b7280; font-size: 16px; }
 
-.page-header h1 {
-    font-size: 32px;
-    font-weight: 700;
-    margin-bottom: 8px;
+/* Live/Closed Toggle */
+.status-toggle {
+    display: flex; gap: 0; margin-bottom: 24px; background: #f3f4f6;
+    border-radius: 12px; padding: 4px; width: fit-content;
 }
-
-.subtitle {
-    color: #6b7280;
-    font-size: 16px;
+.status-toggle a {
+    padding: 10px 28px; border-radius: 10px; font-weight: 600; font-size: 14px;
+    text-decoration: none; color: #6b7280; transition: all 0.2s;
 }
+.status-toggle a.active { background: #111827; color: white; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+.status-toggle a:hover:not(.active) { color: #111827; }
 
-/* Category Filter Tabs */
+/* Category Filters */
 .category-filters {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 32px;
-    flex-wrap: wrap;
-    padding: 16px;
-    background: #f9fafb;
-    border-radius: 12px;
+    display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap;
+    padding: 12px; background: #f9fafb; border-radius: 12px;
 }
-
 .category-tab {
-    padding: 10px 20px;
-    border-radius: 8px;
-    background: white;
-    border: 2px solid #e5e7eb;
-    color: #374151;
-    font-weight: 500;
-    text-decoration: none;
-    transition: all 0.2s;
+    padding: 8px 18px; border-radius: 8px; background: white; border: 1.5px solid #e5e7eb;
+    color: #374151; font-weight: 500; font-size: 13px; text-decoration: none; transition: all 0.2s;
+}
+.category-tab:hover { border-color: #2563eb; color: #2563eb; }
+.category-tab.active { background: #2563eb; border-color: #2563eb; color: white; }
+
+/* Trades Grid */
+.trades-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px;
 }
 
-.category-tab:hover {
-    border-color: #2563eb;
-    color: #2563eb;
+/* Unified Trade Card */
+.trade-card {
+    background: white; border-radius: 16px; overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #e5e7eb;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.trade-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+
+.card-top {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 16px 20px 12px; border-bottom: 1px solid #f3f4f6;
+}
+.posted-date { font-size: 12px; color: #9ca3af; }
+.type-badge {
+    padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600;
+    text-transform: uppercase; background: #eff6ff; color: #2563eb;
 }
 
-.category-tab.active {
-    background: #2563eb;
-    border-color: #2563eb;
-    color: white;
+.card-body { padding: 16px 20px; }
+
+.symbol-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.symbol-name { font-size: 20px; font-weight: 700; color: #111827; }
+.action-pill {
+    padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 700;
+}
+.action-pill.buy { background: #d1fae5; color: #065f46; }
+.action-pill.sell { background: #fee2e2; color: #991b1b; }
+
+.price-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 14px; }
+.price-item { text-align: center; }
+.price-label { font-size: 11px; color: #9ca3af; text-transform: uppercase; margin-bottom: 2px; }
+.price-value { font-size: 15px; font-weight: 700; }
+.price-value.entry { color: #111827; }
+.price-value.target { color: #10b981; }
+.price-value.stoploss { color: #ef4444; }
+
+.potential-bar {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: white; padding: 10px 16px; border-radius: 8px;
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;
+}
+.potential-bar .label { font-size: 12px; opacity: 0.9; }
+.potential-bar .value { font-size: 18px; font-weight: 800; }
+
+/* Closed-specific: net gain */
+.gain-bar {
+    padding: 10px 16px; border-radius: 8px;
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;
+}
+.gain-bar.positive { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; }
+.gain-bar.negative { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; }
+.gain-bar .label { font-size: 12px; opacity: 0.9; }
+.gain-bar .value { font-size: 18px; font-weight: 800; }
+
+.card-footer {
+    display: flex; gap: 8px; padding: 0 20px 16px;
+}
+.card-footer .btn {
+    flex: 1; padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 600;
+    text-align: center; text-decoration: none; transition: all 0.2s; border: none; cursor: pointer;
+}
+.btn-view { background: #f3f4f6; color: #374151; }
+.btn-view:hover { background: #e5e7eb; }
+.btn-pro { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; }
+.btn-pro:hover { opacity: 0.9; }
+
+.no-results {
+    grid-column: 1 / -1; text-align: center; padding: 60px;
+    background: white; border-radius: 16px; color: #6b7280;
 }
 
-    .category-tab {
-        text-align: center;
-    }
-}
-</style>
+@media (max-width: 768px) { .trades-grid { grid-template-columns: 1fr; } }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container live-trades-container">
-    <!-- Header -->
+<div class="trades-page">
     <div class="page-header">
-        <h1>Live Trades ({{ total_count }})</h1>
-        <p class="subtitle">Active research calls across all categories</p>
+        <h1>Research Trades</h1>
+        <p class="subtitle">{{ total_count }} active research calls across all categories</p>
+    </div>
+
+    <!-- Live / Closed Toggle -->
+    <div class="status-toggle">
+        <a href="{% url 'research_calls:live_calls' %}" class="active">Live Trades</a>
+        <a href="{% url 'research_calls:closed_calls' %}">Closed Trades</a>
     </div>
 
     <!-- Category Filters -->
     <div class="category-filters">
-        <a href="?category=all" class="category-tab {% if selected_category == 'all' %}active{% endif %}">
-            All
-        </a>
-        <a href="?category=short_term" class="category-tab {% if selected_category == 'short_term' %}active{% endif %}">
-            Short Term
-        </a>
-        <a href="?category=medium_term" class="category-tab {% if selected_category == 'medium_term' %}active{% endif %}">
-            Medium Term
-        </a>
-        <a href="?category=long_term" class="category-tab {% if selected_category == 'long_term' %}active{% endif %}">
-            Long Term
-        </a>
-        <a href="?category=futures" class="category-tab {% if selected_category == 'futures' %}active{% endif %}">
-            Futures
-        </a>
-        <a href="?category=options" class="category-tab {% if selected_category == 'options' %}active{% endif %}">
-            Options
-        </a>
-        <a href="?category=commodity" class="category-tab {% if selected_category == 'commodity' %}active{% endif %}">
-            Commodity
-        </a>
+        <a href="?category=all" class="category-tab {% if selected_category == 'all' %}active{% endif %}">All</a>
+        <a href="?category=short_term" class="category-tab {% if selected_category == 'short_term' %}active{% endif %}">Short Term</a>
+        <a href="?category=medium_term" class="category-tab {% if selected_category == 'medium_term' %}active{% endif %}">Medium Term</a>
+        <a href="?category=long_term" class="category-tab {% if selected_category == 'long_term' %}active{% endif %}">Long Term</a>
+        <a href="?category=futures" class="category-tab {% if selected_category == 'futures' %}active{% endif %}">Futures</a>
+        <a href="?category=options" class="category-tab {% if selected_category == 'options' %}active{% endif %}">Options</a>
+        <a href="?category=commodity" class="category-tab {% if selected_category == 'commodity' %}active{% endif %}">Commodity</a>
     </div>
 
-    <!-- Live Trades Grid -->
-    <div class="live-trades-grid">
+    <!-- Trades Grid -->
+    <div class="trades-grid">
         {% for call in calls %}
-        <div class="pro-trade-card">
-            <div class="pro-card-header">
-                <span class="posted-date">Posted: {{ call.published_at|date:"d M y | h:i A" }}</span>
-                <span class="duration-badge">
-                    <svg width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
-                        <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/>
-                    </svg>
-                    {{ call.get_call_type_display }}
-                </span>
+        <div class="trade-card">
+            <div class="card-top">
+                <span class="posted-date">{{ call.published_at|date:"d M y · h:i A" }}</span>
+                <span class="type-badge">{{ call.get_call_type_display }}</span>
             </div>
-
-            <div class="pro-banner">
-                Available with all PRO plans
-            </div>
-
-            <div class="pro-visual-container">
-                <div class="potential-badge">
-                    Potential left : {{ call.expected_return_percentage|floatformat:2 }} %
+            <div class="card-body">
+                <div class="symbol-row">
+                    <span class="symbol-name">{{ call.symbol }}</span>
+                    <span class="action-pill {% if call.action == 'BUY' %}buy{% else %}sell{% endif %}">{{ call.action }}</span>
                 </div>
-                
-                {% if user.is_authenticated and user.subscription and user.subscription.is_active %}
-                <a href="{% url 'research_calls:detail' call.id %}" class="btn-subscribe-lock">
-                    View Trade
-                </a>
-                {% else %}
-                <a href="{% url 'payments:membership' %}" class="btn-subscribe-lock">
-                    <svg width="12" height="12" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM5 8h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/>
-                    </svg>
-                    Subscribe Now
-                </a>
+                <div class="price-grid">
+                    <div class="price-item">
+                        <div class="price-label">Entry</div>
+                        <div class="price-value entry">₹{{ call.entry_price }}</div>
+                    </div>
+                    <div class="price-item">
+                        <div class="price-label">Target</div>
+                        <div class="price-value target">₹{{ call.target_1 }}</div>
+                    </div>
+                    <div class="price-item">
+                        <div class="price-label">Stop Loss</div>
+                        <div class="price-value stoploss">₹{{ call.stop_loss }}</div>
+                    </div>
+                </div>
+                <div class="potential-bar">
+                    <span class="label">Potential Return</span>
+                    <span class="value">{{ call.expected_return_percentage|floatformat:1 }}%</span>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'research_calls:detail' call.id %}" class="btn btn-view">View Details</a>
+                {% if not user.is_authenticated or not user.subscription %}
+                <a href="{% url 'payments:membership' %}" class="btn btn-pro">🔒 Go PRO</a>
                 {% endif %}
             </div>
         </div>
@@ -142,12 +184,5 @@
         </div>
         {% endfor %}
     </div>
-
-    <!-- View All Link -->
-    {% if calls.count > 8 %}
-    <div class="view-all-section">
-        <a href="?category=all" class="view-all-link">View all {{ total_count }} live trades →</a>
-    </div>
-    {% endif %}
 </div>
 {% endblock %}

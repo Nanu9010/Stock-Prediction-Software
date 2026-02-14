@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/market_hero.css' %}">{% endblock %}
+
+{% block content %}
+<div class="market-section-page">
+  <div class="section-page-container">
+    <a href="{% url 'dashboard:home' %}" class="back-link">← Back to Market Hero</a>
+    <div class="section-page-header">
+      <div class="section-page-title">📦 Exchange Traded Funds (ETFs)</div>
+      <div class="section-page-desc">Popular ETFs with live prices from NSE.</div>
+    </div>
+
+    <div class="widget-card-hero" style="margin-bottom: 24px;">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ETF Name</th>
+            <th>Symbol</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Change</th>
+            <th>Change %</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for etf in etfs %}
+          <tr>
+            <td style="font-weight: 600;">{{ etf.name }}</td>
+            <td>{{ etf.symbol }}</td>
+            <td>{{ etf.category }}</td>
+            <td>₹{{ etf.price }}</td>
+            <td class="{% if etf.change >= 0 %}text-gain{% else %}text-loss{% endif %}">
+              {% if etf.change >= 0 %}+{% endif %}{{ etf.change }}
+            </td>
+            <td class="{% if etf.change_pct >= 0 %}text-gain{% else %}text-loss{% endif %}">
+              {% if etf.change_pct >= 0 %}+{% endif %}{{ etf.change_pct }}%
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

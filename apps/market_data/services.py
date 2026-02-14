@@ -1,39 +1,20 @@
 """
-Market data services using free yfinance API
+Market Data services using infrastructure client
 """
-import yfinance as yf
 from decimal import Decimal
 from apps.market_data.models import MarketIndex, StockPrice, PopularStock
+from infrastructure.market_data_client import MarketDataClient
 from django.utils import timezone
 import logging
 
 logger = logging.getLogger(__name__)
 
-
-# Indian stock symbol mapping
-INDIAN_SYMBOLS = {
-    'NIFTY50': '^NSEI',
-    'SENSEX': '^BSESN',
-    'BANKNIFTY': '^NSEBANK',
-    'NIFTYIT': '^CNXIT',
-    'NIFTYPHARMA': '^CNXPHARMA',
-}
-
-
-def get_indian_symbol(symbol):
-    """Convert symbol to Yahoo Finance format for Indian stocks"""
-    if symbol in INDIAN_SYMBOLS:
-        return INDIAN_SYMBOLS[symbol]
-    
-    # For individual stocks, add .NS for NSE or .BO for BSE
-    if not symbol.endswith(('.NS', '.BO')):
-        return f"{symbol}.NS"
-    return symbol
-
+# Initialize client
+client = MarketDataClient()
 
 def fetch_stock_price(symbol):
     """
-    Fetch current stock price using yfinance (FREE)
+    Fetch current stock price using infrastructure client
     
     Args:
         symbol: Stock symbol (e.g., 'RELIANCE', 'TCS')
@@ -41,70 +22,31 @@ def fetch_stock_price(symbol):
     Returns:
         dict with price data or None
     """
-    try:
-        yf_symbol = get_indian_symbol(symbol)
-        ticker = yf.Ticker(yf_symbol)
-        info = ticker.info
-        
-        if not info:
-            return None
-        
-        current_price = info.get('currentPrice') or info.get('regularMarketPrice')
-        previous_close = info.get('previousClose')
-        
-        if not current_price or not previous_close:
-            return None
-        
-        change = current_price - previous_close
-        change_percent = (change / previous_close) * 100
-        
-        return {
-            'symbol': symbol,
-            'current_price': Decimal(str(current_price)),
-            'change': Decimal(str(change)),
-            'change_percent': Decimal(str(change_percent)),
-            'volume': info.get('volume', 0),
-            'market_cap': info.get('marketCap'),
-            'company_name': info.get('longName', symbol),
-        }
-    
-    except Exception as e:
-        logger.error(f"Error fetching price for {symbol}: {e}")
-        return None
+    return client.fetch_stock_price(symbol)
 
 
 def update_index_prices():
-    """Update all market indices using yfinance (FREE)"""
+    """Update all market indices using infrastructure client"""
     updated_count = 0
     
-    for index_code, yf_symbol in INDIAN_SYMBOLS.items():
+    for index_code in client.INDIAN_SYMBOLS.keys():
         try:
-            ticker = yf.Ticker(yf_symbol)
-            info = ticker.info
+            price_data = client.fetch_stock_price(index_code)
             
-            if not info:
+            if not price_data:
                 continue
-            
-            current_price = info.get('regularMarketPrice')
-            previous_close = info.get('previousClose')
-            
-            if not current_price or not previous_close:
-                continue
-            
-            change = current_price - previous_close
-            change_percent = (change / previous_close) * 100
             
             MarketIndex.objects.update_or_create(
                 symbol=index_code,
                 defaults={
-                    'name': info.get('longName', index_code),
-                    'current_price': Decimal(str(current_price)),
-                    'change': Decimal(str(change)),
-                    'change_percent': Decimal(str(change_percent)),
-                    'open_price': Decimal(str(info.get('regularMarketOpen', current_price))),
-                    'high': Decimal(str(info.get('dayHigh', current_price))),
-                    'low': Decimal(str(info.get('dayLow', current_price))),
-                    'previous_close': Decimal(str(previous_close)),
+                    'name': price_data.get('company_name', index_code),
+                    'current_price': price_data['current_price'],
+                    'change': price_data['change'],
+                    'change_percent': price_data['change_percent'],
+                    'open_price': price_data.get('open_price', price_data['current_price']),
+                    'high': price_data.get('high', price_data['current_price']),
+                    'low': price_data.get('low', price_data['current_price']),
+                    'previous_close': price_data.get('previous_close', price_data['current_price']),
                 }
             )
             updated_count += 1
@@ -121,12 +63,19 @@ def update_popular_stocks():
     updated_count = 0
     
     for stock in popular_stocks:
-        price_data = fetch_stock_price(stock.symbol)
+        price_data = client.fetch_stock_price(stock.symbol)
         
         if price_data:
             StockPrice.objects.update_or_create(
                 symbol=stock.symbol,
-                defaults=price_data
+                defaults={
+                    'current_price': price_data['current_price'],
+                    'change': price_data['change'],
+                    'change_percent': price_data['change_percent'],
+                    'volume': price_data['volume'],
+                    'market_cap': price_data['market_cap'],
+                    'company_name': price_data['company_name'],
+                }
             )
             updated_count += 1
     
@@ -135,24 +84,9 @@ def update_popular_stocks():
 
 def get_stock_history(symbol, period='1mo'):
     """
-    Get historical stock data (FREE)
-    
-    Args:
-        symbol: Stock symbol
-        period: Time period (1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, max)
-    
-    Returns:
-        DataFrame with historical data
+    Get historical stock data
     """
-    try:
-        yf_symbol = get_indian_symbol(symbol)
-        ticker = yf.Ticker(yf_symbol)
-        hist = ticker.history(period=period)
-        return hist
-    
-    except Exception as e:
-        logger.error(f"Error fetching history for {symbol}: {e}")
-        return None
+    return client.get_stock_history(symbol, period)
 
 
 def get_market_summary():

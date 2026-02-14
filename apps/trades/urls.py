@@ -7,10 +7,10 @@ from apps.trades import views
 app_name = 'trades'
 
 urlpatterns = [
-    path('short-term/', views.short_term_trades_view, name='short_term'),
-    path('medium-term/', views.medium_term_trades_view, name='medium_term'),
-    path('long-term/', views.long_term_trades_view, name='long_term'),
-    path('futures/', views.futures_trades_view, name='futures'),
-    path('options/', views.options_trades_view, name='options'),
-    path('commodity/', views.commodity_trades_view, name='commodity'),
+    path('short-term/', views.trade_list_view, {'trade_type': 'short-term'}, name='short_term'),
+    path('medium-term/', views.trade_list_view, {'trade_type': 'medium-term'}, name='medium_term'),
+    path('long-term/', views.trade_list_view, {'trade_type': 'long-term'}, name='long_term'),
+    path('futures/', views.trade_list_view, {'trade_type': 'futures'}, name='futures'),
+    path('options/', views.trade_list_view, {'trade_type': 'options'}, name='options'),
+    path('commodity/', views.trade_list_view, {'trade_type': 'commodity'}, name='commodity'),
 ]

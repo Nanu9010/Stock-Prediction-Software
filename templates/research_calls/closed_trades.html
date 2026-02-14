@@ -3,113 +3,218 @@
 
 {% block title %}Closed Trades - Stock Research Platform{% endblock %}
 
+{% block extra_css %}
+<style>
+.trades-page { padding: 32px 0; max-width: 1280px; margin: 0 auto; padding: 0 24px 48px; }
+
+.page-header { margin-bottom: 24px; }
+.page-header h1 { font-size: 32px; font-weight: 700; color: #111827; margin-bottom: 4px; }
+.subtitle { color: #6b7280; font-size: 16px; }
+
+/* Live/Closed Toggle */
+.status-toggle {
+    display: flex; gap: 0; margin-bottom: 24px; background: #f3f4f6;
+    border-radius: 12px; padding: 4px; width: fit-content;
+}
+.status-toggle a {
+    padding: 10px 28px; border-radius: 10px; font-weight: 600; font-size: 14px;
+    text-decoration: none; color: #6b7280; transition: all 0.2s;
+}
+.status-toggle a.active { background: #111827; color: white; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+.status-toggle a:hover:not(.active) { color: #111827; }
+
+/* Performance Summary */
+.perf-summary {
+    display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;
+}
+.perf-stat {
+    background: white; padding: 16px 24px; border-radius: 12px;
+    border: 1px solid #e5e7eb; flex: 1; min-width: 140px; text-align: center;
+}
+.perf-stat .stat-value { font-size: 28px; font-weight: 800; color: #111827; }
+.perf-stat .stat-label { font-size: 12px; color: #9ca3af; text-transform: uppercase; margin-top: 4px; }
+.perf-stat.success .stat-value { color: #10b981; }
+.perf-stat.danger .stat-value { color: #ef4444; }
+
+/* Category Filters */
+.category-filters {
+    display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap;
+    padding: 12px; background: #f9fafb; border-radius: 12px;
+}
+.category-tab {
+    padding: 8px 18px; border-radius: 8px; background: white; border: 1.5px solid #e5e7eb;
+    color: #374151; font-weight: 500; font-size: 13px; text-decoration: none; transition: all 0.2s;
+}
+.category-tab:hover { border-color: #2563eb; color: #2563eb; }
+.category-tab.active { background: #2563eb; border-color: #2563eb; color: white; }
+
+/* Trades Grid */
+.trades-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px;
+}
+
+/* Unified Trade Card — same as live_trades.html */
+.trade-card {
+    background: white; border-radius: 16px; overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #e5e7eb;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.trade-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+
+.card-top {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 16px 20px 12px; border-bottom: 1px solid #f3f4f6;
+}
+.posted-date { font-size: 12px; color: #9ca3af; }
+.type-badge {
+    padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600;
+    text-transform: uppercase; background: #eff6ff; color: #2563eb;
+}
+
+.card-body { padding: 16px 20px; }
+
+.symbol-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.symbol-name { font-size: 20px; font-weight: 700; color: #111827; }
+.action-pill {
+    padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 700;
+}
+.action-pill.buy { background: #d1fae5; color: #065f46; }
+.action-pill.sell { background: #fee2e2; color: #991b1b; }
+
+.price-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 14px; }
+.price-item { text-align: center; }
+.price-label { font-size: 11px; color: #9ca3af; text-transform: uppercase; margin-bottom: 2px; }
+.price-value { font-size: 15px; font-weight: 700; }
+.price-value.entry { color: #111827; }
+.price-value.target { color: #10b981; }
+.price-value.stoploss { color: #ef4444; }
+
+/* Closed-specific: net gain bar */
+.gain-bar {
+    padding: 10px 16px; border-radius: 8px;
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;
+}
+.gain-bar.positive { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; }
+.gain-bar.negative { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; }
+.gain-bar .label { font-size: 12px; opacity: 0.9; }
+.gain-bar .value { font-size: 18px; font-weight: 800; }
+
+.exit-info {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px;
+    padding: 10px; background: #f9fafb; border-radius: 8px; font-size: 13px;
+}
+.exit-info .label { color: #9ca3af; }
+.exit-info .val { font-weight: 600; color: #111827; }
+
+.card-footer {
+    display: flex; gap: 8px; padding: 0 20px 16px;
+}
+.card-footer .btn {
+    flex: 1; padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 600;
+    text-align: center; text-decoration: none; transition: all 0.2s; border: none; cursor: pointer;
+}
+.btn-view { background: #f3f4f6; color: #374151; }
+.btn-view:hover { background: #e5e7eb; }
+
+.no-results {
+    grid-column: 1 / -1; text-align: center; padding: 60px;
+    background: white; border-radius: 16px; color: #6b7280;
+}
+
+@media (max-width: 768px) {
+    .trades-grid { grid-template-columns: 1fr; }
+    .perf-summary { flex-direction: column; }
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container">
-    <!-- Performance Banner -->
-    <div class="perf-banner">
-        <div class="perf-header">
-            <h2 class="perf-title">Closed trades</h2>
-            
-            <!-- Search Bar -->
-            <form method="get" class="search-form">
-                <input type="text" name="search" placeholder="Search trade..." value="{{ search_query|default:'' }}">
-                <button type="submit">
-                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
-                    </svg>
-                </button>
-                {% if selected_category != 'all' %}
-                <input type="hidden" name="category" value="{{ selected_category }}">
-                {% endif %}
-            </form>
+<div class="trades-page">
+    <div class="page-header">
+        <h1>Closed Trades</h1>
+        <p class="subtitle">{{ total_calls }} closed research calls with {{ accuracy|floatformat:1 }}% accuracy</p>
+    </div>
 
-            <div class="perf-filters">
-                <a href="?category=short" class="perf-pill {% if selected_category == 'short' %}active{% endif %}">Short</a>
-                <a href="?category=medium" class="perf-pill {% if selected_category == 'medium' %}active{% endif %}">Medium</a>
-                <a href="?category=long" class="perf-pill {% if selected_category == 'long' %}active{% endif %}">Long</a>
-                <a href="?category=futures" class="perf-pill {% if selected_category == 'futures' %}active{% endif %}">Futures</a>
-                <a href="?category=options" class="perf-pill {% if selected_category == 'options' %}active{% endif %}">Options</a>
-                <a href="?category=commodity" class="perf-pill {% if selected_category == 'commodity' %}active{% endif %}">Commodity</a>
-            </div>
+    <!-- Live / Closed Toggle -->
+    <div class="status-toggle">
+        <a href="{% url 'research_calls:live_calls' %}">Live Trades</a>
+        <a href="{% url 'research_calls:closed_calls' %}" class="active">Closed Trades</a>
+    </div>
+
+    <!-- Performance Summary -->
+    <div class="perf-summary">
+        <div class="perf-stat">
+            <div class="stat-value">{{ total_calls }}</div>
+            <div class="stat-label">Total Closed</div>
         </div>
-
-        <div class="progress-container">
-            <div class="progress-bar" style="width: {{ accuracy|default:0 }}%;"></div>
-            <div class="progress-miss" style="width: {{ 100|add:'-'|add:accuracy }}%;"></div>
+        <div class="perf-stat success">
+            <div class="stat-value">{{ successful_calls }}</div>
+            <div class="stat-label">Hits</div>
         </div>
-
-        <div class="perf-stats">
-            <span class="stat-hit">Hit: {{ successful_calls }}</span>
-            <span class="stat-acc">{{ accuracy|floatformat:2 }}% Accuracy</span>
-            <span class="stat-miss">Miss: {{ failed_calls }}</span>
+        <div class="perf-stat danger">
+            <div class="stat-value">{{ failed_calls }}</div>
+            <div class="stat-label">Misses</div>
         </div>
-
-        <div class="dark-center">
-            <a href="{% url 'payments:membership' %}" class="btn-subscribe-dark">Subscribe now</a>
+        <div class="perf-stat">
+            <div class="stat-value">{{ accuracy|floatformat:1 }}%</div>
+            <div class="stat-label">Accuracy</div>
         </div>
     </div>
 
-    <!-- Closed Trades Grid -->
-    <div class="closed-trades-grid">
+    <!-- Category Filters -->
+    <div class="category-filters">
+        <a href="?category=all" class="category-tab {% if selected_category == 'all' %}active{% endif %}">All</a>
+        <a href="?category=short_term" class="category-tab {% if selected_category == 'short_term' %}active{% endif %}">Short Term</a>
+        <a href="?category=medium_term" class="category-tab {% if selected_category == 'medium_term' %}active{% endif %}">Medium Term</a>
+        <a href="?category=long_term" class="category-tab {% if selected_category == 'long_term' %}active{% endif %}">Long Term</a>
+        <a href="?category=futures" class="category-tab {% if selected_category == 'futures' %}active{% endif %}">Futures</a>
+        <a href="?category=options" class="category-tab {% if selected_category == 'options' %}active{% endif %}">Options</a>
+        <a href="?category=commodity" class="category-tab {% if selected_category == 'commodity' %}active{% endif %}">Commodity</a>
+    </div>
+
+    <!-- Trades Grid -->
+    <div class="trades-grid">
         {% for call in calls %}
-        <div class="closed-trade-card-modern">
-            <div class="closed-card-header">
-                <div class="company-info">
-                    <div class="company-logo">
-                        {{ call.symbol|slice:":1" }}
+        <div class="trade-card">
+            <div class="card-top">
+                <span class="posted-date">{{ call.created_at|date:"d M y · h:i A" }}</span>
+                <span class="type-badge">{{ call.get_call_type_display }}</span>
+            </div>
+            <div class="card-body">
+                <div class="symbol-row">
+                    <span class="symbol-name">{{ call.symbol }}</span>
+                    <span class="action-pill {% if call.action == 'BUY' %}buy{% else %}sell{% endif %}">{{ call.action }}</span>
+                </div>
+                <div class="price-grid">
+                    <div class="price-item">
+                        <div class="price-label">Entry</div>
+                        <div class="price-value entry">₹{{ call.entry_price|floatformat:2 }}</div>
                     </div>
-                    <div>
-                        <div class="company-name">{{ call.symbol }}</div>
+                    <div class="price-item">
+                        <div class="price-label">Target</div>
+                        <div class="price-value target">₹{{ call.target_1|floatformat:2 }}</div>
+                    </div>
+                    <div class="price-item">
+                        <div class="price-label">Stop Loss</div>
+                        <div class="price-value stoploss">₹{{ call.stop_loss|floatformat:2 }}</div>
                     </div>
                 </div>
-                <div>
-                    <span class="profit-status">Profit Booked</span>
-                    <span class="trade-time-badge">{{ call.call_type|lower|capfirst }} term</span>
-                </div>
-            </div>
 
-            <div class="trade-table">
-                <div class="trade-row trade-head">
-                    <div>Date</div>
-                    <div>Action</div>
-                    <div>Price</div>
-                    <div>Range</div>
+                <!-- Exit Info -->
+                <div class="exit-info">
+                    <div><span class="label">Exit Price: </span><span class="val">₹{{ call.exit_price|default:call.target_1|floatformat:2 }}</span></div>
+                    <div><span class="label">Closed: </span><span class="val">{{ call.closed_at|date:"d M y" }}</span></div>
                 </div>
-                <div class="trade-row">
-                    <div>{{ call.created_at|date:"d/m/y | h:i A" }}</div>
-                    <div><span class="badge-action badge-buy">{{ call.action }}</span></div>
-                    <div>₹{{ call.entry_price|floatformat:2 }}</div>
-                    <div>{{ call.entry_price|floatformat:1 }} - {{ call.target_1|floatformat:1 }}</div>
-                </div>
-                <div class="trade-row">
-                    <div>{{ call.closed_at|date:"d/m/y | h:i A" }}</div>
-                    <div><span class="badge-action badge-exit">Exit full</span></div>
-                    <div>₹{{ call.exit_price|default:call.target_1|floatformat:2 }}</div>
-                    <div>-</div>
-                </div>
-            </div>
 
-            <div class="net-gain-bar">
-                Net gain: {{ call.actual_return_percentage|floatformat:2 }}% in {{ call.duration_days|default:1 }} days
+                <!-- Net Gain/Loss -->
+                <div class="gain-bar {% if call.actual_return_percentage > 0 %}positive{% else %}negative{% endif %}">
+                    <span class="label">Net Return</span>
+                    <span class="value">{% if call.actual_return_percentage > 0 %}+{% endif %}{{ call.actual_return_percentage|floatformat:1 }}%</span>
+                </div>
             </div>
-
-            <div class="card-sidebar-actions">
-                <button class="btn-icon-action">
-                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M2 2v13.5a.5.5 0 0 0 .74.439L8 13.069l5.26 2.87A.5.5 0 0 0 14 15.5V2a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2"/>
-                    </svg>
-                </button>
-                <button class="btn-icon-action">
-                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-                        <path d="M11.354 4.646a.5.5 0 0 0-.708 0l-6 6a.5.5 0 0 0 .708.708l6-6a.5.5 0 0 0 0-.708"/>
-                    </svg>
-                </button>
-                <a href="{% url 'research_calls:call_detail' call.id %}" class="btn-exit-trade">
-                    Exit trade &rarr;
-                </a>
+            <div class="card-footer">
+                <a href="{% url 'research_calls:detail' call.id %}" class="btn btn-view">View Details</a>
             </div>
-            <a href="{% url 'research_calls:call_detail' call.id %}" class="btn-about-trade">About trade</a>
         </div>
         {% empty %}
         <div class="no-results">
@@ -118,290 +223,4 @@
         {% endfor %}
     </div>
 </div>
-
-<style>
-/* Dark Theme Styles matching live_trades.html */
-body {
-    background-color: #f3f4f6;
-}
-
-.page-header {
-    margin-bottom: 32px;
-}
-
-.page-header h1 {
-    font-size: 32px;
-    font-weight: 800;
-    color: #111827;
-    margin-bottom: 8px;
-}
-
-.subtitle {
-    font-size: 18px;
-    color: #6b7280;
-}
-
-/* Search Form */
-.search-form {
-    display: flex;
-    align-items: center;
-    background: white;
-    padding: 8px 16px;
-    border-radius: 20px;
-    border: 1px solid #e5e7eb;
-    margin: 0 20px;
-    flex: 1;
-    max-width: 400px;
-}
-
-.search-form input {
-    border: none;
-    outline: none;
-    width: 100%;
-    font-size: 14px;
-    color: #374151;
-}
-
-.search-form button {
-    background: none;
-    border: none;
-    color: #9ca3af;
-    cursor: pointer;
-    padding: 0;
-    display: flex;
-    align-items: center;
-}
-
-.search-form button:hover {
-    color: #6b7280;
-}
-
-/* Category Tabs */
-.filter-tabs-section {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 32px;
-    flex-wrap: wrap;
-    gap: 16px;
-}
-
-.filter-tabs {
-    display: flex;
-    background: white;
-    padding: 6px;
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    overflow-x: auto;
-}
-
-.filter-tab {
-    padding: 10px 20px;
-    border-radius: 8px;
-    color: #4b5563;
-    font-weight: 500;
-    text-decoration: none;
-    transition: all 0.2s;
-    white-space: nowrap;
-}
-
-.filter-tab:hover {
-    background-color: #f3f4f6;
-    color: #111827;
-}
-
-.filter-tab.active {
-    background-color: #111827;
-    color: white;
-}
-
-/* Broker Filter */
-.filter-select {
-    padding: 10px 16px;
-    border-radius: 8px;
-    border: 1px solid #d1d5db;
-    background-color: white;
-    color: #374151;
-    font-size: 14px;
-    outline: none;
-}
-
-/* Broker Performance Section */
-.broker-performance-section {
-    margin-bottom: 40px;
-}
-
-.broker-performance-section h2 {
-    font-size: 24px;
-    font-weight: 700;
-    color: #1f2937;
-    margin-bottom: 24px;
-}
-
-.broker-cards-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 24px;
-}
-
-.broker-performance-card {
-    background: white;
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e5e7eb;
-}
-
-/* Closed Trades Grid - Matching Live Trades Cards */
-.closed-trades-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-    gap: 24px;
-}
-
-.closed-trade-card {
-    background: linear-gradient(145deg, #1f2937 0%, #111827 100%);
-    border-radius: 20px;
-    padding: 24px;
-    color: white;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s;
-}
-
-.closed-trade-card:hover {
-    transform: translateY(-4px);
-}
-
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 20px;
-}
-
-.broker-info {
-    display: flex;
-    flex-direction: column;
-}
-
-.broker-name {
-    font-size: 14px;
-    color: #9ca3af;
-    margin-bottom: 4px;
-}
-
-.symbol {
-    font-size: 24px;
-    font-weight: 700;
-    color: white;
-    margin: 0;
-}
-
-.category-badge {
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-}
-
-/* Category Colors */
-.badge-short { background: rgba(251, 191, 36, 0.2); color: #fbbf24; }
-.badge-medium { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
-.badge-long { background: rgba(16, 185, 129, 0.2); color: #34d399; }
-.badge-futures { background: rgba(139, 92, 246, 0.2); color: #a78bfa; }
-.badge-options { background: rgba(236, 72, 153, 0.2); color: #f472b6; }
-.badge-commodity { background: rgba(249, 115, 22, 0.2); color: #fb923c; }
-
-/* Performance Display */
-.performance-display {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 24px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.return-label {
-    font-size: 14px;
-    color: #9ca3af;
-}
-
-.return-value {
-    font-size: 28px;
-    font-weight: 700;
-}
-
-.return-positive { color: #34d399; }
-.return-negative { color: #f87171; }
-
-/* Trade Details */
-.trade-details {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 24px;
-}
-
-.detail-item {
-    display: flex;
-    flex-direction: column;
-}
-
-.detail-label {
-    font-size: 12px;
-    color: #9ca3af;
-    margin-bottom: 4px;
-}
-
-.detail-value {
-    font-size: 16px;
-    font-weight: 600;
-    color: white;
-}
-
-.action-buy { color: #34d399; }
-.action-sell { color: #f87171; }
-
-.card-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 16px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.posted-date {
-    font-size: 12px;
-    color: #9ca3af;
-}
-
-.btn-details {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    padding: 8px 16px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 500;
-    transition: background 0.2s;
-}
-
-.btn-details:hover {
-    background: rgba(255, 255, 255, 0.2);
-}
-
-.no-results {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 60px;
-    background: white;
-    border-radius: 16px;
-    color: #6b7280;
-}
-</style>
 {% endblock %}

@@ -11,7 +11,7 @@ from datetime import timedelta
 import json
 
 from .models import Payment, Subscription, SubscriptionPlan
-from .razorpay_service import RazorpayService
+from infrastructure.razorpay_client import RazorpayClient
 
 
 @login_required
@@ -65,7 +65,7 @@ def create_subscription_order(request):
         )
         
         # Create Razorpay order
-        razorpay_service = RazorpayService()
+        razorpay_service = RazorpayClient()
         try:
             order = razorpay_service.create_order(
                 amount=amount,
@@ -118,7 +118,7 @@ def verify_payment(request):
             return JsonResponse({'error': 'Payment not found'}, status=404)
         
         # Verify signature
-        razorpay_service = RazorpayService()
+        razorpay_service = RazorpayClient()
         if razorpay_service.verify_payment_signature(
             razorpay_order_id, razorpay_payment_id, razorpay_signature
         ):
@@ -178,7 +178,7 @@ def razorpay_webhook(request):
         webhook_body = request.body
         webhook_signature = request.headers.get('X-Razorpay-Signature')
         
-        razorpay_service = RazorpayService()
+        razorpay_service = RazorpayClient()
         
         # Verify webhook signature
         if not razorpay_service.verify_webhook_signature(webhook_body, webhook_signature):

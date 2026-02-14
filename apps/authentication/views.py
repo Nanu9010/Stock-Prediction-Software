@@ -2,12 +2,12 @@
 Authentication views for login, register, logout, and profile management
 """
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, logout
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.utils import timezone
 from apps.authentication.forms import UserRegistrationForm, UserLoginForm, ProfileUpdateForm
 from apps.authentication.models import UserSession
+from services.auth_service import AuthService
 
 
 def register_view(request):
@@ -18,19 +18,7 @@ def register_view(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            
-            # Log the user in
-            login(request, user)
-            
-            # Create session record
-            UserSession.objects.create(
-                user=user,
-                session_token=request.session.session_key,
-                ip_address=request.META.get('REMOTE_ADDR', ''),
-                user_agent=request.META.get('HTTP_USER_AGENT', '')[:500],
-                expires_at=timezone.now() + timezone.timedelta(days=7)
-            )
+            user = AuthService.register_user(request, form)
             
             messages.success(request, f'Welcome {user.get_full_name()}! Your account has been created successfully.')
             return redirect('dashboard:home')
@@ -50,21 +38,7 @@ def login_view(request):
     if request.method == 'POST':
         form = UserLoginForm(request.POST)
         if form.is_valid():
-            user = form.get_user()
-            login(request, user)
-            
-            # Create session record
-            UserSession.objects.create(
-                user=user,
-                session_token=request.session.session_key,
-                ip_address=request.META.get('REMOTE_ADDR', ''),
-                user_agent=request.META.get('HTTP_USER_AGENT', '')[:500],
-                expires_at=timezone.now() + timezone.timedelta(days=7)
-            )
-            
-            # Set session expiry based on remember_me
-            if not form.cleaned_data.get('remember_me'):
-                request.session.set_expiry(0)  # Session expires when browser closes
+            user = AuthService.login_user(request, form)
             
             messages.success(request, f'Welcome back, {user.get_full_name()}!')
             
@@ -83,7 +57,7 @@ def login_view(request):
 def logout_view(request):
     """User logout view"""
     user_name = request.user.get_full_name()
-    logout(request)
+    AuthService.logout_user(request)
     messages.info(request, f'Goodbye, {user_name}! You have been logged out successfully.')
     return redirect('authentication:login')
 

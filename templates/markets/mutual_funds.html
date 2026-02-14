@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block extra_css %}<link rel="stylesheet" href="{% static 'css/market_hero.css' %}">{% endblock %}
+
+{% block content %}
+<div class="market-section-page">
+  <div class="section-page-container">
+    <a href="{% url 'dashboard:home' %}" class="back-link">← Back to Market Hero</a>
+    <div class="section-page-header">
+      <div class="section-page-title">📈 Top Mutual Funds</div>
+      <div class="section-page-desc">Curated selection of highest-performing mutual funds across categories.</div>
+    </div>
+
+    <div class="widget-card-hero" style="margin-bottom: 24px;">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Fund Name</th>
+            <th>Category</th>
+            <th>NAV</th>
+            <th>AUM</th>
+            <th>1Y Return</th>
+            <th>3Y Return</th>
+            <th>5Y Return</th>
+            <th>Risk</th>
+            <th>Rating</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for mf in mutual_funds %}
+          <tr>
+            <td style="font-weight: 600;">{{ mf.name }}</td>
+            <td>{{ mf.category }}</td>
+            <td>₹{{ mf.nav }}</td>
+            <td>{{ mf.aum }}</td>
+            <td class="text-gain">{{ mf.returns_1y }}%</td>
+            <td class="text-gain">{{ mf.returns_3y }}%</td>
+            <td class="text-gain">{{ mf.returns_5y }}%</td>
+            <td>{{ mf.risk }}</td>
+            <td><span class="star-rating">{% for i in "12345" %}{% if forloop.counter <= mf.rating %}★{% else %}☆{% endif %}{% endfor %}</span></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

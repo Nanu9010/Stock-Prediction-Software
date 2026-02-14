@@ -22,24 +22,7 @@
         </div>
         {% endif %}
         
-        <!-- Type Selection -->
-        <div class="form-section type-selector">
-            <div class="section-label">Select Call Type</div>
-            <div class="type-selection-grid">
-                <div class="form-field">
-                    <label>Call Duration<span class="required">*</span></label>
-                    {{ form.call_type }}
-                    {% if form.call_type.errors %}<span class="field-error">{{ form.call_type.errors.0 }}</span>{% endif %}
-                </div>
-                
-                <div class="form-field">
-                    <label>Instrument<span class="required">*</span></label>
-                    {{ form.instrument_type }}
-                    {% if form.instrument_type.errors %}<span class="field-error">{{ form.instrument_type.errors.0 }}</span>{% endif %}
-                </div>
-            </div>
-        </div>
-
+        <!-- Type Selection removed (duplicate of Signal Basics) -->
         <!-- Basic Signal Info - Always Visible -->
         <div class="form-section" id="basicSection">
             <div class="section-label">Signal Basics</div>
@@ -57,17 +40,31 @@
                 </div>
                 
                 <div class="form-field">
+                    <label>Instrument Type<span class="required">*</span></label>
+                    <div class="type-selector-wrapper">
+                        {{ form.instrument_type }}
+                    </div>
+                    {% if form.instrument_type.errors %}<span class="field-error">{{ form.instrument_type.errors.0 }}</span>{% endif %}
+                </div>
+                
+                <div class="form-field">
+                    <label>Call Type<span class="required">*</span></label>
+                    {{ form.call_type }}
+                    {% if form.call_type.errors %}<span class="field-error">{{ form.call_type.errors.0 }}</span>{% endif %}
+                </div>
+                
+                <div class="form-field">
                     <label>Status</label>
                     {{ form.status }}
                     {% if form.status.errors %}<span class="field-error">{{ form.status.errors.0 }}</span>{% endif %}
                 </div>
                 
-                <div class="form-field" data-show-for="equity">
+                <div class="form-field span-2" data-show-for="equity">
                     <label>Company Name</label>
                     {{ form.company_name }}
                 </div>
                 
-                <div class="form-field" data-show-for="equity">
+                <div class="form-field span-2" data-show-for="equity">
                     <label>Sector</label>
                     {{ form.sector }}
                 </div>
@@ -79,12 +76,12 @@
             </div>
         </div>
 
-        <!-- Price Levels - Equity/Standard -->
-        <div class="form-section" id="priceSection" data-show-for="equity">
-            <div class="section-label">Price Levels</div>
+        <!-- Price Levels - Universal -->
+        <div class="form-section" id="priceSection">
+            <div class="section-label" id="priceSectionLabel">Price Levels</div>
             <div class="form-grid price-grid">
                 <div class="form-field price-field entry">
-                    <label>Entry Price<span class="required">*</span></label>
+                    <label id="entryLabel">Entry Price<span class="required">*</span></label>
                     <div class="input-with-prefix">
                         <span class="prefix">₹</span>
                         {{ form.entry_price }}
@@ -93,7 +90,7 @@
                 </div>
                 
                 <div class="form-field price-field target">
-                    <label>Target 1<span class="required">*</span></label>
+                    <label id="targetLabel">Target 1<span class="required">*</span></label>
                     <div class="input-with-prefix">
                         <span class="prefix">₹</span>
                         {{ form.target_1 }}
@@ -102,7 +99,7 @@
                 </div>
                 
                 <div class="form-field price-field stoploss">
-                    <label>Stop Loss<span class="required">*</span></label>
+                    <label id="stoplossLabel">Stop Loss<span class="required">*</span></label>
                     <div class="input-with-prefix">
                         <span class="prefix">₹</span>
                         {{ form.stop_loss }}
@@ -134,165 +131,11 @@
             </div>
         </div>
 
-        <!-- Futures Specific Fields -->
-        <div class="form-section" id="futuresSection" data-show-for="futures" style="display: none;">
-            <div class="section-label">Futures Details</div>
-            <div class="form-grid">
-                <div class="form-field">
-                    <label>Contract Name<span class="required">*</span></label>
-                    <input type="text" class="form-control" id="contract_name" name="contract_name" placeholder="e.g., NIFTY24MAR24500CE">
-                </div>
-                
-                <div class="form-field">
-                    <label>Expiry Date<span class="required">*</span></label>
-                    <input type="date" class="form-control" id="expiry_date" name="expiry_date">
-                </div>
-                
-                <div class="form-field">
-                    <label>Lot Size</label>
-                    <input type="number" class="form-control" id="lot_size" name="lot_size" placeholder="e.g., 50">
-                </div>
-                
-                <div class="form-field price-field entry">
-                    <label>Entry Price<span class="required">*</span></label>
-                    <div class="input-with-prefix">
-                        <span class="prefix">₹</span>
-                        {{ form.entry_price }}
-                    </div>
-                </div>
-                
-                <div class="form-field price-field target">
-                    <label>Target<span class="required">*</span></label>
-                    <div class="input-with-prefix">
-                        <span class="prefix">₹</span>
-                        {{ form.target_1 }}
-                    </div>
-                </div>
-                
-                <div class="form-field price-field stoploss">
-                    <label>Stop Loss<span class="required">*</span></label>
-                    <div class="input-with-prefix">
-                        <span class="prefix">₹</span>
-                        {{ form.stop_loss }}
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Options Specific Fields -->
-        <div class="form-section" id="optionsSection" data-show-for="options" style="display: none;">
-            <div class="section-label">Options Details</div>
-            <div class="form-grid">
-                <div class="form-field">
-                    <label>Underlying Symbol<span class="required">*</span></label>
-                    {{ form.symbol }}
-                </div>
-                
-                <div class="form-field">
-                    <label>Strike Price<span class="required">*</span></label>
-                    <input type="number" class="form-control" id="strike_price" name="strike_price" placeholder="e.g., 24500">
-                </div>
-                
-                <div class="form-field">
-                    <label>Option Type<span class="required">*</span></label>
-                    <select class="form-control" id="option_type" name="option_type">
-                        <option value="">Select...</option>
-                        <option value="CALL">Call</option>
-                        <option value="PUT">Put</option>
-                    </select>
-                </div>
-                
-                <div class="form-field">
-                    <label>Expiry Date<span class="required">*</span></label>
-                    <input type="date" class="form-control" id="options_expiry" name="options_expiry">
-                </div>
-                
-                <div class="form-field">
-                    <label>Lot Size</label>
-                    <input type="number" class="form-control" id="options_lot_size" name="options_lot_size" placeholder="e.g., 50">
-                </div>
-                
-                <div class="form-field price-field entry">
-                    <label>Entry Premium<span class="required">*</span></label>
-                    <div class="input-with-prefix">
-                        <span class="prefix">₹</span>
-                        {{ form.entry_price }}
-                    </div>
-                </div>
-                
-                <div class="form-field price-field target">
-                    <label>Target Premium<span class="required">*</span></label>
-                    <div class="input-with-prefix">
-                        <span class="prefix">₹</span>
-                        {{ form.target_1 }}
-                    </div>
-                </div>
-                
-                <div class="form-field price-field stoploss">
-                    <label>Stop Loss Premium<span class="required">*</span></label>
-                    <div class="input-with-prefix">
-                        <span class="prefix">₹</span>
-                        {{ form.stop_loss }}
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Commodity Specific Fields -->
-        <div class="form-section" id="commoditySection" data-show-for="commodity" style="display: none;">
-            <div class="section-label">Commodity Details</div>
-            <div class="form-grid">
-                <div class="form-field">
-                    <label>Commodity Name<span class="required">*</span></label>
-                    <select class="form-control" id="commodity_name" name="commodity_name">
-                        <option value="">Select...</option>
-                        <option value="GOLD">Gold</option>
-                        <option value="SILVER">Silver</option>
-                        <option value="CRUDE">Crude Oil</option>
-                        <option value="NATURALGAS">Natural Gas</option>
-                        <option value="COPPER">Copper</option>
-                        <option value="ZINC">Zinc</option>
-                    </select>
-                </div>
-                
-                <div class="form-field">
-                    <label>Contract Type</label>
-                    <select class="form-control" id="contract_type" name="contract_type">
-                        <option value="SPOT">Spot</option>
-                        <option value="FUTURES">Futures</option>
-                    </select>
-                </div>
-                
-                <div class="form-field">
-                    <label>Unit</label>
-                    <input type="text" class="form-control" id="unit" name="unit" placeholder="kg/barrel/troy oz">
-                </div>
-                
-                <div class="form-field price-field entry">
-                    <label>Entry Price<span class="required">*</span></label>
-                    <div class="input-with-prefix">
-                        <span class="prefix">₹</span>
-                        {{ form.entry_price }}
-                    </div>
-                </div>
-                
-                <div class="form-field price-field target">
-                    <label>Target<span class="required">*</span></label>
-                    <div class="input-with-prefix">
-                        <span class="prefix">₹</span>
-                        {{ form.target_1 }}
-                    </div>
-                </div>
-                
-                <div class="form-field price-field stoploss">
-                    <label>Stop Loss<span class="required">*</span></label>
-                    <div class="input-with-prefix">
-                        <span class="prefix">₹</span>
-                        {{ form.stop_loss }}
-                    </div>
-                </div>
-            </div>
-        </div>
+        <!-- 
+            NOTE: Futures/Options specific fields (Contract Name, Expiry, etc.) are removed 
+            because the database model does not support them yet. 
+            Displaying them would mislead users into thinking data is saved.
+        -->
 
         <!-- Attribution -->
         <div class="form-section">
@@ -583,32 +426,19 @@ document.addEventListener('DOMContentLoaded', function() {
     const callTypeField = document.querySelector('[name="call_type"]');
     const instrumentTypeField = document.querySelector('[name="instrument_type"]');
     
+    // Labels
+    const entryLabel = document.getElementById('entryLabel');
+    const targetLabel = document.getElementById('targetLabel');
+    const stoplossLabel = document.getElementById('stoplossLabel');
+    
     function updateFieldVisibility() {
         const callType = callTypeField.value;
         const instrumentType = instrumentTypeField.value;
         
-        // Function to disable required on all inputs in a section
-        function disableRequired(sectionId) {
-            const section = document.getElementById(sectionId);
-            if (section) {
-                section.querySelectorAll('input, select, textarea').forEach(field => {
-                    field.removeAttribute('required');
-                });
-            }
-        }
-        
-        // Function to enable required on specific inputs in a section
-        function enableRequired(sectionId, fieldNames = []) {
-            const section = document.getElementById(sectionId);
-            if (section && fieldNames.length > 0) {
-                fieldNames.forEach(name => {
-                    const field = section.querySelector(`[name="${name}"]`);
-                    if (field) {
-                        field.setAttribute('required', 'required');
-                    }
-                });
-            }
-        }
+        // Reset labels to default
+        if (entryLabel) entryLabel.innerHTML = 'Entry Price<span class="required">*</span>';
+        if (targetLabel) targetLabel.innerHTML = 'Target 1<span class="required">*</span>';
+        if (stoplossLabel) stoplossLabel.innerHTML = 'Stop Loss<span class="required">*</span>';
         
         // Hide all conditional sections first
         document.querySelectorAll('[data-show-for]').forEach(el => {
@@ -616,29 +446,19 @@ document.addEventListener('DOMContentLoaded', function() {
             el.style.opacity = '0';
         });
         
-        // Disable required on all price sections initially
-        disableRequired('priceSection');
-        disableRequired('futuresSection');
-        disableRequired('optionsSection');
-        disableRequired('commoditySection');
+        // Update labels based on instrument
+        if (instrumentType === 'OPTIONS') {
+            if (entryLabel) entryLabel.innerHTML = 'Entry Premium<span class="required">*</span>';
+            if (targetLabel) targetLabel.innerHTML = 'Target Premium<span class="required">*</span>';
+            if (stoplossLabel) stoplossLabel.innerHTML = 'Stop Loss Premium<span class="required">*</span>';
+        }
         
-        // Show based on instrument type
+        // Show equity specific fields only for equity
         if (instrumentType === 'EQUITY') {
-            // Show equity fields
             document.querySelectorAll('[data-show-for="equity"]').forEach(el => {
                 el.style.display = '';
                 setTimeout(() => el.style.opacity = '1', 10);
             });
-            document.getElementById('priceSection').style.display = 'block';
-            setTimeout(() => document.getElementById('priceSection').style.opacity = '1', 10);
-            
-            // Enable required for equity price fields
-            enableRequired('priceSection', ['entry_price', 'target_1', 'stop_loss']);
-            
-            // Hide derivative sections
-            document.getElementById('futuresSection').style.display = 'none';
-            document.getElementById('optionsSection').style.display = 'none';
-            document.getElementById('commoditySection').style.display = 'none';
             
         } else if (instrumentType === 'FUTURES') {
             document.getElementById('futuresSection').style.display = 'block';
@@ -704,3 +524,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 {% endblock %}
+
