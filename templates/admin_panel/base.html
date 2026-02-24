@@ -5,12 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Admin Panel - StockPro{% endblock %}</title>
-    
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+
     <!-- CSS -->
     <link rel="stylesheet" href="{% static 'css/design_system.css' %}">
     <link rel="stylesheet" href="{% static 'css/components.css' %}">
@@ -18,82 +18,17 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body class="admin-layout">
-    <!-- Admin Header -->
-    <header class="admin-header">
-        <div class="header-left">
-            <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
-            <div class="header-brand">
-                <a href="{% url 'admin_panel:dashboard' %}">StockPro Admin</a>
-            </div>
-        </div>
-        
-        <div class="header-right">
-            <div class="header-search">
-                <input type="text" placeholder="Search..." class="form-input">
-            </div>
-            <div class="header-user">
-                <div class="user-avatar">{{ user.first_name.0|upper }}</div>
-                <div class="user-info">
-                    <div class="user-name">{{ user.get_full_name }}</div>
-                    <div class="user-role">Administrator</div>
-                </div>
-            </div>
-        </div>
-    </header>
-    
-    <!-- Admin Sidebar -->
-    <aside class="admin-sidebar" id="adminSidebar">
-        <nav class="sidebar-nav">
-            <a href="{% url 'admin_panel:dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
-                <span class="nav-icon">📊</span>
-                <span class="nav-label">Dashboard</span>
-            </a>
-            
-            <div class="nav-section">Research Calls</div>
-            <a href="{% url 'admin_panel:calls_list' %}" class="nav-item {% if 'calls' in request.resolver_match.url_name %}active{% endif %}">
-                <span class="nav-icon">📈</span>
-                <span class="nav-label">All Calls</span>
-            </a>
-            
-            <div class="nav-section">Management</div>
-            <a href="{% url 'admin_panel:brokers_list' %}" class="nav-item {% if 'brokers' in request.resolver_match.url_name %}active{% endif %}">
-                <span class="nav-icon">🏢</span>
-                <span class="nav-label">Brokers</span>
-            </a>
-            <a href="{% url 'admin_panel:users_list' %}" class="nav-item {% if 'users' in request.resolver_match.url_name %}active{% endif %}">
-                <span class="nav-icon">👥</span>
-                <span class="nav-label">Users</span>
-            </a>
-            
-            <div class="nav-section">System</div>
-            <a href="#" class="nav-item">
-                <span class="nav-icon">📦</span>
-                <span class="nav-label">Subscriptions</span>
-            </a>
-            <a href="#" class="nav-item">
-                <span class="nav-icon">📊</span>
-                <span class="nav-label">Reports</span>
-            </a>
-            <a href="#" class="nav-item">
-                <span class="nav-icon">⚙️</span>
-                <span class="nav-label">Settings</span>
-            </a>
-            
-            <div class="sidebar-footer">
-                <a href="/" class="btn btn-outline-primary btn-sm">
-                    ← Back to Site
-                </a>
-            </div>
-        </nav>
-    </aside>
-    
+    {% include 'partials/admin_header.html' %}
+
+    {% include 'partials/admin_sidebar.html' %}
+
     <!-- Main Content -->
     <main class="admin-main">
         <div class="admin-container">
             {% block content %}{% endblock %}
         </div>
     </main>
-    
+
     <!-- JavaScript -->
     <script>
         function toggleSidebar() {

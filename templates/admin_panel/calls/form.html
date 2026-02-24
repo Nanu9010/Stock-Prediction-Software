@@ -4,504 +4,306 @@
     {% if form.instance.pk %}Edit Call{% else %}New Call{% endif %}
 {% endblock %}
 
+{% block extra_css %}
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    "bg-dark": "#0b0f17",
+                    "surface-dark": "#131825",
+                    "border-dark": "#1e2433",
+                    "text-secondary": "#94a3b8",
+                },
+                fontFamily: {
+                    display: ["Manrope", "sans-serif"],
+                },
+            },
+        },
+    }
+</script>
+<style>
+    body, .admin-layout { background: #0b0f17 !important; font-family: 'Manrope', sans-serif; }
+    .admin-main { background: #0b0f17 !important; }
+    .admin-container { max-width: 100% !important; }
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #475569; border-radius: 2px; }
+    .minimal-input {
+        border: none;
+        border-bottom: 1px solid #334155;
+        border-radius: 0;
+        padding: 0.75rem 0;
+        background: transparent;
+        transition: border-color 0.2s;
+        font-family: 'Manrope', sans-serif;
+        color: #e2e8f0;
+        font-size: 1rem;
+        width: 100%;
+    }
+    .minimal-input:focus {
+        border-bottom: 1px solid #fff;
+        box-shadow: none;
+        outline: none;
+    }
+    /* Override Django form widget styles */
+    select.minimal-input { appearance: none; cursor: pointer; }
+    textarea.minimal-input { border: 0; border-radius: 8px; padding: 1.5rem; resize: vertical; min-height: 200px; }
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    /* Make Django-rendered form fields look like minimal inputs */
+    .form-field-wrap input,
+    .form-field-wrap select,
+    .form-field-wrap textarea {
+        border: none;
+        border-bottom: 1px solid #334155;
+        border-radius: 0;
+        padding: 0.75rem 0;
+        background: transparent !important;
+        color: #e2e8f0 !important;
+        font-family: 'Manrope', sans-serif;
+        font-size: 1rem;
+        width: 100%;
+        transition: border-color 0.2s;
+    }
+    .form-field-wrap input:focus,
+    .form-field-wrap select:focus {
+        border-bottom: 1px solid #fff;
+        box-shadow: none;
+        outline: none;
+    }
+    .form-field-wrap textarea {
+        border: 0;
+        border-radius: 12px;
+        padding: 1.5rem;
+        background: rgba(255,255,255,0.03) !important;
+        min-height: 200px;
+        resize: vertical;
+        line-height: 1.7;
+    }
+    .form-field-wrap textarea:focus {
+        outline: none;
+        box-shadow: none;
+        ring: 1px solid #fff;
+    }
+    .form-field-wrap select { appearance: none; cursor: pointer; }
+    .form-field-wrap option { background: #131825; color: #e2e8f0; }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="modern-form-container">
-    <div class="form-header">
-        <h1 class="form-title">{% if form.instance.pk %}Edit Research Call{% else %}Create Research Call{% endif %}</h1>
-        <p class="form-subtitle">Select call type and fill in relevant details</p>
-    </div>
-
-    <form method="post" class="modern-form" id="callForm" novalidate>
-        {% csrf_token %}
-        
-        {% if form.non_field_errors %}
-        <div class="alert-error">
-            {% for error in form.non_field_errors %}
-                {{ error }}
-            {% endfor %}
+<div class="font-display text-slate-100 antialiased">
+    <!-- Breadcrumb Header -->
+    <header class="flex items-center justify-between mb-10">
+        <div class="flex items-center gap-2 text-sm">
+            <a class="text-text-secondary hover:text-white transition-colors no-underline" href="{% url 'admin_panel:calls_list' %}">Calls</a>
+            <span class="text-text-secondary">/</span>
+            <span class="text-white font-medium">{% if form.instance.pk %}Edit{% else %}New Entry{% endif %}</span>
         </div>
-        {% endif %}
-        
-        <!-- Type Selection removed (duplicate of Signal Basics) -->
-        <!-- Basic Signal Info - Always Visible -->
-        <div class="form-section" id="basicSection">
-            <div class="section-label">Signal Basics</div>
-            <div class="form-grid">
-                <div class="form-field">
-                    <label>Symbol<span class="required">*</span></label>
-                    {{ form.symbol }}
-                    {% if form.symbol.errors %}<span class="field-error">{{ form.symbol.errors.0 }}</span>{% endif %}
-                </div>
-                
-                <div class="form-field">
-                    <label>Action<span class="required">*</span></label>
-                    {{ form.action }}
-                    {% if form.action.errors %}<span class="field-error">{{ form.action.errors.0 }}</span>{% endif %}
-                </div>
-                
-                <div class="form-field">
-                    <label>Instrument Type<span class="required">*</span></label>
-                    <div class="type-selector-wrapper">
-                        {{ form.instrument_type }}
-                    </div>
-                    {% if form.instrument_type.errors %}<span class="field-error">{{ form.instrument_type.errors.0 }}</span>{% endif %}
-                </div>
-                
-                <div class="form-field">
-                    <label>Call Type<span class="required">*</span></label>
-                    {{ form.call_type }}
-                    {% if form.call_type.errors %}<span class="field-error">{{ form.call_type.errors.0 }}</span>{% endif %}
-                </div>
-                
-                <div class="form-field">
-                    <label>Status</label>
-                    {{ form.status }}
-                    {% if form.status.errors %}<span class="field-error">{{ form.status.errors.0 }}</span>{% endif %}
-                </div>
-                
-                <div class="form-field span-2" data-show-for="equity">
-                    <label>Company Name</label>
-                    {{ form.company_name }}
-                </div>
-                
-                <div class="form-field span-2" data-show-for="equity">
-                    <label>Sector</label>
-                    {{ form.sector }}
-                </div>
-                
-                <div class="form-field">
-                    <label>Exchange</label>
-                    {{ form.exchange }}
-                </div>
-            </div>
-        </div>
-
-        <!-- Price Levels - Universal -->
-        <div class="form-section" id="priceSection">
-            <div class="section-label" id="priceSectionLabel">Price Levels</div>
-            <div class="form-grid price-grid">
-                <div class="form-field price-field entry">
-                    <label id="entryLabel">Entry Price<span class="required">*</span></label>
-                    <div class="input-with-prefix">
-                        <span class="prefix">₹</span>
-                        {{ form.entry_price }}
-                    </div>
-                    {% if form.entry_price.errors %}<span class="field-error">{{ form.entry_price.errors.0 }}</span>{% endif %}
-                </div>
-                
-                <div class="form-field price-field target">
-                    <label id="targetLabel">Target 1<span class="required">*</span></label>
-                    <div class="input-with-prefix">
-                        <span class="prefix">₹</span>
-                        {{ form.target_1 }}
-                    </div>
-                    {% if form.target_1.errors %}<span class="field-error">{{ form.target_1.errors.0 }}</span>{% endif %}
-                </div>
-                
-                <div class="form-field price-field stoploss">
-                    <label id="stoplossLabel">Stop Loss<span class="required">*</span></label>
-                    <div class="input-with-prefix">
-                        <span class="prefix">₹</span>
-                        {{ form.stop_loss }}
-                    </div>
-                    {% if form.stop_loss.errors %}<span class="field-error">{{ form.stop_loss.errors.0 }}</span>{% endif %}
-                </div>
-                
-                <div class="form-field" data-show-for="medium-long">
-                    <label>Target 2</label>
-                    <div class="input-with-prefix">
-                        <span class="prefix">₹</span>
-                        {{ form.target_2 }}
-                    </div>
-                </div>
-                
-                <div class="form-field" data-show-for="long">
-                    <label>Target 3</label>
-                    <div class="input-with-prefix">
-                        <span class="prefix">₹</span>
-                        {{ form.target_3 }}
-                    </div>
-                </div>
-                
-                <div class="form-field">
-                    <label>Timeframe (Days)</label>
-                    {{ form.timeframe_days }}
-                    {% if form.timeframe_days.errors %}<span class="field-error">{{ form.timeframe_days.errors.0 }}</span>{% endif %}
-                </div>
-            </div>
-        </div>
-
-        <!-- 
-            NOTE: Futures/Options specific fields (Contract Name, Expiry, etc.) are removed 
-            because the database model does not support them yet. 
-            Displaying them would mislead users into thinking data is saved.
-        -->
-
-        <!-- Attribution -->
-        <div class="form-section">
-            <div class="section-label">Attribution</div>
-            <div class="form-grid">
-                <div class="form-field">
-                    <label>Broker<span class="required">*</span></label>
-                    {{ form.broker }}
-                    {% if form.broker.errors %}<span class="field-error">{{ form.broker.errors.0 }}</span>{% endif %}
-                </div>
-            </div>
-        </div>
-
-        <!-- Analysis -->
-        <div class="form-section">
-            <div class="section-label">Analysis <span class="rationale-hint" data-show-for="long">(Detailed required for Long Term)</span></div>
-            <div class="form-field">
-                <label>Rationale / Analysis</label>
-                {{ form.rationale }}
-                {% if form.rationale.errors %}<span class="field-error">{{ form.rationale.errors.0 }}</span>{% endif %}
-            </div>
-        </div>
-
-        <!-- Actions -->
-        <div class="form-actions">
-            <a href="{% url 'admin_panel:calls_list' %}" class="btn-secondary">Cancel</a>
-            <button type="submit" class="btn-primary">
-                {% if form.instance.pk %}Update Call{% else %}Create Call{% endif %}
+        <div class="flex gap-4">
+            <a href="{% url 'admin_panel:calls_list' %}" class="text-sm font-medium text-text-secondary hover:text-white transition-colors no-underline">Discard</a>
+            <button type="submit" form="callForm" class="bg-white text-black px-6 py-2 text-sm font-medium rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2">
+                <span>{% if form.instance.pk %}Update{% else %}Publish{% endif %}</span>
+                <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
             </button>
         </div>
-    </form>
+    </header>
+
+    <div class="max-w-4xl mx-auto">
+        <!-- Title -->
+        <div class="mb-12">
+            <h1 class="text-4xl font-light text-white mb-2 tracking-tight">{% if form.instance.pk %}Edit Research Call{% else %}New Research Call{% endif %}</h1>
+            <p class="text-text-secondary font-light">{% if form.instance.pk %}Updating trade recommendation.{% else %}Drafting a new trade recommendation.{% endif %}</p>
+        </div>
+
+        <form method="post" id="callForm" class="space-y-16">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="bg-red-500/10 border border-red-500/20 rounded-lg p-4 text-red-400 text-sm">
+                {% for error in form.non_field_errors %}
+                    {{ error }}<br>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Section 1: Ticker & Type -->
+            <section>
+                <div class="grid grid-cols-12 gap-x-8 gap-y-8">
+                    <div class="col-span-8 form-field-wrap">
+                        <label class="block text-[10px] uppercase tracking-widest font-bold text-text-secondary mb-1">Ticker Symbol</label>
+                        {{ form.symbol }}
+                        {% if form.symbol.errors %}<span class="text-red-400 text-xs mt-1 block">{{ form.symbol.errors.0 }}</span>{% endif %}
+                    </div>
+                    <div class="col-span-4 form-field-wrap">
+                        <label class="block text-[10px] uppercase tracking-widest font-bold text-text-secondary mb-3">Exchange</label>
+                        {{ form.exchange }}
+                        {% if form.exchange.errors %}<span class="text-red-400 text-xs mt-1 block">{{ form.exchange.errors.0 }}</span>{% endif %}
+                    </div>
+                    <div class="col-span-6 form-field-wrap">
+                        <label class="block text-[10px] uppercase tracking-widest font-bold text-text-secondary mb-1">Instrument Type</label>
+                        {{ form.instrument_type }}
+                        {% if form.instrument_type.errors %}<span class="text-red-400 text-xs mt-1 block">{{ form.instrument_type.errors.0 }}</span>{% endif %}
+                    </div>
+                    <div class="col-span-6 form-field-wrap">
+                        <label class="block text-[10px] uppercase tracking-widest font-bold text-text-secondary mb-1">Time Horizon</label>
+                        {{ form.call_type }}
+                        {% if form.call_type.errors %}<span class="text-red-400 text-xs mt-1 block">{{ form.call_type.errors.0 }}</span>{% endif %}
+                    </div>
+                    <div class="col-span-6 form-field-wrap" data-show-for="equity">
+                        <label class="block text-[10px] uppercase tracking-widest font-bold text-text-secondary mb-1">Company Name</label>
+                        {{ form.company_name }}
+                    </div>
+                    <div class="col-span-6 form-field-wrap" data-show-for="equity">
+                        <label class="block text-[10px] uppercase tracking-widest font-bold text-text-secondary mb-1">Sector</label>
+                        {{ form.sector }}
+                    </div>
+                    <div class="col-span-4 form-field-wrap">
+                        <label class="block text-[10px] uppercase tracking-widest font-bold text-text-secondary mb-1">Status</label>
+                        {{ form.status }}
+                        {% if form.status.errors %}<span class="text-red-400 text-xs mt-1 block">{{ form.status.errors.0 }}</span>{% endif %}
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: Recommendation & Prices -->
+            <section>
+                <div class="grid grid-cols-12 gap-x-8 gap-y-10">
+                    <!-- Action (BUY/SELL) -->
+                    <div class="col-span-12">
+                        <label class="block text-[10px] uppercase tracking-widest font-bold text-text-secondary mb-4">Recommendation</label>
+                        <div class="form-field-wrap">
+                            {{ form.action }}
+                        </div>
+                        {% if form.action.errors %}<span class="text-red-400 text-xs mt-1 block">{{ form.action.errors.0 }}</span>{% endif %}
+                    </div>
+
+                    <!-- Entry Price -->
+                    <div class="col-span-4 form-field-wrap">
+                        <label class="block text-[10px] uppercase tracking-widest font-bold text-text-secondary mb-1" id="entryLabel">Entry Price</label>
+                        {{ form.entry_price }}
+                        {% if form.entry_price.errors %}<span class="text-red-400 text-xs mt-1 block">{{ form.entry_price.errors.0 }}</span>{% endif %}
+                    </div>
+
+                    <!-- Stop Loss -->
+                    <div class="col-span-4 form-field-wrap">
+                        <label class="block text-[10px] uppercase tracking-widest font-bold text-text-secondary mb-1" id="stoplossLabel">Stop Loss</label>
+                        {{ form.stop_loss }}
+                        {% if form.stop_loss.errors %}<span class="text-red-400 text-xs mt-1 block">{{ form.stop_loss.errors.0 }}</span>{% endif %}
+                    </div>
+
+                    <div class="col-span-4"></div>
+
+                    <!-- Targets -->
+                    <div class="col-span-12">
+                        <label class="block text-[10px] uppercase tracking-widest font-bold text-text-secondary mb-1">Targets</label>
+                        <div class="grid grid-cols-3 gap-8">
+                            <div class="relative form-field-wrap">
+                                <span class="absolute left-0 top-3 text-emerald-500 text-xs font-bold">T1</span>
+                                <div class="pl-8">{{ form.target_1 }}</div>
+                                {% if form.target_1.errors %}<span class="text-red-400 text-xs mt-1 block">{{ form.target_1.errors.0 }}</span>{% endif %}
+                            </div>
+                            <div class="relative form-field-wrap" data-show-for="medium-long">
+                                <span class="absolute left-0 top-3 text-emerald-500 text-xs font-bold opacity-70">T2</span>
+                                <div class="pl-8">{{ form.target_2 }}</div>
+                            </div>
+                            <div class="relative form-field-wrap" data-show-for="long">
+                                <span class="absolute left-0 top-3 text-emerald-500 text-xs font-bold opacity-50">T3</span>
+                                <div class="pl-8">{{ form.target_3 }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Timeframe -->
+                    <div class="col-span-4 form-field-wrap">
+                        <label class="block text-[10px] uppercase tracking-widest font-bold text-text-secondary mb-1">Timeframe (Days)</label>
+                        {{ form.timeframe_days }}
+                        {% if form.timeframe_days.errors %}<span class="text-red-400 text-xs mt-1 block">{{ form.timeframe_days.errors.0 }}</span>{% endif %}
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 3: Broker -->
+            <section>
+                <div class="grid grid-cols-12 gap-x-8">
+                    <div class="col-span-6 form-field-wrap">
+                        <label class="block text-[10px] uppercase tracking-widest font-bold text-text-secondary mb-1">Broker</label>
+                        {{ form.broker }}
+                        {% if form.broker.errors %}<span class="text-red-400 text-xs mt-1 block">{{ form.broker.errors.0 }}</span>{% endif %}
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: Rationale -->
+            <section class="pt-4">
+                <div class="flex justify-between items-end mb-4">
+                    <label class="block text-[10px] uppercase tracking-widest font-bold text-text-secondary">Rationale & Analysis</label>
+                </div>
+                <div class="form-field-wrap">
+                    {{ form.rationale }}
+                    {% if form.rationale.errors %}<span class="text-red-400 text-xs mt-1 block">{{ form.rationale.errors.0 }}</span>{% endif %}
+                </div>
+            </section>
+
+            <!-- Bottom Submit (mobile) -->
+            <section class="border-t border-border-dark pt-8 flex justify-end gap-4 lg:hidden">
+                <a href="{% url 'admin_panel:calls_list' %}" class="text-sm font-medium text-text-secondary hover:text-white transition-colors no-underline px-6 py-2">Cancel</a>
+                <button type="submit" class="bg-white text-black px-6 py-2 text-sm font-medium rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2">
+                    <span>{% if form.instance.pk %}Update{% else %}Publish{% endif %}</span>
+                    <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+                </button>
+            </section>
+        </form>
+    </div>
 </div>
-
-<style>
-.modern-form-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0;
-}
-
-.form-header {
-    margin-bottom: 32px;
-}
-
-.form-title {
-    font-size: 28px;
-    font-weight: 700;
-    color: #1a1a1a;
-    margin: 0 0 8px 0;
-}
-
-.form-subtitle {
-    font-size: 15px;
-    color: #6b7280;
-    margin: 0;
-}
-
-.modern-form {
-    background: white;
-    border-radius: 12px;
-    padding: 32px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-}
-
-.alert-error {
-    background: #fee2e2;
-    border-left: 4px solid #ef4444;
-    padding: 16px;
-    border-radius: 8px;
-    color: #991b1b;
-    margin-bottom: 24px;
-    font-size: 14px;
-}
-
-.form-section {
-    margin-bottom: 32px;
-    transition: opacity 0.3s ease;
-}
-
-.form-section:last-of-type {
-    margin-bottom: 0;
-}
-
-.section-label {
-    font-size: 13px;
-    font-weight: 600;
-    color: #374151;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 16px;
-    padding-bottom: 8px;
-    border-bottom: 2px solid #f3f4f6;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.rationale-hint {
-    font-size: 11px;
-    font-weight: 400;
-    color: #6b7280;
-    text-transform: none;
-}
-
-.type-selector {
-    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-    padding: 20px;
-    border-radius: 10px;
-    border: 2px solid #bae6fd;
-}
-
-.type-selection-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-}
-
-.form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-}
-
-.price-grid {
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-}
-
-.form-field {
-    display: flex;
-    flex-direction: column;
-}
-
-.form-field.span-2 {
-    grid-column: span 2;
-}
-
-.form-field label {
-    font-size: 14px;
-    font-weight: 500;
-    color: #374151;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.required {
-    color: #ef4444;
-    font-size: 14px;
-}
-
-.form-field input[type="text"],
-.form-field input[type="number"],
-.form-field input[type="date"],
-.form-field select,
-.form-field textarea,
-.form-control {
-    padding: 10px 14px;
-    border: 1.5px solid #e5e7eb;
-    border-radius: 8px;
-    font-size: 14px;
-    color: #1f2937;
-    transition: all 0.2s;
-    background: white;
-    width: 100%;
-}
-
-.form-field input:focus,
-.form-field select:focus,
-.form-field textarea:focus,
-.form-control:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.form-field textarea {
-    min-height: 120px;
-    resize: vertical;
-    font-family: inherit;
-}
-
-.input-with-prefix {
-    position: relative;
-    display: flex;
-}
-
-.input-with-prefix .prefix {
-    position: absolute;
-    left: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #6b7280;
-    font-weight: 500;
-    pointer-events: none;
-}
-
-.input-with-prefix input {
-    padding-left: 32px;
-    width: 100%;
-}
-
-/* Price field color indicators */
-.price-field.entry label {
-    color: #3b82f6;
-}
-
-.price-field.target label {
-    color: #10b981;
-}
-
-.price-field.stoploss label {
-    color: #ef4444;
-}
-
-.field-error {
-    font-size: 13px;
-    color: #ef4444;
-    margin-top: 6px;
-}
-
-.form-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-    margin-top: 32px;
-    padding-top: 24px;
-    border-top: 1px solid #f3f4f6;
-}
-
-.btn-primary,
-.btn-secondary {
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-    transition: all 0.2s;
-    text-decoration: none;
-    display: inline-block;
-}
-
-.btn-primary {
-    background: #3b82f6;
-    color: white;
-}
-
-.btn-primary:hover {
-    background: #2563eb;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
-
-.btn-secondary {
-    background: #f3f4f6;
-    color: #374151;
-}
-
-.btn-secondary:hover {
-    background: #e5e7eb;
-}
-
-/* Dynamic visibility */
-[data-show-for] {
-    transition: all 0.3s ease;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .modern-form {
-        padding: 24px;
-    }
-    
-    .form-grid,
-    .type-selection-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .form-field.span-2 {
-        grid-column: span 1;
-    }
-}
-</style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const callTypeField = document.querySelector('[name="call_type"]');
     const instrumentTypeField = document.querySelector('[name="instrument_type"]');
-    
-    // Labels
     const entryLabel = document.getElementById('entryLabel');
-    const targetLabel = document.getElementById('targetLabel');
     const stoplossLabel = document.getElementById('stoplossLabel');
-    
+
     function updateFieldVisibility() {
-        const callType = callTypeField.value;
-        const instrumentType = instrumentTypeField.value;
-        
-        // Reset labels to default
-        if (entryLabel) entryLabel.innerHTML = 'Entry Price<span class="required">*</span>';
-        if (targetLabel) targetLabel.innerHTML = 'Target 1<span class="required">*</span>';
-        if (stoplossLabel) stoplossLabel.innerHTML = 'Stop Loss<span class="required">*</span>';
-        
-        // Hide all conditional sections first
+        const callType = callTypeField ? callTypeField.value : '';
+        const instrumentType = instrumentTypeField ? instrumentTypeField.value : '';
+
+        // Reset labels
+        if (entryLabel) entryLabel.textContent = 'Entry Price';
+        if (stoplossLabel) stoplossLabel.textContent = 'Stop Loss';
+
+        // Hide all conditional sections
         document.querySelectorAll('[data-show-for]').forEach(el => {
             el.style.display = 'none';
             el.style.opacity = '0';
         });
-        
-        // Update labels based on instrument
+
+        // Instrument-specific labels
         if (instrumentType === 'OPTIONS') {
-            if (entryLabel) entryLabel.innerHTML = 'Entry Premium<span class="required">*</span>';
-            if (targetLabel) targetLabel.innerHTML = 'Target Premium<span class="required">*</span>';
-            if (stoplossLabel) stoplossLabel.innerHTML = 'Stop Loss Premium<span class="required">*</span>';
+            if (entryLabel) entryLabel.textContent = 'Entry Premium';
+            if (stoplossLabel) stoplossLabel.textContent = 'Stop Loss Premium';
         }
-        
-        // Show equity specific fields only for equity
+
+        // Equity fields
         if (instrumentType === 'EQUITY') {
             document.querySelectorAll('[data-show-for="equity"]').forEach(el => {
                 el.style.display = '';
                 setTimeout(() => el.style.opacity = '1', 10);
             });
-            
-        } else if (instrumentType === 'FUTURES') {
-            document.getElementById('futuresSection').style.display = 'block';
-            setTimeout(() => document.getElementById('futuresSection').style.opacity = '1', 10);
-            
-            // Enable required for futures price fields
-            enableRequired('futuresSection', ['entry_price', 'target_1', 'stop_loss']);
-            
-            document.getElementById('priceSection').style.display = 'none';
-            document.getElementById('optionsSection').style.display = 'none';
-            document.getElementById('commoditySection').style.display = 'none';
-            
-        } else if (instrumentType === 'OPTIONS') {
-            document.getElementById('optionsSection').style.display = 'block';
-            setTimeout(() => document.getElementById('optionsSection').style.opacity = '1', 10);
-            
-            // Enable required for options price fields
-            enableRequired('optionsSection', ['entry_price', 'target_1', 'stop_loss']);
-            
-            document.getElementById('priceSection').style.display = 'none';
-            document.getElementById('futuresSection').style.display = 'none';
-            document.getElementById('commoditySection').style.display = 'none';
-            
-        } else if (instrumentType === 'COMMODITY') {
-            document.getElementById('commoditySection').style.display = 'block';
-            setTimeout(() => document.getElementById('commoditySection').style.opacity = '1', 10);
-            
-            // Enable required for commodity price fields
-            enableRequired('commoditySection', ['entry_price', 'target_1', 'stop_loss']);
-            
-            document.getElementById('priceSection').style.display = 'none';
-            document.getElementById('futuresSection').style.display = 'none';
-            document.getElementById('optionsSection').style.display = 'none';
         }
-        
-        // Show additional fields based on call type
+
+        // Medium/Long term targets
         if (callType === 'MEDIUM_TERM' || callType === 'LONG_TERM') {
             document.querySelectorAll('[data-show-for="medium-long"]').forEach(el => {
                 el.style.display = '';
                 setTimeout(() => el.style.opacity = '1', 10);
             });
         }
-        
+
         if (callType === 'LONG_TERM') {
             document.querySelectorAll('[data-show-for="long"]').forEach(el => {
                 el.style.display = '';
@@ -509,19 +311,10 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     }
-    
-    // Add event listeners
-    if (callTypeField) {
-        callTypeField.addEventListener('change', updateFieldVisibility);
-    }
-    
-    if (instrumentTypeField) {
-        instrumentTypeField.addEventListener('change', updateFieldVisibility);
-    }
-    
-    // Initial setup
+
+    if (callTypeField) callTypeField.addEventListener('change', updateFieldVisibility);
+    if (instrumentTypeField) instrumentTypeField.addEventListener('change', updateFieldVisibility);
     updateFieldVisibility();
 });
 </script>
 {% endblock %}
-

@@ -1,150 +1,220 @@
-{% extends 'base.html' %}
+{% extends 'admin_panel/base.html' %}
 {% load static %}
 
-{% block title %}Admin Dashboard - Stock Research Platform{% endblock %}
+{% block title %}Admin Dashboard - StockPro{% endblock %}
 
 {% block content %}
-<div class="dashboard-container">
-    <div class="dashboard-header">
-        <h1>Admin Dashboard</h1>
-        <p class="text-secondary">System Overview & Management</p>
-    </div>
+<div class="page-header">
+    <h1>Admin Dashboard</h1>
+    <p class="text-secondary">System Overview &amp; Management</p>
+</div>
 
-    <!-- System Stats -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-icon">👥</div>
-            <div class="stat-content">
-                <h3>{{ total_users }}</h3>
-                <p>Total Users</p>
-                <small>{{ customers}} customers</small>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon">🏢</div>
-            <div class="stat-content">
-                <h3>{{ total_brokers }}</h3>
-                <p>Active Brokers</p>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon">📞</div>
-            <div class="stat-content">
-                <h3>{{ total_calls }}</h3>
-                <p>Total Calls</p>
-                <small>{{ active_calls }} active</small>
-            </div>
-        </div>
-        <div class="stat-card alert">
-            <div class="stat-icon">⏳</div>
-            <div class="stat-content">
-                <h3>{{ pending_approvals.count }}</h3>
-                <p>Pending Approvals</p>
-            </div>
+<!-- System Stats -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-content">
+            <h3>{{ total_users }}</h3>
+            <p>Total Users</p>
+            <small>{{ active_users }} active · {{ new_users_30d }} new (30d)</small>
         </div>
     </div>
-
-    <div class="dashboard-grid">
-        <!-- Pending Approvals -->
-        <div class="dashboard-section full-width">
-            <div class="section-header">
-                <h2>Pending Call Approvals</h2>
-            </div>
-            <div class="table-responsive">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Symbol</th>
-                            <th>Broker</th>
-                            <th>Action</th>
-                            <th>Entry</th>
-                            <th>Target</th>
-                            <th>Created</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for call in pending_approvals %}
-                        <tr>
-                            <td><strong>{{ call.symbol }}</strong></td>
-                            <td>{{ call.broker.name }}</td>
-                            <td><span class="badge badge-{{ call.action|lower }}">{{ call.action }}</span></td>
-                            <td>₹{{ call.entry_price }}</td>
-                            <td>₹{{ call.target_1 }}</td>
-                            <td>{{ call.created_at|date:"M d, H:i" }}</td>
-                            <td>
-                                <button class="btn btn-sm btn-success" onclick="approveCall({{ call.id }})">Approve</button>
-                                <button class="btn btn-sm btn-danger" onclick="rejectCall({{ call.id }})">Reject</button>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="8" class="text-center">No pending approvals</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+    <div class="stat-card">
+        <div class="stat-icon">🏢</div>
+        <div class="stat-content">
+            <h3>{{ active_brokers }}</h3>
+            <p>Active Brokers</p>
+            <small>{{ total_brokers }} total</small>
         </div>
-
-        <!-- Recent Calls -->
-        <div class="dashboard-section full-width">
-            <div class="section-header">
-                <h2>Recent Calls</h2>
-            </div>
-            <div class="table-responsive">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Symbol</th>
-                            <th>Broker</th>
-                            <th>Status</th>
-                            <th>Published</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for call in recent_calls %}
-                        <tr>
-                            <td><strong>{{ call.symbol }}</strong></td>
-                            <td>{{ call.broker.name }}</td>
-                            <td><span class="badge badge-{{ call.status|lower }}">{{ call.status }}</span></td>
-                            <td>{{ call.published_at|date:"M d, Y H:i"|default:"Not published" }}</td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="4" class="text-center">No recent calls</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">📈</div>
+        <div class="stat-content">
+            <h3>{{ active_calls }}</h3>
+            <p>Live Calls</p>
+            <small>{{ total_calls }} total · {{ success_rate|floatformat:1 }}% accuracy</small>
+        </div>
+    </div>
+    <div class="stat-card {% if pending_approvals > 0 %}stat-alert{% endif %}">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-content">
+            <h3>{{ pending_approvals }}</h3>
+            <p>Pending Approvals</p>
+            <small>Requires action</small>
         </div>
     </div>
 </div>
 
+<!-- Quick Actions -->
+<div style="display: flex; gap: 12px; margin-bottom: 2rem; flex-wrap: wrap;">
+    <a href="{% url 'admin_panel:call_create' %}" class="btn btn-primary">+ New Call</a>
+    <a href="{% url 'admin_panel:broker_create' %}" class="btn btn-secondary">+ Add Broker</a>
+    <a href="{% url 'admin_panel:users_list' %}" class="btn btn-secondary">Manage Users</a>
+    <a href="{% url 'admin_panel:payments_list' %}" class="btn btn-secondary">View Payments</a>
+</div>
+
+<div class="dashboard-grid">
+    <!-- Pending Approvals Table -->
+    <div class="dashboard-section full-width">
+        <div class="section-header">
+            <h2>Pending Call Approvals</h2>
+            <a href="{% url 'admin_panel:calls_list' %}?status=PENDING_APPROVAL" class="btn btn-sm btn-outline">View All</a>
+        </div>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Symbol</th>
+                        <th>Broker</th>
+                        <th>Action</th>
+                        <th>Entry</th>
+                        <th>Target 1</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for call in pending_approvals_list %}
+                    <tr>
+                        <td><strong>{{ call.symbol }}</strong></td>
+                        <td>{{ call.broker.name }}</td>
+                        <td><span class="badge badge-{{ call.action|lower }}">{{ call.action }}</span></td>
+                        <td>₹{{ call.entry_price }}</td>
+                        <td>₹{{ call.target_1 }}</td>
+                        <td>{{ call.created_at|date:"M d, H:i" }}</td>
+                        <td style="display: flex; gap: 6px;">
+                            <!-- Real approve endpoint -->
+                            <form method="post" action="{% url 'research_calls:approve' call.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-success"
+                                    onclick="return confirm('Approve {{ call.symbol }}?')">✓ Approve</button>
+                            </form>
+                            <!-- Real publish endpoint -->
+                            <form method="post" action="{% url 'research_calls:publish' call.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-primary"
+                                    onclick="return confirm('Publish {{ call.symbol }}?')">▶ Publish</button>
+                            </form>
+                            <a href="{% url 'admin_panel:call_detail' call.id %}" class="btn btn-sm btn-outline">View</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center" style="padding: 2rem; color: #888;">
+                            ✅ No pending approvals
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Recent Calls -->
+    <div class="dashboard-section full-width">
+        <div class="section-header">
+            <h2>Recent Calls</h2>
+            <a href="{% url 'admin_panel:calls_list' %}" class="btn btn-sm btn-outline">View All</a>
+        </div>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Symbol</th>
+                        <th>Broker</th>
+                        <th>Status</th>
+                        <th>Published</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for call in recent_calls %}
+                    <tr>
+                        <td><strong>{{ call.symbol }}</strong></td>
+                        <td>{{ call.broker.name }}</td>
+                        <td><span class="badge badge-{{ call.status|lower }}">{{ call.status }}</span></td>
+                        <td>{{ call.published_at|date:"M d, Y H:i"|default:"Not published" }}</td>
+                        <td>
+                            <a href="{% url 'admin_panel:call_detail' call.id %}" class="btn btn-sm btn-outline">View</a>
+                            <a href="{% url 'admin_panel:call_update' call.id %}" class="btn btn-sm btn-secondary">Edit</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center" style="padding: 2rem; color: #888;">No recent calls</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Top Brokers -->
+    <div class="dashboard-section">
+        <div class="section-header">
+            <h2>Top Brokers</h2>
+            <a href="{% url 'admin_panel:brokers_list' %}" class="btn btn-sm btn-outline">Manage</a>
+        </div>
+        {% for broker in top_brokers %}
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.08);">
+            <div>
+                <strong>{{ broker.name }}</strong>
+                <small style="display: block; color: #888;">{{ broker.total_calls_published }} calls</small>
+            </div>
+            <span style="background: rgba(0,230,118,0.15); color: #00e676; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 700;">
+                {{ broker.overall_accuracy }}%
+            </span>
+        </div>
+        {% empty %}
+        <p style="color: #888; text-align: center; padding: 1rem;">No broker data yet</p>
+        {% endfor %}
+    </div>
+</div>
+
 <style>
-.full-width {
-    grid-column: 1 / -1;
+.full-width { grid-column: 1 / -1; }
+.stat-alert { border-left: 4px solid #f59e0b; }
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
 }
-
-.stat-card.alert {
-    border-left: 4px solid var(--warning-color);
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 1.5rem;
 }
+.stat-card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+.stat-icon { font-size: 2rem; }
+.stat-content h3 { font-size: 1.75rem; font-weight: 700; margin: 0; }
+.stat-content p { margin: 0; color: rgba(255,255,255,0.5); }
+.stat-content small { color: rgba(255,255,255,0.35); font-size: 12px; }
+.dashboard-section {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.section-header h2 { font-size: 1.1rem; font-weight: 600; margin: 0; }
+.page-header { margin-bottom: 1.5rem; }
+.page-header h1 { font-size: 1.75rem; font-weight: 700; margin: 0; }
+.page-header .text-secondary { margin: 0; opacity: 0.5; }
 </style>
-
-<script>
-function approveCall(callId) {
-    if (confirm('Approve this research call?')) {
-        // TODO: Implement approval
-        alert('Approval functionality - Call ID: ' + callId);
-    }
-}
-
-function rejectCall(callId) {
-    if (confirm('Reject this research call?')) {
-        // TODO: Implement rejection
-        alert('Rejection functionality - Call ID: ' + callId);
-    }
-}
-</script>
 {% endblock %}

@@ -1,0 +1,69 @@
+{% load static %}
+{# Reusable customer sidebar — included automatically by base.html in App Mode #}
+<aside class="w-64 flex-col bg-surface shadow-soft z-30 hidden md:flex flex-shrink-0 sticky top-0 h-screen">
+    <div class="h-20 flex items-center px-8">
+        <a href="{% url 'dashboard:dashboard' %}" class="flex items-center gap-3 no-underline">
+            <span class="material-symbols-outlined text-3xl text-text-main">candlestick_chart</span>
+            <h2 class="text-text-main text-xl font-extrabold tracking-tight m-0">StockPro</h2>
+        </a>
+    </div>
+    <div class="flex-1 flex flex-col gap-2 p-6 overflow-y-auto">
+        <div class="space-y-1">
+            <p class="text-text-muted text-[10px] font-bold uppercase tracking-wider mb-4 px-4">Menu</p>
+            <a class="flex items-center gap-4 px-4 py-3 rounded-xl {% if request.path == '/app/' %}bg-background-base text-text-main font-bold shadow-sm{% else %}text-text-muted hover:text-text-main hover:bg-background-base{% endif %} transition-all no-underline" href="{% url 'dashboard:dashboard' %}">
+                <span class="material-symbols-outlined text-[20px]">home</span>
+                <span class="text-sm">Home</span>
+            </a>
+            <a class="flex items-center gap-4 px-4 py-3 rounded-xl {% if 'calls/' in request.path and 'closed' not in request.path %}bg-background-base text-text-main font-bold shadow-sm{% else %}text-text-muted hover:text-text-main hover:bg-background-base{% endif %} transition-all group no-underline" href="{% url 'research_calls:live_calls' %}">
+                <span class="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">trending_up</span>
+                <span class="text-sm font-medium">Live Trades</span>
+            </a>
+            <a class="flex items-center gap-4 px-4 py-3 rounded-xl {% if 'closed' in request.path %}bg-background-base text-text-main font-bold shadow-sm{% else %}text-text-muted hover:text-text-main hover:bg-background-base{% endif %} transition-all group no-underline" href="{% url 'research_calls:closed_calls' %}">
+                <span class="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">check_circle</span>
+                <span class="text-sm font-medium">Closed Calls</span>
+            </a>
+            <a class="flex items-center gap-4 px-4 py-3 rounded-xl {% if 'portfolio' in request.path %}bg-background-base text-text-main font-bold shadow-sm{% else %}text-text-muted hover:text-text-main hover:bg-background-base{% endif %} transition-all group no-underline" href="{% url 'portfolios:portfolio' %}">
+                <span class="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">pie_chart</span>
+                <span class="text-sm font-medium">Portfolio</span>
+            </a>
+            <a class="flex items-center gap-4 px-4 py-3 rounded-xl {% if 'watchlist' in request.path %}bg-background-base text-text-main font-bold shadow-sm{% else %}text-text-muted hover:text-text-main hover:bg-background-base{% endif %} transition-all group no-underline" href="{% url 'watchlists:watchlist' %}">
+                <span class="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">visibility</span>
+                <span class="text-sm font-medium">Watchlist</span>
+            </a>
+            {% comment %} <a class="flex items-center gap-4 px-4 py-3 rounded-xl {% if 'markets' in request.path or '/market/' in request.path %}bg-background-base text-text-main font-bold shadow-sm{% else %}text-text-muted hover:text-text-main hover:bg-background-base{% endif %} transition-all group no-underline" href="{% url 'dashboard:markets' %}">
+                <span class="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">bar_chart</span>
+                <span class="text-sm font-medium">Markets</span>
+            </a> {% endcomment %}
+            <a class="flex items-center gap-4 px-4 py-3 rounded-xl {% if 'notifications' in request.path %}bg-background-base text-text-main font-bold shadow-sm{% else %}text-text-muted hover:text-text-main hover:bg-background-base{% endif %} transition-all group no-underline" href="/api/notifications/inbox/">
+                <span class="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">notifications</span>
+                <span class="text-sm font-medium">Notifications</span>
+            </a>
+        </div>
+        <!-- Go Pro Sidebar CTA -->
+        {% if not user.subscription %}
+        <div class="mt-auto pt-6">
+            <div class="bg-gradient-to-br from-text-main to-gray-800 rounded-2xl p-6 shadow-soft relative overflow-hidden group">
+                <div class="absolute -right-4 -top-4 opacity-10 transition-transform group-hover:rotate-12 group-hover:scale-110 duration-500">
+                    <span class="material-symbols-outlined text-8xl text-white">workspace_premium</span>
+                </div>
+                <h3 class="text-white font-bold mb-1 relative z-10 text-lg">Go Pro</h3>
+                <p class="text-gray-300 text-xs mb-4 relative z-10 font-medium leading-relaxed">Unlock real-time alerts & premium analysis.</p>
+                <a href="{% url 'payments:membership' %}" class="block w-full py-2.5 bg-white text-text-main text-xs font-bold rounded-lg hover:shadow-lg transition-all relative z-10 text-center no-underline">
+                    Upgrade Now
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    <div class="p-6">
+        <a href="{% url 'authentication:profile' %}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-background-base cursor-pointer transition-colors no-underline">
+            <div class="size-10 rounded-full bg-accent-teal flex items-center justify-center text-white font-bold shadow-sm">
+                {{ user.first_name|first|upper }}
+            </div>
+            <div class="flex flex-col">
+                <span class="text-sm font-bold text-text-main">{{ user.get_full_name|default:user.email }}</span>
+                <span class="text-xs text-text-muted">{% if user.subscription %}PRO Member{% else %}Free Account{% endif %}</span>
+            </div>
+        </a>
+    </div>
+</aside>

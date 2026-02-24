@@ -1,0 +1,253 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Notifications — StockPro{% endblock %}
+
+{% block page_css %}
+<style>
+    .notif-tab.active { color: #2D3748; border-bottom: 2px solid #38B2AC; }
+    @keyframes shimmer { 0%,100% { opacity: 0.4; } 50% { opacity: 0.8; } }
+</style>
+{% endblock %}
+
+{% block page_content %}
+<div class="max-w-[880px] mx-auto py-6">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-8 flex-wrap gap-4">
+        <div class="flex items-center gap-3">
+            <h1 class="text-2xl font-bold text-text-main tracking-tight">Notifications</h1>
+            <span class="bg-accent-teal text-white text-xs font-bold px-3 py-1 rounded-full" id="unreadBadge" style="display:none">0 new</span>
+        </div>
+        <div class="flex gap-3">
+            <button onclick="markAllRead()" class="px-4 py-2 rounded-lg text-sm font-semibold text-text-muted bg-background-base border border-gray-200 hover:bg-gray-100 hover:text-text-main transition-all flex items-center gap-2">
+                <span class="material-symbols-outlined text-[16px]">done_all</span>
+                Mark all read
+            </button>
+            <a href="{% url 'dashboard:dashboard' %}" class="px-4 py-2 rounded-lg text-sm font-semibold text-text-muted bg-background-base border border-gray-200 hover:bg-gray-100 hover:text-text-main transition-all no-underline flex items-center gap-2">
+                <span class="material-symbols-outlined text-[16px]">arrow_back</span>
+                Back
+            </a>
+        </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="flex gap-1 mb-6 border-b border-gray-200 pb-0 overflow-x-auto">
+        <button class="notif-tab active px-4 py-2.5 rounded-t-lg text-sm font-semibold text-text-main relative transition-all" data-filter="all" onclick="setFilter('all',this)">All</button>
+        <button class="notif-tab px-4 py-2.5 rounded-t-lg text-sm font-semibold text-text-muted hover:text-text-main transition-all" data-filter="unread" onclick="setFilter('unread',this)">Unread</button>
+        <button class="notif-tab px-4 py-2.5 rounded-t-lg text-sm font-semibold text-text-muted hover:text-text-main transition-all" data-filter="CALL_PUBLISHED" onclick="setFilter('CALL_PUBLISHED',this)">
+            <span class="material-symbols-outlined text-[14px] align-middle mr-1">trending_up</span>Calls
+        </button>
+        <button class="notif-tab px-4 py-2.5 rounded-t-lg text-sm font-semibold text-text-muted hover:text-text-main transition-all" data-filter="TARGET_HIT" onclick="setFilter('TARGET_HIT',this)">
+            <span class="material-symbols-outlined text-[14px] align-middle mr-1">gps_fixed</span>Targets
+        </button>
+        <button class="notif-tab px-4 py-2.5 rounded-t-lg text-sm font-semibold text-text-muted hover:text-text-main transition-all" data-filter="STOP_LOSS_HIT" onclick="setFilter('STOP_LOSS_HIT',this)">
+            <span class="material-symbols-outlined text-[14px] align-middle mr-1">shield</span>Stop Loss
+        </button>
+        <button class="notif-tab px-4 py-2.5 rounded-t-lg text-sm font-semibold text-text-muted hover:text-text-main transition-all" data-filter="SYSTEM" onclick="setFilter('SYSTEM',this)">
+            <span class="material-symbols-outlined text-[14px] align-middle mr-1">settings</span>System
+        </button>
+    </div>
+
+    <!-- Loading Skeletons -->
+    <div id="loadingState" class="space-y-3">
+        {% for _ in '123'|make_list %}
+        <div class="bg-surface border border-gray-200 rounded-xl p-5 flex gap-4 items-start" style="animation: shimmer 1.4s infinite;">
+            <div class="w-10 h-10 rounded-lg bg-gray-100 flex-shrink-0"></div>
+            <div class="flex-1 space-y-2">
+                <div class="h-3 bg-gray-100 rounded-md w-[55%]"></div>
+                <div class="h-3 bg-gray-100 rounded-md w-full"></div>
+                <div class="h-3 bg-gray-100 rounded-md w-[40%]"></div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Notification List -->
+    <div class="space-y-3" id="notifList" style="display:none"></div>
+
+    <!-- Empty State -->
+    <div class="text-center py-20" id="emptyState" style="display:none">
+        <span class="material-symbols-outlined text-[56px] text-text-muted/40 mb-4 block">notifications_off</span>
+        <div class="text-lg font-bold text-text-muted">No notifications</div>
+        <div class="text-sm text-text-muted mt-2">You're all caught up!</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_js %}
+<script>
+const TYPE_ICONS = {
+    CALL_PUBLISHED:  'trending_up',
+    TARGET_HIT:      'gps_fixed',
+    STOP_LOSS_HIT:   'shield',
+    CALL_UPDATED:    'edit_note',
+    CALL_EXPIRED:    'timer_off',
+    PORTFOLIO_ALERT: 'work',
+    SYSTEM:          'settings',
+};
+const TYPE_COLORS = {
+    CALL_PUBLISHED:  'bg-blue-50 text-blue-600',
+    TARGET_HIT:      'bg-emerald-50 text-emerald-600',
+    STOP_LOSS_HIT:   'bg-red-50 text-red-600',
+    CALL_UPDATED:    'bg-cyan-50 text-cyan-600',
+    CALL_EXPIRED:    'bg-amber-50 text-amber-600',
+    PORTFOLIO_ALERT: 'bg-yellow-50 text-yellow-600',
+    SYSTEM:          'bg-gray-100 text-gray-500',
+};
+const BADGE_COLORS = {
+    CALL_PUBLISHED:  'bg-blue-50 text-blue-600',
+    TARGET_HIT:      'bg-emerald-50 text-emerald-600',
+    STOP_LOSS_HIT:   'bg-red-50 text-red-600',
+    CALL_UPDATED:    'bg-cyan-50 text-cyan-600',
+    CALL_EXPIRED:    'bg-amber-50 text-amber-600',
+    PORTFOLIO_ALERT: 'bg-yellow-50 text-yellow-600',
+    SYSTEM:          'bg-gray-100 text-gray-500',
+};
+
+let allNotifs = [];
+let currentFilter = 'all';
+
+async function loadNotifications(filter) {
+    try {
+        const url = filter === 'unread'
+            ? '/api/notifications/?unread=1'
+            : '/api/notifications/';
+        const res = await fetch(url, {credentials: 'same-origin'});
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        allNotifs = Array.isArray(data) ? data : (data.results || []);
+        renderList();
+        updateBadge();
+    } catch (e) {
+        document.getElementById('loadingState').innerHTML =
+            '<p class="text-center text-text-muted py-10 text-sm">Could not load notifications.</p>';
+    }
+}
+
+function renderList() {
+    const list   = document.getElementById('notifList');
+    const empty  = document.getElementById('emptyState');
+    const loader = document.getElementById('loadingState');
+    loader.style.display = 'none';
+
+    let items = allNotifs;
+    if (currentFilter !== 'all' && currentFilter !== 'unread') {
+        items = allNotifs.filter(n => n.type === currentFilter);
+    }
+
+    if (!items.length) {
+        list.style.display  = 'none';
+        empty.style.display = 'block';
+        return;
+    }
+    empty.style.display = 'none';
+    list.style.display  = 'flex';
+    list.style.flexDirection = 'column';
+    list.style.gap = '0.5rem';
+
+    list.innerHTML = items.map(n => {
+        const typeKey  = (n.type || 'SYSTEM');
+        const icon     = TYPE_ICONS[typeKey] || 'notifications';
+        const iconColor = TYPE_COLORS[typeKey] || 'bg-gray-100 text-gray-500';
+        const badgeColor = BADGE_COLORS[typeKey] || 'bg-gray-100 text-gray-500';
+        const cardCls  = n.is_read ? '' : 'border-l-2 border-l-accent-teal';
+        const unreadBg = n.is_read ? 'bg-surface border-gray-200' : 'bg-accent-teal/[0.03] border-accent-teal/20';
+        const timeAgo  = formatTime(n.created_at);
+        const label    = (n.type || '').replace(/_/g,' ');
+        return `
+        <div class="${unreadBg} border rounded-xl p-4 flex gap-3.5 items-start cursor-pointer transition-all hover:bg-accent-teal/[0.05] hover:border-accent-teal/30 group ${cardCls}" id="notif-${n.id}" onclick="markRead(${n.id}, this)">
+            <div class="w-10 h-10 rounded-lg ${iconColor} flex items-center justify-center flex-shrink-0">
+                <span class="material-symbols-outlined text-[20px]">${icon}</span>
+            </div>
+            <div class="flex-1 min-w-0">
+                <div class="text-sm font-bold text-text-main mb-1 truncate">${escHtml(n.title)}</div>
+                <div class="text-[13px] text-text-muted leading-relaxed line-clamp-2">${escHtml(n.message)}</div>
+                <div class="flex items-center gap-2.5 mt-2">
+                    <span class="text-[11px] text-text-muted/60">${timeAgo}</span>
+                    <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md ${badgeColor}">${label}</span>
+                </div>
+            </div>
+            ${!n.is_read ? `<button class="text-text-muted hover:text-accent-teal hover:bg-accent-teal/10 p-1.5 rounded-lg transition-all text-xs opacity-0 group-hover:opacity-100 flex-shrink-0" onclick="event.stopPropagation();markRead(${n.id},document.getElementById('notif-${n.id}'))" title="Mark read">
+                <span class="material-symbols-outlined text-[16px]">done</span>
+            </button>` : ''}
+        </div>`;
+    }).join('');
+}
+
+async function markRead(id, card) {
+    try {
+        await fetch('/api/notifications/mark-read/', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {'Content-Type':'application/json', 'X-CSRFToken': getCsrf()},
+            body: JSON.stringify({notification_ids: [id]})
+        });
+        const n = allNotifs.find(x => x.id === id);
+        if (n) n.is_read = true;
+        renderList();
+        updateBadge();
+    } catch(e) {}
+}
+
+async function markAllRead() {
+    try {
+        await fetch('/api/notifications/mark-all-read/', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {'X-CSRFToken': getCsrf()}
+        });
+        allNotifs.forEach(n => n.is_read = true);
+        renderList();
+        updateBadge();
+    } catch(e) {}
+}
+
+function setFilter(filter, btn) {
+    currentFilter = filter;
+    document.querySelectorAll('.notif-tab').forEach(t => {
+        t.classList.remove('active', 'text-text-main');
+        t.classList.add('text-text-muted');
+    });
+    btn.classList.add('active', 'text-text-main');
+    btn.classList.remove('text-text-muted');
+    if (filter === 'unread') {
+        loadNotifications('unread');
+    } else {
+        renderList();
+    }
+}
+
+function updateBadge() {
+    const count  = allNotifs.filter(n => !n.is_read).length;
+    const badge  = document.getElementById('unreadBadge');
+    const global = document.getElementById('notif-count');
+    if (badge) {
+        badge.textContent = count + ' new';
+        badge.style.display = count ? 'inline-flex' : 'none';
+    }
+    if (global) {
+        global.textContent    = count > 99 ? '99+' : count;
+        global.style.display  = count ? 'flex' : 'none';
+    }
+}
+
+function formatTime(iso) {
+    if (!iso) return '';
+    const d    = new Date(iso);
+    const diff = (Date.now() - d) / 1000;
+    if (diff < 60)   return 'just now';
+    if (diff < 3600) return Math.floor(diff/60) + 'm ago';
+    if (diff < 86400)return Math.floor(diff/3600) + 'h ago';
+    return Math.floor(diff/86400) + 'd ago';
+}
+function escHtml(s) {
+    return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function getCsrf() {
+    return document.cookie.match('csrftoken=([^;]+)')?.[1] || '';
+}
+
+/* Init */
+loadNotifications('all');
+</script>
+{% endblock %}

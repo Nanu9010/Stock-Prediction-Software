@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block extra_css %}<link rel="stylesheet" href="{% static 'css/market_hero.css' %}">{% endblock %}
+{% block page_css %}<link rel="stylesheet" href="{% static 'css/market_hero.css' %}">{% endblock page_css %}
 
-{% block content %}
+{% block page_content %}
 <div class="market-section-page">
   <div class="section-page-container">
-    <a href="{% url 'dashboard:home' %}" class="back-link">← Back to Market Hero</a>
+    <a href="{% url 'dashboard:landing' %}" class="back-link">← Back to Market Hero</a>
     <div class="section-page-header">
       <div class="section-page-title">📋 Trades Dashboard</div>
       <div class="section-page-desc">All active research calls across categories.</div>

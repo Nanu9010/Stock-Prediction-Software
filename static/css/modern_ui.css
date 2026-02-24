@@ -387,3 +387,87 @@
 .dark-center {
     text-align: center;
 }
+
+/* ============================================
+   DASHBOARD REFINEMENTS (DENSITY & FILTERS)
+   ============================================ */
+
+/* Filter Bar */
+.filter-bar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    background: #f8fafc;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.filter-select {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 1px solid #cbd5e1;
+    background: white;
+    font-size: 0.85rem;
+    color: #334155;
+    cursor: pointer;
+    outline: none;
+}
+
+.filter-select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+.btn-filter-icon {
+    background: white;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    color: #334155;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-filter-icon:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+}
+
+.btn-filter-icon.active {
+    background: #eff6ff;
+    border-color: #3b82f6;
+    color: #1d4ed8;
+}
+
+/* Premium Badges */
+.badge-premium {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: rgba(251, 191, 36, 0.2);
+    color: #d97706;
+    border: 1px solid rgba(251, 191, 36, 0.3);
+    backdrop-filter: blur(4px);
+}
+
+/* Compact Stats */
+.stats-grid {
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.stat-card {
+    padding: 1rem;
+}
+
+.stat-icon {
+    font-size: 2rem;
+}
+
+.stat-content h3 {
+    font-size: 1.5rem;
+}

@@ -1,47 +1,78 @@
 {% extends 'base.html' %}
-{% load static %}
-{% block extra_css %}<link rel="stylesheet" href="{% static 'css/market_hero.css' %}">{% endblock %}
 
-{% block content %}
-<div class="market-section-page">
-  <div class="section-page-container">
-    <a href="{% url 'dashboard:home' %}" class="back-link">← Back to Market Hero</a>
-    <div class="section-page-header">
-      <div class="section-page-title">🏛️ Bonds & Fixed Income</div>
-      <div class="section-page-desc">Government and corporate bond yields, tax-free options.</div>
+{% block title %}Bonds & Fixed Income — StockPro{% endblock %}
+
+{% block page_content %}
+<div class="space-y-8">
+    <!-- Page Header -->
+    <div class="flex items-center gap-3">
+        <span class="size-10 rounded-xl bg-accent-teal/10 flex items-center justify-center">
+            <span class="material-symbols-outlined text-accent-teal text-xl">account_balance</span>
+        </span>
+        <div>
+            <h1 class="text-2xl font-extrabold text-text-main m-0">Bonds & Fixed Income</h1>
+            <p class="text-sm text-text-muted m-0">Government and corporate bond yields, tax-free options.</p>
+        </div>
     </div>
 
-    <div class="widget-card-hero" style="margin-bottom: 24px;">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Bond Name</th>
-            <th>Type</th>
-            <th>Yield</th>
-            <th>Maturity</th>
-            <th>Rating</th>
-            <th>Trend</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for bond in bonds %}
-          <tr>
-            <td style="font-weight: 600;">{{ bond.name }}</td>
-            <td>{{ bond.type }}</td>
-            <td style="font-weight: 700; color: var(--accent-green);">{{ bond.yield_pct }}%</td>
-            <td>{{ bond.maturity }}</td>
-            <td>{{ bond.rating }}</td>
-            <td>
-              {% if bond.trend == 'up' %}<span class="text-gain">▲ Up</span>
-              {% elif bond.trend == 'down' %}<span class="text-loss">▼ Down</span>
-              {% else %}<span style="color: var(--text-muted);">― Stable</span>
-              {% endif %}
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+    <!-- Bonds Table Card -->
+    <div class="bg-surface rounded-2xl shadow-soft overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="border-b border-gray-100">
+                        <th class="text-left px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Bond Name</th>
+                        <th class="text-left px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Type</th>
+                        <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Yield</th>
+                        <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Maturity</th>
+                        <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Rating</th>
+                        <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Trend</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    {% for bond in bonds %}
+                    <tr class="hover:bg-gray-50/50 transition-colors">
+                        <td class="px-6 py-4">
+                            <span class="font-bold text-text-main text-sm">{{ bond.name }}</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="text-sm text-text-muted">{{ bond.type }}</span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="text-sm font-bold text-green-500">{{ bond.yield_pct }}%</span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="text-sm text-text-muted">{{ bond.maturity }}</span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="px-2.5 py-1 rounded bg-blue-50 text-blue-600 text-xs font-bold uppercase tracking-wider">{{ bond.rating }}</span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <div class="flex items-center justify-center gap-1.5 text-xs font-bold">
+                                {% if bond.trend == 'up' %}
+                                    <span class="material-symbols-outlined text-green-500 text-base">trending_up</span>
+                                    <span class="text-green-600">Up</span>
+                                {% elif bond.trend == 'down' %}
+                                    <span class="material-symbols-outlined text-red-500 text-base">trending_down</span>
+                                    <span class="text-red-600">Down</span>
+                                {% else %}
+                                    <span class="material-symbols-outlined text-gray-300 text-base">horizontal_rule</span>
+                                    <span class="text-gray-400">Stable</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="px-6 py-12 text-center">
+                            <span class="material-symbols-outlined text-5xl text-gray-300 mb-3 block">history_edu</span>
+                            <p class="text-text-muted text-sm m-0">No bond data available right now</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
-  </div>
 </div>
 {% endblock %}

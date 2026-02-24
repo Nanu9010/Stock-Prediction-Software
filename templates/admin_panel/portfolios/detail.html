@@ -1,0 +1,48 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block title %}Portfolio — {{ portfolio.user.email }}{% endblock %}
+
+{% block content %}
+<div class="page-header" style="display:flex;justify-content:space-between;align-items:center;">
+    <div>
+        <h1>Portfolio: {{ portfolio.name }}</h1>
+        <p class="text-secondary">{{ portfolio.user.email }}</p>
+    </div>
+    <div style="display:flex;gap:8px;">
+        <a href="{% url 'admin_panel:portfolios_list' %}" class="btn btn-secondary">← Back</a>
+        <form method="post" action="{% url 'admin_panel:portfolio_delete' portfolio.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger" onclick="return confirm('Delete this portfolio?')">Delete</button>
+        </form>
+    </div>
+</div>
+
+<div class="stats-grid" style="margin-bottom:1.5rem;">
+    <div class="stat-card"><div class="stat-icon">💼</div><div class="stat-content"><h3>{{ items.count }}</h3><p>Holdings</p></div></div>
+    <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-content"><h3>₹{{ portfolio.total_value|default:"0" }}</h3><p>Total Value</p></div></div>
+    <div class="stat-card"><div class="stat-icon">📈</div><div class="stat-content"><h3>₹{{ portfolio.total_profit_loss|default:"0" }}</h3><p>Total P&L</p></div></div>
+</div>
+
+<div class="dashboard-section">
+    <h2 style="margin-bottom:1rem;font-size:1.1rem;">Holdings</h2>
+    <table class="data-table">
+        <thead>
+            <tr><th>Symbol</th><th>Entry</th><th>Qty</th><th>Invested</th><th>P&L</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td><strong>{{ item.research_call.symbol }}</strong></td>
+                <td>₹{{ item.entry_price }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>₹{{ item.invested_amount }}</td>
+                <td class="{% if item.profit_loss >= 0 %}text-success{% else %}text-danger{% endif %}">₹{{ item.profit_loss }}</td>
+                <td><span class="badge badge-{{ item.status|lower }}">{{ item.status }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="text-center" style="padding:1.5rem;color:#888;">No holdings</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

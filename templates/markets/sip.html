@@ -1,44 +1,73 @@
 {% extends 'base.html' %}
-{% load static %}
-{% block extra_css %}<link rel="stylesheet" href="{% static 'css/market_hero.css' %}">{% endblock %}
 
-{% block content %}
-<div class="market-section-page">
-  <div class="section-page-container">
-    <a href="{% url 'dashboard:home' %}" class="back-link">← Back to Market Hero</a>
-    <div class="section-page-header">
-      <div class="section-page-title">💰 Systematic Investment Plans (SIP)</div>
-      <div class="section-page-desc">Start small, grow big. Top SIP funds with consistent returns.</div>
+{% block title %}Top SIP Funds — StockPro{% endblock %}
+
+{% block page_content %}
+<div class="space-y-8">
+    <!-- Page Header -->
+    <div class="flex items-center gap-3">
+        <span class="size-10 rounded-xl bg-accent-teal/10 flex items-center justify-center">
+            <span class="material-symbols-outlined text-accent-teal text-xl">payments</span>
+        </span>
+        <div>
+            <h1 class="text-2xl font-extrabold text-text-main m-0">Top SIP Funds</h1>
+            <p class="text-sm text-text-muted m-0">Start small, grow big. Top SIP funds with consistent returns.</p>
+        </div>
     </div>
 
-    <div class="widget-card-hero" style="margin-bottom: 24px;">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Fund Name</th>
-            <th>Category</th>
-            <th>Min SIP</th>
-            <th>1Y Return</th>
-            <th>3Y Return</th>
-            <th>5Y Return</th>
-            <th>Popularity</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for sip in sip_funds %}
-          <tr>
-            <td style="font-weight: 600;">{{ sip.name }}</td>
-            <td>{{ sip.category }}</td>
-            <td>₹{{ sip.min_sip }}</td>
-            <td class="text-gain">{{ sip.returns_1y }}%</td>
-            <td class="text-gain">{{ sip.returns_3y }}%</td>
-            <td class="text-gain">{{ sip.returns_5y }}%</td>
-            <td><span class="ipo-status ipo-open">{{ sip.popularity }}</span></td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+    <!-- Funds Table Card -->
+    <div class="bg-surface rounded-2xl shadow-soft overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="border-b border-gray-100">
+                        <th class="text-left px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Fund Name</th>
+                        <th class="text-left px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Category</th>
+                        <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Min SIP</th>
+                        <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">1Y Return</th>
+                        <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">3Y Return</th>
+                        <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">5Y Return</th>
+                        <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Popularity</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    {% for sip in sip_funds %}
+                    <tr class="hover:bg-gray-50/50 transition-colors">
+                        <td class="px-6 py-4">
+                            <span class="font-bold text-text-main text-sm">{{ sip.name }}</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="text-sm text-text-muted">{{ sip.category }}</span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="text-sm font-bold text-text-main">₹{{ sip.min_sip }}</span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="text-sm font-bold text-green-500">{{ sip.returns_1y }}%</span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="text-sm font-bold text-green-500">{{ sip.returns_3y }}%</span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="text-sm font-bold text-green-500">{{ sip.returns_5y }}%</span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="px-3 py-1 rounded-full bg-green-50 text-green-600 text-xs font-bold">
+                                {{ sip.popularity }}
+                            </span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="px-6 py-12 text-center">
+                            <span class="material-symbols-outlined text-5xl text-gray-300 mb-3 block">account_balance_wallet</span>
+                            <p class="text-text-muted text-sm m-0">No SIP fund data available right now</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
-  </div>
 </div>
 {% endblock %}

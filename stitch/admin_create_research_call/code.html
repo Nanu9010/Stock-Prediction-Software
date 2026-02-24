@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>StockPro Admin - Create Research Call</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#000000", // Stark black for high contrast
+                        "primary-dark": "#ffffff", // White for dark mode
+                        "background-light": "#ffffff",
+                        "background-dark": "#121212",
+                        "surface-light": "#f8f9fa",
+                        "surface-dark": "#1e1e1e",
+                        "border-light": "#e2e8f0",
+                        "border-dark": "#2d2d2d",
+                        "text-secondary": "#94a3b8",
+                    },
+                    fontFamily: {
+                        display: ["Manrope", "sans-serif"],
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Manrope', sans-serif;
+        }::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 2px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }.minimal-input {
+            border: none;
+            border-bottom: 1px solid #e2e8f0;
+            border-radius: 0;
+            padding: 0.75rem 0;
+            background: transparent;
+            transition: border-color 0.2s;
+        }
+        .dark .minimal-input {
+            border-bottom: 1px solid #334155;
+        }
+        .minimal-input:focus {
+            border-bottom: 1px solid #000;
+            box-shadow: none;
+            outline: none;
+        }
+        .dark .minimal-input:focus {
+            border-bottom: 1px solid #fff;
+        }input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen flex overflow-hidden selection:bg-slate-200 dark:selection:bg-slate-700">
+<aside class="w-64 bg-background-light dark:bg-background-dark border-r border-border-light dark:border-border-dark flex-shrink-0 flex flex-col h-screen fixed left-0 top-0 z-50">
+<div class="p-8 flex flex-col gap-10 flex-1 overflow-y-auto">
+<div class="flex items-center gap-3">
+<div class="h-8 w-8 bg-black dark:bg-white flex items-center justify-center rounded">
+<span class="material-symbols-outlined text-white dark:text-black text-[20px]">candlestick_chart</span>
+</div>
+<h1 class="text-slate-900 dark:text-white text-lg font-bold tracking-tight">StockPro</h1>
+</div>
+<nav class="flex flex-col gap-2">
+<p class="text-[10px] font-bold text-text-secondary uppercase tracking-widest mb-2 pl-3">Main</p>
+<a class="flex items-center gap-3 px-3 py-2 rounded text-text-secondary hover:text-slate-900 dark:hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+<span class="font-medium text-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded bg-surface-light dark:bg-surface-dark text-slate-900 dark:text-white transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">article</span>
+<span class="font-medium text-sm">Research Calls</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded text-text-secondary hover:text-slate-900 dark:hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">group</span>
+<span class="font-medium text-sm">Users</span>
+</a>
+<p class="text-[10px] font-bold text-text-secondary uppercase tracking-widest mt-6 mb-2 pl-3">System</p>
+<a class="flex items-center gap-3 px-3 py-2 rounded text-text-secondary hover:text-slate-900 dark:hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+<span class="font-medium text-sm">Configuration</span>
+</a>
+</nav>
+</div>
+<div class="p-6 border-t border-border-light dark:border-border-dark">
+<div class="flex items-center gap-3">
+<div class="h-8 w-8 rounded bg-gray-200 dark:bg-gray-700 bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA679BHjqOemQHRSuPlOndPJW6LcbL2Lx5bzqEYtavuAxMiIsAwDD0Uoc9iMCICl-H366dzSvje3SXXEUmP7NP9cafr7oR0MHincYtJHKsIrrILXhUNVv0j5mq-yQQAQGCr2FGzUTmK6owfdeLRmufy6ohnfB-fnb6uE5KkokdjrQwsWb0aNL_99fj_e3Hh26ah82UeKfQevUGe4C5XtAKa-WWJwoo9_dmvdkWQ2L6T39k1Fa-Owb2_RvyOa67IaXhTsXEAjN9mOBg');"></div>
+<div class="flex flex-col">
+<span class="text-sm font-semibold text-slate-900 dark:text-white">Alex M.</span>
+<span class="text-[10px] text-text-secondary uppercase tracking-wider">Super Admin</span>
+</div>
+</div>
+</div>
+</aside>
+<main class="ml-64 flex-1 flex flex-col min-h-screen bg-white dark:bg-[#0b0f17]">
+<header class="h-20 flex items-center justify-between px-12 sticky top-0 z-40 bg-white/80 dark:bg-[#0b0f17]/80 backdrop-blur-md">
+<div class="flex items-center gap-2 text-sm">
+<a class="text-text-secondary hover:text-slate-900 dark:hover:text-white transition-colors" href="#">Calls</a>
+<span class="text-text-secondary">/</span>
+<span class="text-slate-900 dark:text-white font-medium">New Entry</span>
+</div>
+<div class="flex gap-4">
+<button class="text-sm font-medium text-text-secondary hover:text-slate-900 dark:hover:text-white transition-colors">Discard</button>
+<button class="bg-black dark:bg-white text-white dark:text-black px-6 py-2 text-sm font-medium rounded hover:opacity-90 transition-opacity flex items-center gap-2">
+<span>Publish</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</button>
+</div>
+</header>
+<div class="flex-1 overflow-y-auto px-12 pb-12">
+<div class="max-w-4xl mx-auto pt-4">
+<div class="mb-12">
+<h1 class="text-4xl font-light text-slate-900 dark:text-white mb-2 tracking-tight">New Research Call</h1>
+<p class="text-text-secondary font-light">Drafting a new trade recommendation.</p>
+</div>
+<form class="space-y-16">
+<section>
+<div class="grid grid-cols-12 gap-x-8 gap-y-8">
+<div class="col-span-8">
+<label class="block text-[10px] uppercase tracking-widest font-bold text-text-secondary mb-1">Ticker Symbol</label>
+<input class="minimal-input w-full text-2xl font-light text-slate-900 dark:text-white placeholder-slate-300 dark:placeholder-slate-700" placeholder="e.g. RELIANCE" type="text"/>
+</div>
+<div class="col-span-4">
+<label class="block text-[10px] uppercase tracking-widest font-bold text-text-secondary mb-3">Exchange</label>
+<div class="flex gap-4">
+<label class="cursor-pointer group">
+<input checked="" class="sr-only peer" name="exchange" type="radio"/>
+<span class="text-sm font-medium text-text-secondary peer-checked:text-black dark:peer-checked:text-white border-b-2 border-transparent peer-checked:border-black dark:peer-checked:border-white pb-1 transition-all">NSE</span>
+</label>
+<label class="cursor-pointer group">
+<input class="sr-only peer" name="exchange" type="radio"/>
+<span class="text-sm font-medium text-text-secondary peer-checked:text-black dark:peer-checked:text-white border-b-2 border-transparent peer-checked:border-black dark:peer-checked:border-white pb-1 transition-all">BSE</span>
+</label>
+</div>
+</div>
+<div class="col-span-6">
+<label class="block text-[10px] uppercase tracking-widest font-bold text-text-secondary mb-1">Instrument Type</label>
+<div class="relative">
+<select class="minimal-input w-full text-lg font-light text-slate-900 dark:text-white appearance-none bg-transparent py-3 pr-8 cursor-pointer">
+<option>Equity Cash</option>
+<option>Futures (F&amp;O)</option>
+<option>Options (F&amp;O)</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-text-secondary">
+<span class="material-symbols-outlined text-[18px]">expand_more</span>
+</div>
+</div>
+</div>
+<div class="col-span-6">
+<label class="block text-[10px] uppercase tracking-widest font-bold text-text-secondary mb-1">Time Horizon</label>
+<div class="relative">
+<select class="minimal-input w-full text-lg font-light text-slate-900 dark:text-white appearance-none bg-transparent py-3 pr-8 cursor-pointer">
+<option>Intraday</option>
+<option>BTST</option>
+<option>Short Term (1-2 Weeks)</option>
+<option>Positional (1-3 Months)</option>
+<option>Long Term</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-text-secondary">
+<span class="material-symbols-outlined text-[18px]">expand_more</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section>
+<div class="grid grid-cols-12 gap-x-8 gap-y-10">
+<div class="col-span-12">
+<label class="block text-[10px] uppercase tracking-widest font-bold text-text-secondary mb-4">Recommendation</label>
+<div class="flex gap-8">
+<label class="cursor-pointer relative group">
+<input checked="" class="sr-only peer" name="action" type="radio"/>
+<div class="flex items-center gap-3 px-6 py-4 rounded bg-surface-light dark:bg-surface-dark peer-checked:bg-green-50 dark:peer-checked:bg-green-900/10 peer-checked:ring-1 peer-checked:ring-green-500 transition-all opacity-60 peer-checked:opacity-100 grayscale peer-checked:grayscale-0">
+<span class="material-symbols-outlined text-green-600 text-[24px]">trending_up</span>
+<span class="text-lg font-medium text-green-700 dark:text-green-400">BUY</span>
+</div>
+</label>
+<label class="cursor-pointer relative group">
+<input class="sr-only peer" name="action" type="radio"/>
+<div class="flex items-center gap-3 px-6 py-4 rounded bg-surface-light dark:bg-surface-dark peer-checked:bg-red-50 dark:peer-checked:bg-red-900/10 peer-checked:ring-1 peer-checked:ring-red-500 transition-all opacity-60 peer-checked:opacity-100 grayscale peer-checked:grayscale-0">
+<span class="material-symbols-outlined text-red-600 text-[24px]">trending_down</span>
+<span class="text-lg font-medium text-red-700 dark:text-red-400">SELL</span>
+</div>
+</label>
+</div>
+</div>
+<div class="col-span-4">
+<label class="block text-[10px] uppercase tracking-widest font-bold text-text-secondary mb-1">Entry Range</label>
+<div class="flex items-center gap-2">
+<input class="minimal-input w-full text-lg font-light text-slate-900 dark:text-white" placeholder="Min" type="number"/>
+<span class="text-text-secondary font-light">–</span>
+<input class="minimal-input w-full text-lg font-light text-slate-900 dark:text-white" placeholder="Max" type="number"/>
+</div>
+</div>
+<div class="col-span-4">
+<label class="block text-[10px] uppercase tracking-widest font-bold text-text-secondary mb-1">Stop Loss</label>
+<div class="relative">
+<span class="absolute left-0 top-3 text-red-400 text-lg font-light">@</span>
+<input class="minimal-input w-full pl-6 text-lg font-light text-slate-900 dark:text-white" placeholder="0.00" type="number"/>
+</div>
+</div>
+<div class="col-span-4">
+</div>
+<div class="col-span-12">
+<label class="block text-[10px] uppercase tracking-widest font-bold text-text-secondary mb-1">Targets</label>
+<div class="grid grid-cols-3 gap-8">
+<div class="relative group">
+<span class="absolute left-0 top-3 text-green-500 text-xs font-bold">T1</span>
+<input class="minimal-input w-full pl-8 text-lg font-light text-slate-900 dark:text-white" placeholder="Target 1" type="number"/>
+</div>
+<div class="relative group">
+<span class="absolute left-0 top-3 text-green-500 text-xs font-bold opacity-70">T2</span>
+<input class="minimal-input w-full pl-8 text-lg font-light text-slate-900 dark:text-white" placeholder="Target 2" type="number"/>
+</div>
+<div class="relative group">
+<span class="absolute left-0 top-3 text-green-500 text-xs font-bold opacity-50">T3</span>
+<input class="minimal-input w-full pl-8 text-lg font-light text-slate-900 dark:text-white" placeholder="Target 3" type="number"/>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="pt-4">
+<div class="flex justify-between items-end mb-4">
+<label class="block text-[10px] uppercase tracking-widest font-bold text-text-secondary">Rationale &amp; Analysis</label>
+<button class="text-xs text-blue-500 hover:text-blue-600 font-medium flex items-center gap-1 transition-colors" type="button">
+<span class="material-symbols-outlined text-[14px]">auto_awesome</span>
+                            Generate Draft
+                        </button>
+</div>
+<div class="relative group">
+<textarea class="w-full bg-surface-light dark:bg-surface-dark/30 rounded-lg border-0 p-6 text-slate-800 dark:text-slate-200 text-base leading-relaxed focus:ring-1 focus:ring-black dark:focus:ring-white resize-y min-h-[200px] placeholder-text-secondary/50 font-light" placeholder="Detail the technical setup or fundamental reasons for this call..."></textarea>
+<div class="absolute bottom-4 left-4 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white dark:bg-[#252525] p-1 rounded-full shadow-lg border border-border-light dark:border-border-dark">
+<button class="p-1.5 rounded-full hover:bg-surface-light dark:hover:bg-surface-dark text-text-secondary hover:text-black dark:hover:text-white transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">format_bold</span>
+</button>
+<button class="p-1.5 rounded-full hover:bg-surface-light dark:hover:bg-surface-dark text-text-secondary hover:text-black dark:hover:text-white transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">format_italic</span>
+</button>
+<button class="p-1.5 rounded-full hover:bg-surface-light dark:hover:bg-surface-dark text-text-secondary hover:text-black dark:hover:text-white transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">link</span>
+</button>
+<div class="w-px h-3 bg-border-light dark:bg-border-dark mx-1"></div>
+<button class="p-1.5 rounded-full hover:bg-surface-light dark:hover:bg-surface-dark text-text-secondary hover:text-black dark:hover:text-white transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">image</span>
+</button>
+</div>
+</div>
+</section>
+<section class="border-t border-border-light dark:border-border-dark pt-8">
+<div class="flex items-start justify-between">
+<div>
+<h3 class="text-sm font-medium text-slate-900 dark:text-white mb-1">Visibility Settings</h3>
+<p class="text-xs text-text-secondary max-w-sm">Control who can see this call and how it's categorized.</p>
+</div>
+<div class="flex gap-8 items-center">
+<div class="flex items-center gap-3">
+<span class="text-[10px] uppercase tracking-widest font-bold text-text-secondary">Risk</span>
+<div class="flex rounded-md bg-surface-light dark:bg-surface-dark p-1">
+<button class="px-3 py-1 text-xs font-medium rounded text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-white/10 transition-all" type="button">Low</button>
+<button class="px-3 py-1 text-xs font-medium rounded bg-white dark:bg-white/10 shadow-sm text-slate-900 dark:text-white" type="button">Medium</button>
+<button class="px-3 py-1 text-xs font-medium rounded text-slate-600 dark:text-slate-300 hover:bg-white dark:hover:bg-white/10 transition-all" type="button">High</button>
+</div>
+</div>
+<div class="h-8 w-px bg-border-light dark:bg-border-dark"></div>
+<div class="flex items-center gap-3">
+<span class="text-[10px] uppercase tracking-widest font-bold text-text-secondary">PRO Only</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-black dark:peer-checked:bg-white dark:peer-checked:after:bg-black"></div>
+</label>
+</div>
+</div>
+</div>
+</section>
+</form>
+</div>
+</div>
+</main>
+
+</body></html>

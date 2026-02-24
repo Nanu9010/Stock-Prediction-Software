@@ -1,0 +1,54 @@
+{% load static %}
+{# ─── Admin Sidebar ─────────────────────────────────────────────────────────── #}
+<aside class="admin-sidebar" id="adminSidebar">
+    <nav class="sidebar-nav">
+        <a href="{% url 'admin_panel:dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+            <span class="nav-icon">📊</span>
+            <span class="nav-label">Dashboard</span>
+        </a>
+
+        <div class="nav-section">Research Calls</div>
+        <a href="{% url 'admin_panel:calls_list' %}" class="nav-item {% if 'calls' in request.resolver_match.url_name %}active{% endif %}">
+            <span class="nav-icon">📈</span>
+            <span class="nav-label">All Calls</span>
+        </a>
+
+        <div class="nav-section">Management</div>
+        <a href="{% url 'admin_panel:brokers_list' %}" class="nav-item {% if 'brokers' in request.resolver_match.url_name %}active{% endif %}">
+            <span class="nav-icon">🏢</span>
+            <span class="nav-label">Brokers</span>
+        </a>
+        <a href="{% url 'admin_panel:users_list' %}" class="nav-item {% if 'users' in request.resolver_match.url_name %}active{% endif %}">
+            <span class="nav-icon">👥</span>
+            <span class="nav-label">Users</span>
+        </a>
+
+        <div class="nav-section">Data</div>
+        <a href="{% url 'admin_panel:portfolios_list' %}" class="nav-item {% if 'portfolios' in request.resolver_match.url_name %}active{% endif %}">
+            <span class="nav-icon">💼</span>
+            <span class="nav-label">Portfolios</span>
+        </a>
+        <a href="{% url 'admin_panel:watchlists_list' %}" class="nav-item {% if 'watchlists' in request.resolver_match.url_name %}active{% endif %}">
+            <span class="nav-icon">👁️</span>
+            <span class="nav-label">Watchlists</span>
+        </a>
+
+        <div class="nav-section">System</div>
+        <a href="{% url 'admin_panel:subscriptions_list' %}" class="nav-item {% if 'subscription' in request.resolver_match.url_name %}active{% endif %}">
+            <span class="nav-icon">📦</span>
+            <span class="nav-label">Subscriptions</span>
+        </a>
+        <a href="{% url 'admin_panel:payments_list' %}" class="nav-item {% if 'payment' in request.resolver_match.url_name %}active{% endif %}">
+            <span class="nav-icon">💳</span>
+            <span class="nav-label">Payments</span>
+        </a>
+    </nav>
+
+    {# ── Back to Site button — outside nav so it always stays at bottom ── #}
+    <div class="sidebar-footer">
+        <a href="{% url 'dashboard:dashboard' %}" class="back-to-site-btn">
+            <span class="nav-icon">←</span>
+            <span class="nav-label">Back to Site</span>
+        </a>
+    </div>
+</aside>

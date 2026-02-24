@@ -1,0 +1,33 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block title %}Payment — {{ payment.transaction_id|default:payment.pk }}{% endblock %}
+
+{% block content %}
+<div class="page-header" style="display:flex;justify-content:space-between;align-items:center;">
+    <div>
+        <h1>Payment Detail</h1>
+        <p class="text-secondary">TXN: {{ payment.transaction_id|default:"N/A" }}</p>
+    </div>
+    <a href="{% url 'admin_panel:payments_list' %}" class="btn btn-secondary">← Back to Payments</a>
+</div>
+
+<div class="dashboard-section" style="max-width:600px;">
+    <table class="data-table" style="border:none;">
+        <tr><th style="width:35%;">User</th><td>{{ payment.user.email }}</td></tr>
+        <tr><th>Amount</th><td><strong style="font-size:1.2rem;">₹{{ payment.amount }}</strong></td></tr>
+        <tr><th>Plan Type</th><td>{{ payment.plan_type|default:"—" }}</td></tr>
+        <tr><th>Status</th>
+            <td>
+                <span class="badge badge-{% if payment.status == 'SUCCESS' %}success{% elif payment.status == 'FAILED' %}danger{% elif payment.status == 'REFUNDED' %}warning{% else %}secondary{% endif %}">
+                    {{ payment.status }}
+                </span>
+            </td>
+        </tr>
+        <tr><th>Transaction ID</th><td><code>{{ payment.transaction_id|default:"—" }}</code></td></tr>
+        <tr><th>Razorpay Order ID</th><td><code>{{ payment.razorpay_order_id|default:"—" }}</code></td></tr>
+        <tr><th>Payment ID</th><td><code>{{ payment.razorpay_payment_id|default:"—" }}</code></td></tr>
+        <tr><th>Date</th><td>{{ payment.created_at|date:"d M Y, H:i" }}</td></tr>
+        <tr><th>Gateway Response</th><td><small style="color:#888;">{{ payment.gateway_response|default:"—" }}</small></td></tr>
+    </table>
+</div>
+{% endblock %}

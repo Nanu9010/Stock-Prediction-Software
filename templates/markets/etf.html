@@ -1,46 +1,71 @@
 {% extends 'base.html' %}
-{% load static %}
-{% block extra_css %}<link rel="stylesheet" href="{% static 'css/market_hero.css' %}">{% endblock %}
 
-{% block content %}
-<div class="market-section-page">
-  <div class="section-page-container">
-    <a href="{% url 'dashboard:home' %}" class="back-link">← Back to Market Hero</a>
-    <div class="section-page-header">
-      <div class="section-page-title">📦 Exchange Traded Funds (ETFs)</div>
-      <div class="section-page-desc">Popular ETFs with live prices from NSE.</div>
+{% block title %}Exchange Traded Funds (ETFs) — StockPro{% endblock %}
+
+{% block page_content %}
+<div class="space-y-8">
+    <!-- Page Header -->
+    <div class="flex items-center gap-3">
+        <span class="size-10 rounded-xl bg-accent-teal/10 flex items-center justify-center">
+            <span class="material-symbols-outlined text-accent-teal text-xl">package</span>
+        </span>
+        <div>
+            <h1 class="text-2xl font-extrabold text-text-main m-0">Exchange Traded Funds (ETFs)</h1>
+            <p class="text-sm text-text-muted m-0">Popular ETFs with live prices from NSE.</p>
+        </div>
     </div>
 
-    <div class="widget-card-hero" style="margin-bottom: 24px;">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>ETF Name</th>
-            <th>Symbol</th>
-            <th>Category</th>
-            <th>Price</th>
-            <th>Change</th>
-            <th>Change %</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for etf in etfs %}
-          <tr>
-            <td style="font-weight: 600;">{{ etf.name }}</td>
-            <td>{{ etf.symbol }}</td>
-            <td>{{ etf.category }}</td>
-            <td>₹{{ etf.price }}</td>
-            <td class="{% if etf.change >= 0 %}text-gain{% else %}text-loss{% endif %}">
-              {% if etf.change >= 0 %}+{% endif %}{{ etf.change }}
-            </td>
-            <td class="{% if etf.change_pct >= 0 %}text-gain{% else %}text-loss{% endif %}">
-              {% if etf.change_pct >= 0 %}+{% endif %}{{ etf.change_pct }}%
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+    <!-- ETF Table Card -->
+    <div class="bg-surface rounded-2xl shadow-soft overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="border-b border-gray-100">
+                        <th class="text-left px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">ETF Name</th>
+                        <th class="text-left px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Symbol</th>
+                        <th class="text-left px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Category</th>
+                        <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Price</th>
+                        <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Change</th>
+                        <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Change %</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    {% for etf in etfs %}
+                    <tr class="hover:bg-gray-50/50 transition-colors">
+                        <td class="px-6 py-4">
+                            <span class="font-bold text-text-main text-sm">{{ etf.name }}</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="text-xs font-bold text-text-muted bg-gray-100 px-2 py-1 rounded">{{ etf.symbol }}</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="text-sm text-text-muted">{{ etf.category }}</span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="text-sm font-bold text-text-main">₹{{ etf.price }}</span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="text-sm font-bold {% if etf.change >= 0 %}text-green-500{% else %}text-red-500{% endif %}">
+                                {% if etf.change >= 0 %}+{% endif %}{{ etf.change }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="text-sm font-bold {% if etf.change_pct >= 0 %}text-green-500{% else %}text-red-500{% endif %}">
+                                {% if etf.change_pct >= 0 %}+{% endif %}{{ etf.change_pct }}%
+                            </span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="px-6 py-12 text-center">
+                            <span class="material-symbols-outlined text-5xl text-gray-300 mb-3 block">inventory_2</span>
+                            <p class="text-text-muted text-sm m-0">No ETF data available right now</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
-  </div>
 </div>
 {% endblock %}

@@ -3,7 +3,7 @@
 
 {% block title %}PRO Trades - Premium Trading Insights{% endblock %}
 
-{% block extra_css %}
+{% block page_css %}
 <style>
 .pro-container {
     max-width: 1280px;
@@ -135,9 +135,9 @@
     }
 }
 </style>
-{% endblock %}
+{% endblock page_css %}
 
-{% block content %}
+{% block page_content %}
 <div class="pro-container">
     <div class="pro-header">
         <span class="pro-badge">PREMIUM</span>
@@ -240,9 +240,9 @@
             </div>
         </div>
         
-        <button class="btn-subscribe" onclick="alert('Payment gateway integration coming soon!')">
-            Subscribe Now
-        </button>
+        <a href="{% url 'payments:membership' %}" class="btn-subscribe">
+            Subscribe Now — ₹999/month
+        </a>
     </div>
     {% endif %}
 </div>

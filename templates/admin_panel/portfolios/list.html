@@ -1,0 +1,60 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block title %}Portfolios — Admin{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Portfolios</h1>
+    <p class="text-secondary">All user portfolios ({{ portfolios.count }} total)</p>
+</div>
+
+<div class="data-table-wrapper">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Name</th>
+                <th>Items</th>
+                <th>Total Value</th>
+                <th>P&L</th>
+                <th>Created</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for portfolio in portfolios %}
+            <tr>
+                <td>{{ portfolio.user.email }}</td>
+                <td>{{ portfolio.name }}</td>
+                <td>{{ portfolio.item_count }}</td>
+                <td>₹{{ portfolio.total_value|default:"0.00" }}</td>
+                <td class="{% if portfolio.total_profit_loss >= 0 %}text-success{% else %}text-danger{% endif %}">
+                    ₹{{ portfolio.total_profit_loss|default:"0.00" }}
+                </td>
+                <td>{{ portfolio.created_at|date:"d M Y" }}</td>
+                <td>
+                    <a href="{% url 'admin_panel:portfolio_detail' portfolio.pk %}" class="btn btn-sm btn-outline">View</a>
+                    <form method="post" action="{% url 'admin_panel:portfolio_delete' portfolio.pk %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-danger"
+                            onclick="return confirm('Delete this portfolio?')">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="text-center" style="padding:2rem;color:#888;">No portfolios found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if is_paginated %}
+<div class="pagination">
+    {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" class="btn btn-sm btn-outline">← Prev</a>{% endif %}
+    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}" class="btn btn-sm btn-outline">Next →</a>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

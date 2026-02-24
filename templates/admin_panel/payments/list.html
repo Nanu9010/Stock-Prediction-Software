@@ -1,0 +1,73 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block title %}Payments — Admin{% endblock %}
+
+{% block content %}
+<div class="page-header" style="display:flex;justify-content:space-between;align-items:center;">
+    <div>
+        <h1>Payments</h1>
+        <p class="text-secondary">All transactions (read-only)</p>
+    </div>
+    <!-- Search / Filter -->
+    <form method="get" style="display:flex;gap:8px;align-items:center;">
+        <input type="text" name="search" value="{{ request.GET.search }}" placeholder="Search email or TXN ID…"
+            class="form-input" style="width:220px;">
+        <select name="status" class="form-input" style="width:140px;">
+            <option value="">All Statuses</option>
+            <option value="SUCCESS" {% if request.GET.status == 'SUCCESS' %}selected{% endif %}>Success</option>
+            <option value="PENDING" {% if request.GET.status == 'PENDING' %}selected{% endif %}>Pending</option>
+            <option value="FAILED" {% if request.GET.status == 'FAILED' %}selected{% endif %}>Failed</option>
+            <option value="REFUNDED" {% if request.GET.status == 'REFUNDED' %}selected{% endif %}>Refunded</option>
+        </select>
+        <button type="submit" class="btn btn-sm btn-secondary">Filter</button>
+        <a href="{% url 'admin_panel:payments_list' %}" class="btn btn-sm btn-outline">Reset</a>
+    </form>
+</div>
+
+<div class="data-table-wrapper">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Plan</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>TXN ID</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for payment in payments %}
+            <tr>
+                <td>{{ payment.user.email }}</td>
+                <td>{{ payment.plan_type|default:"—" }}</td>
+                <td>₹{{ payment.amount }}</td>
+                <td>
+                    <span class="badge badge-{% if payment.status == 'SUCCESS' %}success{% elif payment.status == 'FAILED' %}danger{% elif payment.status == 'REFUNDED' %}warning{% else %}secondary{% endif %}">
+                        {{ payment.status }}
+                    </span>
+                </td>
+                <td><small>{{ payment.transaction_id|default:"—" }}</small></td>
+                <td>{{ payment.created_at|date:"d M Y, H:i" }}</td>
+                <td>
+                    <a href="{% url 'admin_panel:payment_detail' payment.pk %}" class="btn btn-sm btn-outline">View</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="text-center" style="padding:2rem;color:#888;">No payments found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if is_paginated %}
+<div class="pagination">
+    {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" class="btn btn-sm btn-outline">← Prev</a>{% endif %}
+    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}" class="btn btn-sm btn-outline">Next →</a>{% endif %}
+</div>
+{% endif %}
+{% endblock %}

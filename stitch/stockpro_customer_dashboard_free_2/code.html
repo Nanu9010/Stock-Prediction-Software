@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>StockPro Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#2D3748",
+                        "primary-soft": "#4A5568",
+                        "background-base": "#F7F8FA",
+                        "surface": "#FFFFFF",
+                        "text-main": "#2D3748",
+                        "text-muted": "#718096",
+                        "accent-gold": "#D69E2E",
+                        "accent-teal": "#38B2AC","accent-coral": "#FC8181","accent-teal-soft": "#E6FFFA",
+                        "accent-coral-soft": "#FFF5F5",
+                    },
+                    fontFamily: {
+                        display: ["Manrope", "sans-serif"],
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'soft-hover': '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05)',
+                        'inner-soft': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.02)',
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        body {
+            font-family: 'Manrope', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-background-base text-text-main font-display antialiased min-h-screen flex flex-col overflow-hidden selection:bg-accent-teal selection:text-white">
+<div class="flex h-screen w-full overflow-hidden">
+<aside class="w-64 flex-col bg-surface shadow-soft z-30 hidden md:flex h-full">
+<div class="h-20 flex items-center px-8">
+<div class="flex items-center gap-3">
+<div class="size-8 text-text-main">
+<span class="material-symbols-outlined text-3xl">candlestick_chart</span>
+</div>
+<h2 class="text-text-main text-xl font-extrabold tracking-tight">StockPro</h2>
+</div>
+</div>
+<div class="flex-1 flex flex-col gap-2 p-6 overflow-y-auto">
+<div class="space-y-1">
+<p class="text-text-muted text-[10px] font-bold uppercase tracking-wider mb-4 px-4">Menu</p>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl bg-background-base text-text-main font-bold shadow-sm transition-all" href="#">
+<span class="material-symbols-outlined text-[20px]">home</span>
+<span class="text-sm">Home</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl text-text-muted hover:text-text-main hover:bg-background-base transition-all group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">trending_up</span>
+<span class="text-sm font-medium">Live Trades</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl text-text-muted hover:text-text-main hover:bg-background-base transition-all group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">check_circle</span>
+<span class="text-sm font-medium">Closed Calls</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl text-text-muted hover:text-text-main hover:bg-background-base transition-all group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">pie_chart</span>
+<span class="text-sm font-medium">Portfolio</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl text-text-muted hover:text-text-main hover:bg-background-base transition-all group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">visibility</span>
+<span class="text-sm font-medium">Watchlist</span>
+</a>
+</div>
+<div class="mt-auto pt-6">
+<div class="bg-gradient-to-br from-text-main to-gray-800 rounded-2xl p-6 shadow-soft relative overflow-hidden group">
+<div class="absolute -right-4 -top-4 opacity-10 transition-transform group-hover:rotate-12 group-hover:scale-110 duration-500">
+<span class="material-symbols-outlined text-8xl text-white">workspace_premium</span>
+</div>
+<h3 class="text-white font-bold mb-1 relative z-10 text-lg">Go Pro</h3>
+<p class="text-gray-300 text-xs mb-4 relative z-10 font-medium leading-relaxed">Unlock real-time alerts &amp; premium analysis.</p>
+<button class="w-full py-2.5 bg-white text-text-main text-xs font-bold rounded-lg hover:shadow-lg transition-all relative z-10">
+                        Upgrade Now
+                    </button>
+</div>
+</div>
+</div>
+<div class="p-6">
+<div class="flex items-center gap-3 p-3 rounded-xl hover:bg-background-base cursor-pointer transition-colors">
+<div class="size-10 rounded-full bg-gray-200 overflow-hidden shadow-sm" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDG6k1XYJ9GWCnPULchcE5XdmfB0eWamknhgzcR4TkxhoYj-_PpSWkt70nFXeZFXxhqBIMYeyjrfTjfArQvKqvXyfXeVlR2ot-Ho-gCml2iNN8S7lZh-H7NQ_d14qgd9uu3LLgeILkFg5gCglQQQfibaynhoMjPy4zzjWLAwMQ1TpWFpm4YPfOAOs3TqAx7aKbwbHAVcpsX4h7SuWkCICLsAOyP2zW8MDoQZqfq_W1sOF3fI6_OLVVYtRWRRTShllgbHe3YE07T5hc"); background-size: cover; background-position: center;'></div>
+<div class="flex flex-col">
+<span class="text-sm font-bold text-text-main">Alex Morgan</span>
+<span class="text-xs text-text-muted">Free Account</span>
+</div>
+</div>
+</div>
+</aside>
+<main class="flex-1 flex flex-col h-full relative overflow-y-auto bg-background-base">
+<header class="h-20 flex items-center justify-between px-8 sticky top-0 z-20 bg-background-base/90 backdrop-blur-sm">
+<button class="md:hidden text-text-muted hover:text-text-main p-2">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="hidden md:flex items-center max-w-md w-full">
+<div class="relative w-full group">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-accent-teal transition-colors material-symbols-outlined text-[20px]">search</span>
+<input class="w-full bg-surface shadow-soft rounded-full pl-12 pr-6 py-3 text-sm text-text-main placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-accent-teal/20 transition-all border-none" placeholder="Search stocks, indices..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6 ml-auto">
+<button class="hidden sm:flex bg-accent-gold/10 hover:bg-accent-gold/20 text-accent-gold px-5 py-2.5 rounded-full text-sm font-bold items-center gap-2 transition-all">
+<span class="material-symbols-outlined text-[18px]">diamond</span>
+<span>Upgrade to PRO</span>
+</button>
+<button class="relative p-3 bg-surface text-text-muted hover:text-text-main rounded-full shadow-soft hover:shadow-soft-hover transition-all">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+<span class="absolute top-2.5 right-3 size-2 bg-accent-coral rounded-full ring-2 ring-white"></span>
+</button>
+<div class="md:hidden size-9 rounded-full bg-gray-200 overflow-hidden shadow-sm" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAmbdKddNaKVjrH2U3u8WiCVQAsny0IYHvx6eMVd4wP4vS1iwqPQXBHPhsIt-1tHn4VBTk3p9QGwxZCNP2iIQevjPcxEST7rXa4ouGdb3aCeviIzTWQlwOgrKdchH7KJB6bW0wE1LFnGdF94PfeN62ydyXX4fmO96XR4zk16nZ-kPckWFWMRLjzEmsZ3aloaNM2v4OoHeMsu9TRRch1S462c2VHzqXF6AtCmd9Zql11DD99gVwXe8ztfDgoYUvYFw06u2qyRuOI-2s"); background-size: cover; background-position: center;'></div>
+</div>
+</header>
+<div class="flex-1 px-4 md:px-8 pb-8 max-w-7xl mx-auto w-full">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+<div class="bg-surface rounded-2xl p-5 flex items-center justify-between shadow-soft hover:shadow-soft-hover transition-shadow cursor-default">
+<div>
+<p class="text-text-muted text-[10px] font-bold uppercase tracking-wider mb-1">Nifty 50</p>
+<h3 class="text-text-main text-2xl font-bold tracking-tight">19,435.30</h3>
+</div>
+<div class="text-right">
+<span class="text-accent-teal bg-accent-teal-soft px-3 py-1 rounded-full text-xs font-bold inline-flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">arrow_upward</span>
+                            0.52%
+                        </span>
+<p class="text-text-muted text-xs mt-1 font-medium">+101.45</p>
+</div>
+</div>
+<div class="bg-surface rounded-2xl p-5 flex items-center justify-between shadow-soft hover:shadow-soft-hover transition-shadow cursor-default">
+<div>
+<p class="text-text-muted text-[10px] font-bold uppercase tracking-wider mb-1">Sensex</p>
+<h3 class="text-text-main text-2xl font-bold tracking-tight">65,387.12</h3>
+</div>
+<div class="text-right">
+<span class="text-accent-coral bg-accent-coral-soft px-3 py-1 rounded-full text-xs font-bold inline-flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">arrow_downward</span>
+                            0.12%
+                        </span>
+<p class="text-text-muted text-xs mt-1 font-medium">-87.20</p>
+</div>
+</div>
+<div class="bg-surface rounded-2xl p-5 flex items-center justify-between shadow-soft hover:shadow-soft-hover transition-shadow cursor-default">
+<div>
+<p class="text-text-muted text-[10px] font-bold uppercase tracking-wider mb-1">Bank Nifty</p>
+<h3 class="text-text-main text-2xl font-bold tracking-tight">43,890.05</h3>
+</div>
+<div class="text-right">
+<span class="text-accent-teal bg-accent-teal-soft px-3 py-1 rounded-full text-xs font-bold inline-flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">arrow_upward</span>
+                            0.85%
+                        </span>
+<p class="text-text-muted text-xs mt-1 font-medium">+350.15</p>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-2 mb-8 overflow-x-auto hide-scrollbar py-2">
+<button class="px-6 py-2.5 bg-text-main text-white rounded-full font-bold text-sm shadow-lg shadow-text-main/20 whitespace-nowrap transition-transform hover:-translate-y-0.5">Markets</button>
+<button class="px-6 py-2.5 bg-surface text-text-muted hover:text-text-main rounded-full font-bold text-sm shadow-soft hover:shadow-md whitespace-nowrap transition-all">Trades</button>
+<button class="px-6 py-2.5 bg-surface text-text-muted hover:text-text-main rounded-full font-bold text-sm shadow-soft hover:shadow-md whitespace-nowrap transition-all">IPO</button>
+<button class="px-6 py-2.5 bg-surface text-text-muted hover:text-text-main rounded-full font-bold text-sm shadow-soft hover:shadow-md whitespace-nowrap transition-all">Invest</button>
+<button class="px-6 py-2.5 bg-surface text-text-muted hover:text-text-main rounded-full font-bold text-sm shadow-soft hover:shadow-md whitespace-nowrap transition-all">Mutual Funds</button>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<div class="lg:col-span-2 flex flex-col gap-8">
+<div class="flex flex-col gap-5">
+<div class="flex items-center justify-between px-1">
+<h2 class="text-text-main text-xl font-bold flex items-center gap-3">
+<span class="size-8 rounded-full bg-accent-teal/10 flex items-center justify-center text-accent-teal">
+<span class="material-symbols-outlined text-lg">campaign</span>
+</span>
+                                Today's Calls
+                            </h2>
+<a class="text-text-muted text-sm font-semibold hover:text-accent-teal transition-colors" href="#">View All</a>
+</div>
+<div class="flex flex-col gap-4">
+<div class="bg-surface rounded-2xl p-5 shadow-soft hover:shadow-soft-hover transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 group cursor-pointer relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-accent-teal rounded-l-2xl"></div>
+<div class="flex items-center gap-4 min-w-[180px]">
+<div class="size-12 rounded-xl bg-background-base flex items-center justify-center text-text-main font-bold shadow-inner-soft">
+                                        TCS
+                                    </div>
+<div>
+<h4 class="text-text-main font-bold text-lg">TCS</h4>
+<div class="flex items-center gap-2 text-xs text-text-muted font-medium">
+<span>NSE</span>
+<span class="size-1 rounded-full bg-gray-300"></span>
+<span>Equity</span>
+</div>
+</div>
+</div>
+<div class="flex-1 grid grid-cols-3 gap-4 border-l border-gray-100 sm:pl-6">
+<div class="flex flex-col">
+<span class="text-[10px] text-text-muted font-bold uppercase tracking-wider">Entry</span>
+<span class="text-text-main font-bold">3450.00</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] text-text-muted font-bold uppercase tracking-wider">Target</span>
+<span class="text-accent-teal font-bold">3520.00</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] text-text-muted font-bold uppercase tracking-wider">SL</span>
+<span class="text-accent-coral font-bold">3410.00</span>
+</div>
+</div>
+<div class="flex items-center justify-between sm:justify-end gap-4 sm:pl-6 sm:border-l border-gray-100 min-w-[140px]">
+<span class="bg-accent-teal-soft text-accent-teal px-3 py-1 rounded-lg text-xs font-bold">BUY</span>
+<button class="size-8 rounded-full bg-text-main text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+<div class="bg-surface rounded-2xl p-5 shadow-soft hover:shadow-soft-hover transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 group cursor-pointer relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-accent-coral rounded-l-2xl"></div>
+<div class="flex items-center gap-4 min-w-[180px]">
+<div class="size-12 rounded-xl bg-background-base flex items-center justify-center text-text-main font-bold shadow-inner-soft">
+                                        INFY
+                                    </div>
+<div>
+<h4 class="text-text-main font-bold text-lg">Infosys</h4>
+<div class="flex items-center gap-2 text-xs text-text-muted font-medium">
+<span>NSE</span>
+<span class="size-1 rounded-full bg-gray-300"></span>
+<span>Equity</span>
+</div>
+</div>
+</div>
+<div class="flex-1 grid grid-cols-3 gap-4 border-l border-gray-100 sm:pl-6">
+<div class="flex flex-col">
+<span class="text-[10px] text-text-muted font-bold uppercase tracking-wider">Entry</span>
+<span class="text-text-main font-bold">1420.00</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] text-text-muted font-bold uppercase tracking-wider">Target</span>
+<span class="text-accent-teal font-bold">1380.00</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] text-text-muted font-bold uppercase tracking-wider">SL</span>
+<span class="text-accent-coral font-bold">1445.00</span>
+</div>
+</div>
+<div class="flex items-center justify-between sm:justify-end gap-4 sm:pl-6 sm:border-l border-gray-100 min-w-[140px]">
+<span class="bg-accent-coral-soft text-accent-coral px-3 py-1 rounded-lg text-xs font-bold">SELL</span>
+<button class="size-8 rounded-full bg-text-main text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+<div class="bg-gradient-to-r from-text-main to-gray-800 rounded-2xl p-5 shadow-soft flex flex-col sm:flex-row items-center justify-between gap-4 relative overflow-hidden">
+<div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/dark-matter.png')] opacity-10"></div>
+<div class="flex items-center gap-4 relative z-10">
+<div class="size-10 rounded-full bg-accent-gold/20 flex items-center justify-center text-accent-gold">
+<span class="material-symbols-outlined">lock</span>
+</div>
+<div>
+<h4 class="text-white font-bold">5+ More Premium Calls</h4>
+<p class="text-gray-400 text-xs">High probability setups from top experts.</p>
+</div>
+</div>
+<button class="bg-accent-gold text-text-main font-bold text-xs px-5 py-2.5 rounded-full hover:bg-white transition-colors relative z-10 shadow-lg whitespace-nowrap">
+                                    Unlock Premium
+                                </button>
+</div>
+</div>
+</div>
+<div class="w-full bg-surface rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden shadow-soft">
+<div class="absolute -right-10 -bottom-10 size-40 bg-accent-gold/5 rounded-full blur-2xl"></div>
+<div class="absolute -left-10 -top-10 size-40 bg-accent-teal/5 rounded-full blur-2xl"></div>
+<div class="z-10 max-w-lg">
+<span class="text-accent-gold text-xs font-bold tracking-widest uppercase mb-2 block">Premium Access</span>
+<h3 class="text-text-main text-2xl font-extrabold mb-2 tracking-tight">Level up your trading game.</h3>
+<p class="text-text-muted text-sm leading-relaxed">Access advanced charts, real-time heatmaps, and exclusive expert webinars with StockPro Premium.</p>
+</div>
+<button class="whitespace-nowrap bg-text-main text-white font-bold px-8 py-3.5 rounded-xl shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-1 z-10 flex items-center gap-2">
+<span>Try Pro for $9/mo</span>
+<span class="material-symbols-outlined text-sm">rocket_launch</span>
+</button>
+</div>
+<div class="bg-surface rounded-2xl shadow-soft overflow-hidden">
+<div class="px-6 py-5 flex justify-between items-center border-b border-gray-50">
+<h3 class="text-text-main font-bold text-lg">Market Movers</h3>
+<div class="flex bg-background-base rounded-lg p-1">
+<span class="text-xs bg-white text-text-main font-bold px-3 py-1.5 rounded shadow-sm cursor-pointer transition-all">Gainers</span>
+<span class="text-xs text-text-muted hover:text-text-main px-3 py-1.5 rounded cursor-pointer transition-colors">Losers</span>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-sm text-left">
+<thead class="text-xs text-text-muted uppercase bg-gray-50/50">
+<tr>
+<th class="px-6 py-4 font-semibold tracking-wider">Symbol</th>
+<th class="px-6 py-4 text-right font-semibold tracking-wider">Price</th>
+<th class="px-6 py-4 text-right font-semibold tracking-wider">Change</th>
+<th class="px-6 py-4 text-right font-semibold tracking-wider">Vol (M)</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-gray-50">
+<tr class="hover:bg-gray-50 transition-colors group">
+<td class="px-6 py-4 font-bold text-text-main">RELIANCE</td>
+<td class="px-6 py-4 text-right text-text-main">2,456.10</td>
+<td class="px-6 py-4 text-right text-accent-teal font-bold">+1.45%</td>
+<td class="px-6 py-4 text-right text-text-muted group-hover:text-text-main">4.2M</td>
+</tr>
+<tr class="hover:bg-gray-50 transition-colors group">
+<td class="px-6 py-4 font-bold text-text-main">HDFCBANK</td>
+<td class="px-6 py-4 text-right text-text-main">1,602.45</td>
+<td class="px-6 py-4 text-right text-accent-teal font-bold">+0.89%</td>
+<td class="px-6 py-4 text-right text-text-muted group-hover:text-text-main">12.5M</td>
+</tr>
+<tr class="hover:bg-gray-50 transition-colors group">
+<td class="px-6 py-4 font-bold text-text-main">ADANIENT</td>
+<td class="px-6 py-4 text-right text-text-main">2,410.00</td>
+<td class="px-6 py-4 text-right text-accent-teal font-bold">+2.30%</td>
+<td class="px-6 py-4 text-right text-text-muted group-hover:text-text-main">8.1M</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-8">
+<div class="bg-surface rounded-2xl p-6 shadow-soft hover:shadow-soft-hover transition-shadow">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-text-main font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-accent-teal text-[20px]">donut_large</span>
+                                Portfolio
+                            </h3>
+<button class="text-text-muted hover:text-text-main">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</div>
+<div class="flex flex-col items-center justify-center mb-8 relative">
+<div class="size-48 rounded-full bg-[conic-gradient(var(--color-accent-teal)_70%,#F1F5F9_70%)] relative flex items-center justify-center shadow-inner-soft">
+<div class="size-36 rounded-full bg-surface shadow-soft flex flex-col items-center justify-center">
+<span class="text-text-muted text-xs font-medium uppercase tracking-wide">Total Value</span>
+<span class="text-text-main text-2xl font-extrabold mt-1">₹1.24L</span>
+</div>
+</div>
+</div>
+<div class="space-y-4">
+<div class="flex items-center justify-between p-3 rounded-xl bg-background-base">
+<div class="flex items-center gap-3">
+<span class="size-2 rounded-full bg-accent-teal ring-4 ring-white"></span>
+<span class="text-text-main text-sm font-bold">Equity</span>
+</div>
+<span class="text-text-muted font-medium text-sm">70%</span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-xl bg-background-base">
+<div class="flex items-center gap-3">
+<span class="size-2 rounded-full bg-gray-300 ring-4 ring-white"></span>
+<span class="text-text-main text-sm font-bold">Cash</span>
+</div>
+<span class="text-text-muted font-medium text-sm">30%</span>
+</div>
+</div>
+<div class="mt-6 pt-6 border-t border-gray-50 grid grid-cols-2 gap-4">
+<div>
+<p class="text-text-muted text-[10px] font-bold uppercase tracking-wider mb-1">Invested</p>
+<p class="text-text-main font-bold text-lg">₹1.10L</p>
+</div>
+<div>
+<p class="text-text-muted text-[10px] font-bold uppercase tracking-wider mb-1">P&amp;L</p>
+<p class="text-accent-teal font-bold text-lg">+₹14k</p>
+</div>
+</div>
+</div>
+<div class="bg-surface rounded-2xl p-6 shadow-soft hover:shadow-soft-hover transition-shadow">
+<h3 class="text-text-main font-bold mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-accent-gold text-[20px]">speed</span>
+                            Market Sentiment
+                        </h3>
+<div class="relative mb-8 px-2">
+<div class="h-3 w-full bg-gray-100 rounded-full overflow-hidden">
+<div class="h-full w-full bg-gradient-to-r from-accent-coral via-accent-gold to-accent-teal opacity-30"></div>
+</div>
+<div class="absolute top-1/2 -translate-y-1/2 left-[65%] -ml-2">
+<div class="size-4 bg-white border-4 border-text-main rounded-full shadow-lg"></div>
+</div>
+</div>
+<div class="flex justify-between text-[10px] font-bold uppercase tracking-wider mb-6 px-1">
+<span class="text-accent-coral">Bearish</span>
+<span class="text-accent-gold">Neutral</span>
+<span class="text-accent-teal">Bullish</span>
+</div>
+<div class="flex items-center gap-5 bg-background-base p-4 rounded-xl">
+<div class="text-center min-w-[60px]">
+<span class="block text-3xl font-extrabold text-accent-teal">65</span>
+<span class="text-[10px] text-text-muted uppercase font-bold">Score</span>
+</div>
+<div class="text-sm text-text-muted border-l border-gray-200 pl-5">
+<span class="text-text-main font-bold">Greed.</span> Market shows optimism. Institutional buying observed.
+                            </div>
+</div>
+</div>
+<div class="bg-surface rounded-2xl p-6 shadow-soft hover:shadow-soft-hover transition-shadow">
+<div class="flex justify-between items-center mb-5">
+<h3 class="text-text-main font-bold">Quick News</h3>
+</div>
+<div class="flex flex-col gap-5">
+<div class="flex gap-4 items-start pb-5 border-b border-gray-50">
+<div class="size-12 rounded-lg bg-gray-200 flex-shrink-0 bg-cover bg-center shadow-inner-soft" data-alt="News Thumbnail" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBCKD0lREOjw-fBnJeP-dLGiMRq7YPlyLoFGiMvwfnLpSHI5fW-egAOKS09z33E6bHpqZVPVZoGFyQOiTfgCaMPQ0ShDuromjIPX3RlYrQvmUesnLcDSkEAXhwv7pnvmMM0Rd6VQWkH-yOCWIOK_Nf8uJh5oWVca1kWhF8t6zDVU5jcOKobyu4iGq9JkWuz3Gom-XWcIZLxe0o5FuKno5JXhV9BF8RRyRTC0EKufUXendv1AKYOa-nSS_suzul7Dk5AXfqKCBiz8WM')"></div>
+<div>
+<a class="text-text-main text-sm font-bold hover:text-accent-teal leading-snug line-clamp-2 transition-colors" href="#">RBI keeps repo rate unchanged at 6.5% for fourth time</a>
+<p class="text-text-muted text-xs mt-1.5 font-medium">1h ago • Economy</p>
+</div>
+</div>
+<div class="flex gap-4 items-start">
+<div class="size-12 rounded-lg bg-gray-200 flex-shrink-0 bg-cover bg-center shadow-inner-soft" data-alt="News Thumbnail 2" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCtd95Ebij_x553W57JavHI6ATMLabLsdWuOSXe1WvScUq_B6syVT8VK2tiZTewT0mpa7eKFXLpuS5zGK4XUy2wEVKropQ85Y10QaIOS-RYVpxF3XURJK0Id7tAdN7zLX7NQ2MhkIiyNvGGLvSjBuUMgxwYsV7S9dbWC-ReEEn7aqlSSOQI3uzczMnKt_3Ey3SA--sWvwqDWdjT4YSQhG5rLNFG2tEWRP-8xpVrkTD40hDx27Q6VwM6I6fmdFq1e0GSOn3agBT0eII')"></div>
+<div>
+<a class="text-text-main text-sm font-bold hover:text-accent-teal leading-snug line-clamp-2 transition-colors" href="#">Tata Motors global sales up 15% in Q2, JLR leads growth</a>
+<p class="text-text-muted text-xs mt-1.5 font-medium">3h ago • Auto</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>

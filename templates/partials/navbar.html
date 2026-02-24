@@ -1,0 +1,99 @@
+{% load static %}
+{# ─── Clean Light Navbar (Public Pages Only) ─────────────────────────────── #}
+{# This navbar is only visible on public pages (login, register, etc.)       #}
+{# Logged-in users see the sidebar instead (handled by base.html)            #}
+
+<nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100 font-display">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="flex items-center justify-between h-16">
+
+            <!-- Brand -->
+            <a href="/" class="flex items-center gap-2.5 no-underline group">
+                <span class="material-symbols-outlined text-2xl text-accent-teal group-hover:scale-110 transition-transform">candlestick_chart</span>
+                <span class="text-xl font-extrabold tracking-tight text-text-main">StockPro</span>
+            </a>
+
+            <!-- Center Links (visible on md+) -->
+            <div class="hidden md:flex items-center gap-1">
+                <a href="/" class="px-4 py-2 rounded-lg text-sm font-semibold text-text-muted hover:text-text-main hover:bg-gray-50 transition-all no-underline">Home</a>
+                <a href="/calls/" class="px-4 py-2 rounded-lg text-sm font-semibold text-text-muted hover:text-text-main hover:bg-gray-50 transition-all no-underline">Trades</a>
+                <a href="/market/" class="px-4 py-2 rounded-lg text-sm font-semibold text-text-muted hover:text-text-main hover:bg-gray-50 transition-all no-underline">Markets</a>
+            </div>
+
+            <!-- Actions -->
+            <div class="flex items-center gap-3">
+                {% if not user.is_authenticated %}
+                    <a href="{% url 'authentication:login' %}" class="px-5 py-2 rounded-lg text-sm font-semibold text-text-muted hover:text-text-main hover:bg-gray-50 border border-gray-200 transition-all no-underline">
+                        Login
+                    </a>
+                    <a href="{% url 'authentication:register' %}" class="px-5 py-2 rounded-lg text-sm font-bold text-white bg-text-main hover:bg-primary-soft shadow-soft hover:shadow-soft-hover transition-all no-underline">
+                        Sign Up
+                    </a>
+                {% else %}
+                    <!-- User Avatar + Dropdown (fallback for edge cases) -->
+                    <div class="relative" id="userMenuWrapper">
+                        <button onclick="toggleUserMenu()" class="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-gray-50 border border-gray-200 transition-all cursor-pointer bg-white">
+                            <div class="size-8 rounded-lg bg-accent-teal flex items-center justify-center text-white text-sm font-bold">
+                                {{ user.first_name.0|upper }}
+                            </div>
+                            <span class="text-sm font-semibold text-text-main hidden sm:inline">{{ user.get_full_name }}</span>
+                            <span class="material-symbols-outlined text-text-muted text-base transition-transform" id="userChevron">expand_more</span>
+                        </button>
+
+                        <!-- Dropdown -->
+                        <div id="userDropdown" class="hidden absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
+                            <div class="px-4 py-2 border-b border-gray-100">
+                                <p class="text-sm font-bold text-text-main m-0">{{ user.get_full_name }}</p>
+                                <p class="text-xs text-text-muted m-0">{{ user.role|capfirst }}</p>
+                            </div>
+
+                            <a href="{% url 'authentication:profile' %}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-text-muted hover:text-text-main hover:bg-gray-50 transition-colors no-underline">
+                                <span class="material-symbols-outlined text-lg">person</span> Profile
+                            </a>
+                            <a href="{% url 'portfolios:portfolio' %}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-text-muted hover:text-text-main hover:bg-gray-50 transition-colors no-underline">
+                                <span class="material-symbols-outlined text-lg">pie_chart</span> Portfolio
+                            </a>
+                            <a href="{% url 'watchlists:watchlist' %}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-text-muted hover:text-text-main hover:bg-gray-50 transition-colors no-underline">
+                                <span class="material-symbols-outlined text-lg">visibility</span> Watchlist
+                            </a>
+
+                            {% if user.role == 'ADMIN' %}
+                            <div class="border-t border-gray-100 my-1"></div>
+                            <a href="{% url 'admin_panel:dashboard' %}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-text-muted hover:text-text-main hover:bg-gray-50 transition-colors no-underline">
+                                <span class="material-symbols-outlined text-lg">shield</span> Admin Panel
+                            </a>
+                            {% endif %}
+
+                            <div class="border-t border-gray-100 my-1"></div>
+                            <a href="{% url 'authentication:logout' %}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-red-500 hover:text-red-600 hover:bg-red-50 transition-colors no-underline">
+                                <span class="material-symbols-outlined text-lg">logout</span> Logout
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</nav>
+
+<script>
+function toggleUserMenu() {
+    const dropdown = document.getElementById('userDropdown');
+    const chevron = document.getElementById('userChevron');
+    const wrapper = document.getElementById('userMenuWrapper');
+    dropdown.classList.toggle('hidden');
+    chevron.style.transform = dropdown.classList.contains('hidden') ? '' : 'rotate(180deg)';
+
+    if (!dropdown.classList.contains('hidden')) {
+        setTimeout(() => {
+            document.addEventListener('click', function handler(e) {
+                if (!wrapper.contains(e.target)) {
+                    dropdown.classList.add('hidden');
+                    chevron.style.transform = '';
+                    document.removeEventListener('click', handler);
+                }
+            });
+        }, 0);
+    }
+}
+</script>

@@ -1,42 +1,65 @@
 {% extends 'base.html' %}
-{% load static %}
-{% block extra_css %}<link rel="stylesheet" href="{% static 'css/market_hero.css' %}">{% endblock %}
 
-{% block content %}
-<div class="market-section-page">
-  <div class="section-page-container">
-    <a href="{% url 'dashboard:home' %}" class="back-link">← Back to Market Hero</a>
-    <div class="section-page-header">
-      <div class="section-page-title">💧 Money Market & Liquidity</div>
-      <div class="section-page-desc">Overnight rates, RBI policy rates, treasury yields, and deposit rates.</div>
+{% block title %}Money Market & Liquidity — StockPro{% endblock %}
+
+{% block page_content %}
+<div class="space-y-8">
+    <!-- Page Header -->
+    <div class="flex items-center gap-3">
+        <span class="size-10 rounded-xl bg-accent-teal/10 flex items-center justify-center">
+            <span class="material-symbols-outlined text-accent-teal text-xl">water_drop</span>
+        </span>
+        <div>
+            <h1 class="text-2xl font-extrabold text-text-main m-0">Money Market & Liquidity</h1>
+            <p class="text-sm text-text-muted m-0">Overnight rates, RBI policy rates, treasury yields, and deposit rates.</p>
+        </div>
     </div>
 
-    <div class="widget-card-hero" style="margin-bottom: 24px;">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Instrument</th>
-            <th>Type</th>
-            <th>Rate</th>
-            <th>Change</th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for rate in liquidity %}
-          <tr>
-            <td style="font-weight: 600;">{{ rate.name }}</td>
-            <td>{{ rate.type }}</td>
-            <td style="font-weight: 700; color: var(--accent-blue);">{{ rate.rate }}%</td>
-            <td class="{% if rate.change > 0 %}text-gain{% elif rate.change < 0 %}text-loss{% endif %}">
-              {% if rate.change > 0 %}+{% endif %}{% if rate.change != 0 %}{{ rate.change }}%{% else %}—{% endif %}
-            </td>
-            <td style="color: var(--text-muted); font-size: 13px;">{{ rate.description }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+    <!-- Liquidity Table Card -->
+    <div class="bg-surface rounded-2xl shadow-soft overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="border-b border-gray-100">
+                        <th class="text-left px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Instrument</th>
+                        <th class="text-left px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Type</th>
+                        <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Rate</th>
+                        <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Change</th>
+                        <th class="text-left px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Description</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    {% for rate in liquidity %}
+                    <tr class="hover:bg-gray-50/50 transition-colors">
+                        <td class="px-6 py-4">
+                            <span class="font-bold text-text-main text-sm">{{ rate.name }}</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="text-sm text-text-muted">{{ rate.type }}</span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="text-sm font-bold text-blue-600">{{ rate.rate }}%</span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="text-sm font-bold {% if rate.change > 0 %}text-green-500{% elif rate.change < 0 %}text-red-500{% else %}text-text-muted{% endif %}">
+                                {% if rate.change > 0 %}+{% endif %}{% if rate.change != 0 %}{{ rate.change }}%{% else %}—{% endif %}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="text-xs text-text-muted">{{ rate.description }}</span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="px-6 py-12 text-center">
+                            <span class="material-symbols-outlined text-5xl text-gray-300 mb-3 block">liquidity</span>
+                            <p class="text-text-muted text-sm m-0">No liquidity data available right now</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
-  </div>
 </div>
 {% endblock %}

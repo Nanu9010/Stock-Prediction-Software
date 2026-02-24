@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>StockPro Dashboard - Minimalist</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#111111","primary-hover": "#333333",
+                        background: "#ffffff",
+                        surface: "#f9fafb","surface-hover": "#f3f4f6",
+                        border: "#e5e7eb","text-main": "#111827",
+                        "text-muted": "#6b7280",
+                        gold: "#B8860B","gold-light": "#FDF8E8",success: "#10b981",
+                        danger: "#ef4444",
+                    },
+                    fontFamily: {
+                        sans: ["Inter", "sans-serif"],
+                    },
+                    boxShadow: {
+                        'subtle': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-background text-text-main font-sans antialiased min-h-screen flex flex-col overflow-hidden selection:bg-gray-100">
+<div class="flex h-screen w-full overflow-hidden">
+<aside class="w-64 flex-col bg-background border-r border-border hidden md:flex z-20">
+<div class="h-16 flex items-center px-6 border-b border-border">
+<div class="flex items-center gap-2 text-text-main">
+<div class="size-6 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl">candlestick_chart</span>
+</div>
+<h2 class="text-text-main text-lg font-semibold tracking-tight">StockPro</h2>
+</div>
+</div>
+<div class="flex-1 flex flex-col gap-1 p-4 overflow-y-auto">
+<div class="px-2 py-2">
+<p class="text-text-muted text-[10px] font-semibold uppercase tracking-widest mb-3 pl-3">Menu</p>
+<a class="flex items-center gap-3 px-3 py-2 rounded-md bg-surface text-primary mb-1 border border-border" href="#">
+<span class="material-symbols-outlined text-[20px]">home</span>
+<span class="text-sm font-medium">Home</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-md text-text-muted hover:text-primary hover:bg-surface transition-colors mb-1" href="#">
+<span class="material-symbols-outlined text-[20px]">trending_up</span>
+<span class="text-sm font-medium">Live Trades</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-md text-text-muted hover:text-primary hover:bg-surface transition-colors mb-1" href="#">
+<span class="material-symbols-outlined text-[20px]">check_circle</span>
+<span class="text-sm font-medium">Closed Calls</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-md text-text-muted hover:text-primary hover:bg-surface transition-colors mb-1" href="#">
+<span class="material-symbols-outlined text-[20px]">pie_chart</span>
+<span class="text-sm font-medium">Portfolio</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-md text-text-muted hover:text-primary hover:bg-surface transition-colors mb-1" href="#">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+<span class="text-sm font-medium">Watchlist</span>
+</a>
+</div>
+<div class="mt-auto px-2 py-6">
+<div class="border border-border rounded-lg p-5 bg-surface relative overflow-hidden">
+<h3 class="text-primary font-semibold text-sm mb-1 relative z-10">Go Pro</h3>
+<p class="text-text-muted text-xs mb-4 relative z-10 leading-relaxed">Unlock real-time alerts &amp; premium analysis.</p>
+<button class="w-full py-2 border border-gold text-gold hover:bg-gold hover:text-white text-xs font-medium rounded-md transition-colors relative z-10">
+                        Upgrade
+                    </button>
+</div>
+</div>
+</div>
+<div class="p-4 border-t border-border">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-gray-200 overflow-hidden" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDG6k1XYJ9GWCnPULchcE5XdmfB0eWamknhgzcR4TkxhoYj-_PpSWkt70nFXeZFXxhqBIMYeyjrfTjfArQvKqvXyfXeVlR2ot-Ho-gCml2iNN8S7lZh-H7NQ_d14qgd9uu3LLgeILkFg5gCglQQQfibaynhoMjPy4zzjWLAwMQ1TpWFpm4YPfOAOs3TqAx7aKbwbHAVcpsX4h7SuWkCICLsAOyP2zW8MDoQZqfq_W1sOF3fI6_OLVVYtRWRRTShllgbHe3YE07T5hc"); background-size: cover; background-position: center;'></div>
+<div class="flex flex-col">
+<span class="text-sm font-medium text-text-main">Alex Morgan</span>
+<span class="text-[10px] text-text-muted">Free Account</span>
+</div>
+</div>
+</div>
+</aside>
+<main class="flex-1 flex flex-col h-full relative overflow-y-auto bg-background">
+<header class="h-16 bg-background border-b border-border flex items-center justify-between px-8 sticky top-0 z-30">
+<button class="md:hidden text-text-muted hover:text-primary">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="hidden md:flex items-center max-w-sm w-full">
+<div class="relative w-full group">
+<span class="absolute left-0 top-1/2 -translate-y-1/2 text-text-muted material-symbols-outlined text-[18px] group-focus-within:text-primary transition-colors">search</span>
+<input class="w-full bg-transparent border-0 border-b border-border pl-8 pr-4 py-2 text-sm text-text-main placeholder-gray-400 focus:outline-none focus:ring-0 focus:border-primary transition-colors" placeholder="Search stocks..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6 ml-auto">
+<button class="hidden sm:flex border border-gold text-gold hover:bg-gold-light px-4 py-1.5 rounded-md text-xs font-medium items-center gap-2 transition-colors">
+<span>Upgrade to PRO</span>
+</button>
+<button class="relative text-text-muted hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+<span class="absolute top-0 right-0 size-1.5 bg-danger rounded-full border border-white"></span>
+</button>
+<div class="md:hidden size-8 rounded-full bg-gray-200 overflow-hidden" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAmbdKddNaKVjrH2U3u8WiCVQAsny0IYHvx6eMVd4wP4vS1iwqPQXBHPhsIt-1tHn4VBTk3p9QGwxZCNP2iIQevjPcxEST7rXa4ouGdb3aCeviIzTWQlwOgrKdchH7KJB6bW0wE1LFnGdF94PfeN62ydyXX4fmO96XR4zk16nZ-kPckWFWMRLjzEmsZ3aloaNM2v4OoHeMsu9TRRch1S462c2VHzqXF6AtCmd9Zql11DD99gVwXe8ztfDgoYUvYFw06u2qyRuOI-2s"); background-size: cover; background-position: center;'></div>
+</div>
+</header>
+<div class="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+<div class="bg-background border border-border rounded-lg p-5 flex items-center justify-between hover:shadow-subtle transition-shadow">
+<div>
+<p class="text-text-muted text-[10px] font-semibold uppercase tracking-wider mb-1">Nifty 50</p>
+<h3 class="text-text-main text-lg font-medium">19,435.30</h3>
+</div>
+<div class="text-right">
+<span class="text-success text-xs font-medium flex items-center justify-end gap-1">
+<span class="material-symbols-outlined text-[14px]">north_east</span>
+                            0.52%
+                        </span>
+<span class="text-text-muted text-[10px] mt-0.5 block">+101.45</span>
+</div>
+</div>
+<div class="bg-background border border-border rounded-lg p-5 flex items-center justify-between hover:shadow-subtle transition-shadow">
+<div>
+<p class="text-text-muted text-[10px] font-semibold uppercase tracking-wider mb-1">Sensex</p>
+<h3 class="text-text-main text-lg font-medium">65,387.12</h3>
+</div>
+<div class="text-right">
+<span class="text-danger text-xs font-medium flex items-center justify-end gap-1">
+<span class="material-symbols-outlined text-[14px]">south_east</span>
+                            0.12%
+                        </span>
+<span class="text-text-muted text-[10px] mt-0.5 block">-87.20</span>
+</div>
+</div>
+<div class="bg-background border border-border rounded-lg p-5 flex items-center justify-between hover:shadow-subtle transition-shadow">
+<div>
+<p class="text-text-muted text-[10px] font-semibold uppercase tracking-wider mb-1">Bank Nifty</p>
+<h3 class="text-text-main text-lg font-medium">43,890.05</h3>
+</div>
+<div class="text-right">
+<span class="text-success text-xs font-medium flex items-center justify-end gap-1">
+<span class="material-symbols-outlined text-[14px]">north_east</span>
+                            0.85%
+                        </span>
+<span class="text-text-muted text-[10px] mt-0.5 block">+350.15</span>
+</div>
+</div>
+</div>
+<div class="flex gap-8 mb-10 border-b border-border overflow-x-auto hide-scrollbar pb-1">
+<button class="pb-3 border-b border-primary text-primary font-medium text-sm whitespace-nowrap">Markets</button>
+<button class="pb-3 border-b border-transparent text-text-muted hover:text-primary font-medium text-sm whitespace-nowrap transition-colors">Trades</button>
+<button class="pb-3 border-b border-transparent text-text-muted hover:text-primary font-medium text-sm whitespace-nowrap transition-colors">IPO</button>
+<button class="pb-3 border-b border-transparent text-text-muted hover:text-primary font-medium text-sm whitespace-nowrap transition-colors">Invest</button>
+<button class="pb-3 border-b border-transparent text-text-muted hover:text-primary font-medium text-sm whitespace-nowrap transition-colors">Mutual Funds</button>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+<div class="lg:col-span-2 flex flex-col gap-10">
+<div class="flex flex-col gap-6">
+<div class="flex items-center justify-between">
+<h2 class="text-text-main text-lg font-medium flex items-center gap-2">
+                                Today's Calls
+                            </h2>
+<a class="text-text-muted text-xs hover:text-primary transition-colors" href="#">View All</a>
+</div>
+<div class="flex overflow-x-auto gap-6 pb-2 hide-scrollbar snap-x">
+<div class="min-w-[280px] bg-background rounded-lg p-6 border border-border hover:border-gray-300 transition-colors snap-start flex flex-col relative group">
+<div class="flex justify-between items-start mb-6">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded bg-surface flex items-center justify-center text-primary text-xs font-semibold border border-border">
+                                            TCS
+                                        </div>
+<div>
+<h4 class="text-text-main font-semibold text-sm">TCS</h4>
+<p class="text-text-muted text-[10px]">NSE • Equity</p>
+</div>
+</div>
+<span class="text-success text-[10px] font-bold px-2 py-0.5 rounded border border-success/30 bg-success/5 tracking-wider">BUY</span>
+</div>
+<div class="grid grid-cols-2 gap-y-4 gap-x-2 mb-6">
+<div>
+<p class="text-text-muted text-[10px] mb-1">Entry</p>
+<p class="text-text-main font-medium text-sm">3450.00</p>
+</div>
+<div>
+<p class="text-text-muted text-[10px] mb-1">Target</p>
+<p class="text-success font-medium text-sm">3520.00</p>
+</div>
+<div>
+<p class="text-text-muted text-[10px] mb-1">Stop Loss</p>
+<p class="text-danger font-medium text-sm">3410.00</p>
+</div>
+<div>
+<p class="text-text-muted text-[10px] mb-1">Broker</p>
+<p class="text-text-main font-medium text-sm flex items-center gap-1.5">
+<span class="size-1.5 rounded-full bg-blue-500"></span> AngelOne
+                                        </p>
+</div>
+</div>
+<div class="mt-auto pt-4 border-t border-border flex justify-between items-center">
+<span class="text-[10px] text-text-muted">20 mins ago</span>
+<button class="text-primary text-xs font-medium flex items-center gap-1 hover:underline">
+                                        Trade <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</button>
+</div>
+</div>
+<div class="min-w-[280px] bg-background rounded-lg p-6 border border-border hover:border-gray-300 transition-colors snap-start flex flex-col relative group">
+<div class="flex justify-between items-start mb-6">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded bg-surface flex items-center justify-center text-primary text-xs font-semibold border border-border">
+                                            INFY
+                                        </div>
+<div>
+<h4 class="text-text-main font-semibold text-sm">Infosys</h4>
+<p class="text-text-muted text-[10px]">NSE • Equity</p>
+</div>
+</div>
+<span class="text-danger text-[10px] font-bold px-2 py-0.5 rounded border border-danger/30 bg-danger/5 tracking-wider">SELL</span>
+</div>
+<div class="grid grid-cols-2 gap-y-4 gap-x-2 mb-6">
+<div>
+<p class="text-text-muted text-[10px] mb-1">Entry</p>
+<p class="text-text-main font-medium text-sm">1420.00</p>
+</div>
+<div>
+<p class="text-text-muted text-[10px] mb-1">Target</p>
+<p class="text-success font-medium text-sm">1380.00</p>
+</div>
+<div>
+<p class="text-text-muted text-[10px] mb-1">Stop Loss</p>
+<p class="text-danger font-medium text-sm">1445.00</p>
+</div>
+<div>
+<p class="text-text-muted text-[10px] mb-1">Broker</p>
+<p class="text-text-main font-medium text-sm flex items-center gap-1.5">
+<span class="size-1.5 rounded-full bg-green-500"></span> Zerodha
+                                        </p>
+</div>
+</div>
+<div class="mt-auto pt-4 border-t border-border flex justify-between items-center">
+<span class="text-[10px] text-text-muted">45 mins ago</span>
+<button class="text-primary text-xs font-medium flex items-center gap-1 hover:underline">
+                                        Trade <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</button>
+</div>
+</div>
+<div class="min-w-[280px] bg-surface rounded-lg p-6 border border-dashed border-gray-300 snap-start flex flex-col items-center justify-center text-center relative">
+<span class="material-symbols-outlined text-text-muted text-3xl mb-3">lock</span>
+<h4 class="text-text-main font-semibold text-sm mb-1">Premium Calls</h4>
+<p class="text-text-muted text-xs mb-4 px-4 leading-relaxed">High probability trade calls daily from experts.</p>
+<button class="text-primary hover:text-black font-medium text-xs px-4 py-2 border border-border rounded bg-white hover:border-gray-400 transition-all">
+                                    Upgrade to Unlock
+                                </button>
+</div>
+</div>
+</div>
+<div class="w-full bg-white border border-gold rounded-lg p-8 flex flex-col md:flex-row items-center justify-between gap-6 relative shadow-sm">
+<div class="z-10 max-w-lg">
+<h3 class="text-text-main text-xl font-light mb-2">Elevate your strategy.</h3>
+<p class="text-text-muted text-sm font-light">Access advanced charts, real-time heatmaps, and exclusive expert webinars with StockPro Premium.</p>
+</div>
+<button class="whitespace-nowrap bg-gold hover:bg-[#9e7209] text-white font-medium text-sm px-6 py-2.5 rounded transition-colors z-10">
+                            Get Pro access — $9/mo
+                        </button>
+</div>
+<div class="mt-2">
+<div class="pb-4 border-b border-border flex justify-between items-center mb-4">
+<h3 class="text-text-main font-medium">Market Movers</h3>
+<div class="flex gap-4 text-xs font-medium">
+<span class="text-primary cursor-pointer border-b border-primary pb-0.5">Gainers</span>
+<span class="text-text-muted hover:text-primary cursor-pointer transition-colors pb-0.5">Losers</span>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-sm text-left">
+<thead class="text-xs text-text-muted uppercase font-medium">
+<tr>
+<th class="py-3 font-medium">Symbol</th>
+<th class="py-3 text-right font-medium">Price</th>
+<th class="py-3 text-right font-medium">Change</th>
+<th class="py-3 text-right font-medium">Vol (M)</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border">
+<tr class="group hover:bg-surface transition-colors">
+<td class="py-4 font-medium text-text-main group-hover:pl-2 transition-all">RELIANCE</td>
+<td class="py-4 text-right text-text-main">2,456.10</td>
+<td class="py-4 text-right text-success">+1.45%</td>
+<td class="py-4 text-right text-text-muted">4.2M</td>
+</tr>
+<tr class="group hover:bg-surface transition-colors">
+<td class="py-4 font-medium text-text-main group-hover:pl-2 transition-all">HDFCBANK</td>
+<td class="py-4 text-right text-text-main">1,602.45</td>
+<td class="py-4 text-right text-success">+0.89%</td>
+<td class="py-4 text-right text-text-muted">12.5M</td>
+</tr>
+<tr class="group hover:bg-surface transition-colors">
+<td class="py-4 font-medium text-text-main group-hover:pl-2 transition-all">ADANIENT</td>
+<td class="py-4 text-right text-text-main">2,410.00</td>
+<td class="py-4 text-right text-success">+2.30%</td>
+<td class="py-4 text-right text-text-muted">8.1M</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-10">
+<div class="bg-surface/50 border border-border rounded-lg p-8">
+<div class="flex justify-between items-center mb-8">
+<h3 class="text-text-main font-medium flex items-center gap-2">
+                                Portfolio
+                            </h3>
+<button class="text-text-muted hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">more_horiz</span>
+</button>
+</div>
+<div class="flex flex-col items-center justify-center mb-8 relative">
+<div class="size-48 rounded-full border-[12px] border-surface relative flex items-center justify-center" style="border-top-color: #111111; border-right-color: #111111; border-bottom-color: #e5e7eb; border-left-color: #111111; transform: rotate(-45deg);">
+<div class="flex flex-col items-center justify-center -rotate-[45deg] absolute inset-0">
+<span class="text-text-muted text-[10px] uppercase tracking-wide mb-1">Total Value</span>
+<span class="text-text-main text-2xl font-light">₹1.24L</span>
+</div>
+</div>
+</div>
+<div class="space-y-3">
+<div class="flex items-center justify-between pb-2 border-b border-dashed border-border">
+<div class="flex items-center gap-2">
+<span class="size-2 rounded-full bg-primary"></span>
+<span class="text-text-muted text-sm">Equity</span>
+</div>
+<span class="text-text-main font-medium text-sm">70%</span>
+</div>
+<div class="flex items-center justify-between pb-2">
+<div class="flex items-center gap-2">
+<span class="size-2 rounded-full bg-gray-300"></span>
+<span class="text-text-muted text-sm">Cash</span>
+</div>
+<span class="text-text-main font-medium text-sm">30%</span>
+</div>
+</div>
+<div class="mt-8 pt-6 border-t border-border grid grid-cols-2 gap-4">
+<div>
+<p class="text-text-muted text-[10px] uppercase tracking-wide mb-1">Invested</p>
+<p class="text-text-main font-medium">₹1.10L</p>
+</div>
+<div class="text-right">
+<p class="text-text-muted text-[10px] uppercase tracking-wide mb-1">P&amp;L</p>
+<p class="text-success font-medium">+₹14k (12%)</p>
+</div>
+</div>
+</div>
+<div class="bg-surface/50 border border-border rounded-lg p-8">
+<h3 class="text-text-main font-medium mb-6">Market Sentiment</h3>
+<div class="relative h-1.5 bg-gray-200 rounded-full mb-3 overflow-hidden">
+<div class="absolute top-0 left-0 h-full w-[65%] bg-success rounded-full"></div>
+</div>
+<div class="flex justify-between text-[10px] font-semibold uppercase tracking-wider mb-8 text-text-muted">
+<span>Bearish</span>
+<span>Neutral</span>
+<span>Bullish</span>
+</div>
+<div class="flex items-start gap-5">
+<div class="text-center">
+<span class="block text-3xl font-light text-text-main mb-1">65</span>
+</div>
+<div class="text-sm text-text-muted border-l border-border pl-5">
+<span class="text-success font-medium">Greed.</span> Market is optimistic. Institutional buying observed.
+                            </div>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-center mb-6 border-b border-border pb-2">
+<h3 class="text-text-main font-medium">Quick News</h3>
+</div>
+<div class="flex flex-col gap-6">
+<div class="flex gap-4 items-start group cursor-pointer">
+<div class="size-12 rounded bg-gray-100 flex-shrink-0 bg-cover bg-center grayscale group-hover:grayscale-0 transition-all" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBCKD0lREOjw-fBnJeP-dLGiMRq7YPlyLoFGiMvwfnLpSHI5fW-egAOKS09z33E6bHpqZVPVZoGFyQOiTfgCaMPQ0ShDuromjIPX3RlYrQvmUesnLcDSkEAXhwv7pnvmMM0Rd6VQWkH-yOCWIOK_Nf8uJh5oWVca1kWhF8t6zDVU5jcOKobyu4iGq9JkWuz3Gom-XWcIZLxe0o5FuKno5JXhV9BF8RRyRTC0EKufUXendv1AKYOa-nSS_suzul7Dk5AXfqKCBiz8WM')"></div>
+<div>
+<h5 class="text-text-main text-sm font-medium hover:text-primary leading-snug line-clamp-2 transition-colors">RBI keeps repo rate unchanged at 6.5% for fourth time</h5>
+<p class="text-text-muted text-[10px] mt-1.5">1h ago • Economy</p>
+</div>
+</div>
+<div class="flex gap-4 items-start group cursor-pointer">
+<div class="size-12 rounded bg-gray-100 flex-shrink-0 bg-cover bg-center grayscale group-hover:grayscale-0 transition-all" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCtd95Ebij_x553W57JavHI6ATMLabLsdWuOSXe1WvScUq_B6syVT8VK2tiZTewT0mpa7eKFXLpuS5zGK4XUy2wEVKropQ85Y10QaIOS-RYVpxF3XURJK0Id7tAdN7zLX7NQ2MhkIiyNvGGLvSjBuUMgxwYsV7S9dbWC-ReEEn7aqlSSOQI3uzczMnKt_3Ey3SA--sWvwqDWdjT4YSQhG5rLNFG2tEWRP-8xpVrkTD40hDx27Q6VwM6I6fmdFq1e0GSOn3agBT0eII')"></div>
+<div>
+<h5 class="text-text-main text-sm font-medium hover:text-primary leading-snug line-clamp-2 transition-colors">Tata Motors global sales up 15% in Q2, JLR leads growth</h5>
+<p class="text-text-muted text-[10px] mt-1.5">3h ago • Auto</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>

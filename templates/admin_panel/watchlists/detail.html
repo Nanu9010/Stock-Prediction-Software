@@ -1,0 +1,41 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block title %}Watchlist — {{ watchlist.user.email }}{% endblock %}
+
+{% block content %}
+<div class="page-header" style="display:flex;justify-content:space-between;align-items:center;">
+    <div>
+        <h1>{{ watchlist.name }}</h1>
+        <p class="text-secondary">{{ watchlist.user.email }}</p>
+    </div>
+    <div style="display:flex;gap:8px;">
+        <a href="{% url 'admin_panel:watchlists_list' %}" class="btn btn-secondary">← Back</a>
+        <form method="post" action="{% url 'admin_panel:watchlist_delete' watchlist.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger" onclick="return confirm('Delete?')">Delete</button>
+        </form>
+    </div>
+</div>
+
+<div class="dashboard-section">
+    <h2 style="margin-bottom:1rem;font-size:1.1rem;">Watchlist Items ({{ items.count }})</h2>
+    <table class="data-table">
+        <thead>
+            <tr><th>Symbol</th><th>Broker</th><th>Status</th><th>Notes</th><th>Added</th></tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td><strong>{{ item.research_call.symbol }}</strong></td>
+                <td>{{ item.research_call.broker.name }}</td>
+                <td><span class="badge badge-{{ item.research_call.status|lower }}">{{ item.research_call.status }}</span></td>
+                <td>{{ item.notes|default:"—" }}</td>
+                <td>{{ item.created_at|date:"d M Y" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="text-center" style="padding:1.5rem;color:#888;">Empty watchlist</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

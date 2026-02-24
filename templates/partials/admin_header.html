@@ -1,0 +1,23 @@
+{% load static %}
+{# ─── Admin Header ──────────────────────────────────────────────────────────── #}
+<header class="admin-header">
+    <div class="header-left">
+        <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+        <div class="header-brand">
+            <a href="{% url 'admin_panel:dashboard' %}">StockPro Admin</a>
+        </div>
+    </div>
+
+    <div class="header-right">
+        {% comment %} <div class="header-search">
+            <input type="text" placeholder="Search..." class="form-input">
+        </div> {% endcomment %}
+        <div class="header-user">
+            <a class="user-avatar" href="{% url 'authentication:profile' %}">{{ user.first_name.0|upper }}</a>
+            <div class="user-info">
+                <div class="user-name">{{ user.get_full_name }}</div>
+                <div class="user-role">Admin Dashboard</div>
+            </div>
+        </div>
+    </div>
+</header>

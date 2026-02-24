@@ -3,7 +3,7 @@
 
 {% block title %}Live Trades - Stock Research Platform{% endblock %}
 
-{% block extra_css %}
+{% block page_css %}
 <style>
 .trades-page { padding: 32px 0; max-width: 1280px; margin: 0 auto; padding: 0 24px 48px; }
 
@@ -113,9 +113,9 @@
 
 @media (max-width: 768px) { .trades-grid { grid-template-columns: 1fr; } }
 </style>
-{% endblock %}
+{% endblock page_css %}
 
-{% block content %}
+{% block page_content %}
 <div class="trades-page">
     <div class="page-header">
         <h1>Research Trades</h1>
@@ -185,4 +185,4 @@
         {% endfor %}
     </div>
 </div>
-{% endblock %}
+{% endblock page_content %}

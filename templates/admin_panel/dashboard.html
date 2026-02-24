@@ -2,194 +2,236 @@
 
 {% block title %}Dashboard - Admin Panel{% endblock %}
 
+{% block extra_css %}
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    "bg-dark": "#0b0f17",
+                    "surface-dark": "#131825",
+                    "border-dark": "#1e2433",
+                    "text-secondary": "#94a3b8",
+                },
+                fontFamily: {
+                    display: ["Manrope", "sans-serif"],
+                },
+            },
+        },
+    }
+</script>
+<style>
+    body, .admin-layout { background: #0b0f17 !important; font-family: 'Manrope', sans-serif; }
+    .admin-main { background: #0b0f17 !important; }
+    .admin-container { max-width: 100% !important; }
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #475569; border-radius: 2px; }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="page-header">
-    <h1 class="page-title">Dashboard Overview</h1>
-    <div class="page-actions">
-        <button class="btn btn-primary">
-            <span>📊</span>
-            Generate Report
-        </button>
+<div class="font-display text-slate-100 antialiased">
+    <!-- Page Header -->
+    <div class="flex items-center justify-between mb-10">
+        <div>
+            <h1 class="text-3xl font-light text-white tracking-tight">Dashboard</h1>
+            <p class="text-text-secondary text-sm mt-1">Overview of your platform metrics.</p>
+        </div>
+        <div class="flex gap-3">
+            <a href="{% url 'admin_panel:call_create' %}" class="bg-white text-black px-5 py-2.5 text-sm font-semibold rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2 no-underline">
+                <span class="material-symbols-outlined text-[16px]">add</span>
+                New Call
+            </a>
+        </div>
     </div>
-</div>
 
-<!-- Stats Grid -->
-<div class="stats-grid">
-    <div class="stat-card">
-        <div class="stat-header">
-            <div class="stat-icon" style="background: #dbeafe; color: #2563eb;">👥</div>
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
+        <!-- Total Users -->
+        <div class="bg-surface-dark border border-border-dark rounded-xl p-5 transition-colors hover:border-slate-600">
+            <div class="flex items-center justify-between mb-4">
+                <span class="text-[10px] font-bold uppercase tracking-widest text-text-secondary">Users</span>
+                <span class="material-symbols-outlined text-text-secondary text-[18px]">group</span>
+            </div>
+            <div class="text-3xl font-bold text-white tracking-tight mb-1">{{ total_users|default:0 }}</div>
+            <div class="text-xs text-emerald-400 font-medium">+{{ new_users_30d|default:0 }} this month</div>
         </div>
-        <div class="stat-value">{{ total_users|default:0 }}</div>
-        <div class="stat-label">Total Users</div>
-        <div class="stat-change positive">
-            <span>↑</span>
-            <span>+{{ new_users_30d|default:0 }} this month</span>
-        </div>
-    </div>
-    
-    <div class="stat-card">
-        <div class="stat-icon" style="background: #d1fae5; color: #059669;">📈</div>
-        <div class="stat-value">{{ total_calls|default:0 }}</div>
-        <div class="stat-label">Research Calls</div>
-        <div class="stat-change positive">
-            <span>↑</span>
-            <span>{{ active_calls|default:0 }} active</span>
-        </div>
-    </div>
-    
-    <div class="stat-card">
-        <div class="stat-icon" style="background: #fef3c7; color: #d97706;">⏳</div>
-        <div class="stat-value">{{ pending_calls|default:0 }}</div>
-        <div class="stat-label">Pending Approvals</div>
-        {% if pending_calls > 0 %}
-        <div class="stat-change negative">
-            <span>!</span>
-            <span>Requires attention</span>
-        </div>
-        {% endif %}
-    </div>
-    
-    <div class="stat-card">
-        <div class="stat-icon" style="background: #d1fae5; color: #059669;">✓</div>
-        <div class="stat-value">{{ success_rate|floatformat:1 }}%</div>
-        <div class="stat-label">Success Rate</div>
-        <div class="stat-change positive">
-            <span>↑</span>
-            <span>All time</span>
-        </div>
-    </div>
-    
-    <div class="stat-card">
-        <div class="stat-icon" style="background: #dbeafe; color: #2563eb;">🏢</div>
-        <div class="stat-value">{{ total_brokers|default:0 }}</div>
-        <div class="stat-label">Total Brokers</div>
-        <div class="stat-change">
-            <span>✓</span>
-            <span>{{ verified_brokers|default:0 }} verified</span>
-        </div>
-    </div>
-    
-    <div class="stat-card">
-        <div class="stat-icon" style="background: #fef3c7; color: #d97706;">👨‍💼</div>
-        <div class="stat-value">{{ active_users|default:0 }}</div>
-        <div class="stat-label">Active Users</div>
-        <div class="stat-change positive">
-            <span>↑</span>
-            <span>Last 30 days</span>
-        </div>
-    </div>
-</div>
 
-<!-- Content Grid -->
-<div class="grid grid-cols-2" style="gap: var(--spacing-6); margin-top: var(--spacing-8);">
-    <!-- Top Brokers -->
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">Top Performing Brokers</h3>
+        <!-- Research Calls -->
+        <div class="bg-surface-dark border border-border-dark rounded-xl p-5 transition-colors hover:border-slate-600">
+            <div class="flex items-center justify-between mb-4">
+                <span class="text-[10px] font-bold uppercase tracking-widest text-text-secondary">Calls</span>
+                <span class="material-symbols-outlined text-text-secondary text-[18px]">trending_up</span>
+            </div>
+            <div class="text-3xl font-bold text-white tracking-tight mb-1">{{ total_calls|default:0 }}</div>
+            <div class="text-xs text-emerald-400 font-medium">{{ active_calls|default:0 }} active</div>
         </div>
-        <div class="card-body">
+
+        <!-- Pending Approvals -->
+        <div class="bg-surface-dark border border-border-dark rounded-xl p-5 transition-colors hover:border-slate-600">
+            <div class="flex items-center justify-between mb-4">
+                <span class="text-[10px] font-bold uppercase tracking-widest text-text-secondary">Pending</span>
+                <span class="material-symbols-outlined text-amber-400 text-[18px]">pending_actions</span>
+            </div>
+            <div class="text-3xl font-bold text-white tracking-tight mb-1">{{ pending_calls|default:0 }}</div>
+            {% if pending_calls > 0 %}
+            <div class="text-xs text-amber-400 font-medium">Requires attention</div>
+            {% else %}
+            <div class="text-xs text-text-secondary font-medium">All clear</div>
+            {% endif %}
+        </div>
+
+        <!-- Success Rate -->
+        <div class="bg-surface-dark border border-border-dark rounded-xl p-5 transition-colors hover:border-slate-600">
+            <div class="flex items-center justify-between mb-4">
+                <span class="text-[10px] font-bold uppercase tracking-widest text-text-secondary">Success Rate</span>
+                <span class="material-symbols-outlined text-text-secondary text-[18px]">verified</span>
+            </div>
+            <div class="text-3xl font-bold text-white tracking-tight mb-1">{{ success_rate|floatformat:1 }}%</div>
+            <div class="text-xs text-text-secondary font-medium">All time</div>
+        </div>
+    </div>
+
+    <!-- Secondary Stats Row -->
+    <div class="grid grid-cols-3 gap-5 mb-10">
+        <div class="bg-surface-dark border border-border-dark rounded-xl p-5">
+            <div class="flex items-center gap-3">
+                <div class="size-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-blue-400 text-[20px]">storefront</span>
+                </div>
+                <div>
+                    <div class="text-xl font-bold text-white">{{ total_brokers|default:0 }}</div>
+                    <div class="text-xs text-text-secondary">Total Brokers</div>
+                </div>
+            </div>
+        </div>
+        <div class="bg-surface-dark border border-border-dark rounded-xl p-5">
+            <div class="flex items-center gap-3">
+                <div class="size-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-purple-400 text-[20px]">pie_chart</span>
+                </div>
+                <div>
+                    <div class="text-xl font-bold text-white">{{ total_portfolios|default:0 }}</div>
+                    <div class="text-xs text-text-secondary">Portfolios</div>
+                </div>
+            </div>
+        </div>
+        <div class="bg-surface-dark border border-border-dark rounded-xl p-5">
+            <div class="flex items-center gap-3">
+                <div class="size-10 rounded-lg bg-cyan-500/10 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-cyan-400 text-[20px]">visibility</span>
+                </div>
+                <div>
+                    <div class="text-xl font-bold text-white">{{ total_watchlists|default:0 }}</div>
+                    <div class="text-xs text-text-secondary">Watchlists</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- Top Brokers -->
+        <div class="bg-surface-dark border border-border-dark rounded-xl overflow-hidden">
+            <div class="px-6 py-5 border-b border-border-dark flex items-center justify-between">
+                <h3 class="text-white font-semibold text-sm">Top Performing Brokers</h3>
+                <a href="{% url 'admin_panel:brokers_list' %}" class="text-text-secondary text-xs hover:text-white transition-colors no-underline">View All</a>
+            </div>
             {% if top_brokers %}
-            <div class="data-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Broker</th>
-                            <th>Accuracy</th>
-                            <th>Total Calls</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for broker in top_brokers %}
-                        <tr>
-                            <td>
-                                <a href="{% url 'admin_panel:broker_detail' broker.id %}" style="color: var(--color-primary); text-decoration: none; font-weight: 600;">
-                                    {{ broker.name }}
-                                </a>
-                            </td>
-                            <td>
-                                <span class="badge badge-success">{{ broker.overall_accuracy|floatformat:1 }}%</span>
-                            </td>
-                            <td>{{ broker.research_calls.count }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+            <div class="divide-y divide-border-dark">
+                {% for broker in top_brokers %}
+                <a href="{% url 'admin_panel:broker_detail' broker.id %}" class="flex items-center justify-between px-6 py-4 hover:bg-white/[0.02] transition-colors no-underline">
+                    <div class="flex items-center gap-3">
+                        <div class="size-8 rounded-lg bg-slate-800 flex items-center justify-center text-white text-xs font-bold">{{ forloop.counter }}</div>
+                        <span class="text-white text-sm font-medium">{{ broker.name }}</span>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="text-text-secondary text-xs">{{ broker.research_calls.count }} calls</span>
+                        <span class="text-emerald-400 text-sm font-bold">{{ broker.overall_accuracy|floatformat:1 }}%</span>
+                    </div>
+                </a>
+                {% endfor %}
             </div>
             {% else %}
-            <p style="text-align: center; color: var(--color-gray-600); padding: var(--spacing-8);">No brokers found</p>
+            <div class="px-6 py-10 text-center text-text-secondary text-sm">No brokers found</div>
             {% endif %}
         </div>
-    </div>
-    
-    <!-- Recent Calls -->
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">Recent Research Calls</h3>
-        </div>
-        <div class="card-body">
-            {% if recent_calls %}
-            <div class="data-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Symbol</th>
-                            <th>Broker</th>
-                            <th>Status</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for call in recent_calls %}
-                        <tr>
-                            <td>
-                                <a href="{% url 'admin_panel:call_detail' call.id %}" style="color: var(--color-primary); text-decoration: none; font-weight: 600;">
-                                    {{ call.symbol }}
-                                </a>
-                            </td>
-                            <td>{{ call.broker.name }}</td>
-                            <td>
-                                {% if call.status == 'ACTIVE' %}
-                                <span class="badge badge-success">Active</span>
-                                {% elif call.status == 'PENDING' %}
-                                <span class="badge badge-warning">Pending</span>
-                                {% elif call.status == 'CLOSED' %}
-                                <span class="badge badge-gray">Closed</span>
-                                {% else %}
-                                <span class="badge badge-info">{{ call.status }}</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <span class="badge {% if call.action == 'BUY' %}badge-success{% else %}badge-danger{% endif %}">
-                                    {{ call.action }}
-                                </span>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            {% else %}
-            <p style="text-align: center; color: var(--color-gray-600); padding: var(--spacing-8);">No recent calls</p>
-            {% endif %}
-        </div>
-        <div class="card-footer">
-            <a href="{% url 'admin_panel:calls_list' %}" class="btn btn-outline-primary btn-sm">View All Calls →</a>
-        </div>
-    </div>
-</div>
 
-<!-- Pending Approvals -->
-{% if pending_approvals > 0 %}
-<div class="card" style="margin-top: var(--spacing-6); border-left: 4px solid var(--color-warning);">
-    <div class="card-header">
-        <h3 class="card-title">⚠️ Pending Approvals</h3>
+        <!-- Recent Calls -->
+        <div class="bg-surface-dark border border-border-dark rounded-xl overflow-hidden">
+            <div class="px-6 py-5 border-b border-border-dark flex items-center justify-between">
+                <h3 class="text-white font-semibold text-sm">Recent Research Calls</h3>
+                <a href="{% url 'admin_panel:calls_list' %}" class="text-text-secondary text-xs hover:text-white transition-colors no-underline">View All</a>
+            </div>
+            {% if recent_calls %}
+            <div class="divide-y divide-border-dark">
+                {% for call in recent_calls %}
+                <a href="{% url 'admin_panel:call_detail' call.id %}" class="flex items-center justify-between px-6 py-4 hover:bg-white/[0.02] transition-colors no-underline">
+                    <div class="flex items-center gap-3">
+                        <div class="size-8 rounded-lg {% if call.action == 'BUY' %}bg-emerald-500/10 text-emerald-400{% else %}bg-red-500/10 text-red-400{% endif %} flex items-center justify-center">
+                            <span class="material-symbols-outlined text-[16px]">{% if call.action == 'BUY' %}trending_up{% else %}trending_down{% endif %}</span>
+                        </div>
+                        <div>
+                            <span class="text-white text-sm font-medium block">{{ call.symbol }}</span>
+                            <span class="text-text-secondary text-[10px]">{{ call.broker.name }}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        {% if call.status == 'ACTIVE' %}
+                        <span class="text-[10px] font-bold uppercase px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400">Active</span>
+                        {% elif call.status == 'PENDING_APPROVAL' %}
+                        <span class="text-[10px] font-bold uppercase px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400">Pending</span>
+                        {% elif call.status == 'CLOSED' %}
+                        <span class="text-[10px] font-bold uppercase px-2.5 py-1 rounded-full bg-slate-500/10 text-slate-400">Closed</span>
+                        {% else %}
+                        <span class="text-[10px] font-bold uppercase px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400">{{ call.status }}</span>
+                        {% endif %}
+                        <span class="text-[10px] font-bold uppercase px-2.5 py-1 rounded-full {% if call.action == 'BUY' %}bg-emerald-500/10 text-emerald-400{% else %}bg-red-500/10 text-red-400{% endif %}">{{ call.action }}</span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="px-6 py-10 text-center text-text-secondary text-sm">No recent calls</div>
+            {% endif %}
+        </div>
     </div>
-    <div class="card-body">
-        <p>You have <strong>{{ pending_approvals }}</strong> research calls waiting for approval.</p>
-        <a href="{% url 'admin_panel:calls_list' %}?status=PENDING" class="btn btn-warning" style="margin-top: var(--spacing-4);">
-            Review Pending Calls
-        </a>
+
+    <!-- Pending Approvals -->
+    {% if pending_approvals > 0 %}
+    <div class="bg-surface-dark border border-amber-500/20 rounded-xl overflow-hidden">
+        <div class="px-6 py-5 border-b border-border-dark flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-amber-400 text-[20px]">warning</span>
+                <h3 class="text-white font-semibold text-sm">Pending Approvals</h3>
+                <span class="text-[10px] font-bold bg-amber-500/10 text-amber-400 px-2.5 py-0.5 rounded-full">{{ pending_approvals }}</span>
+            </div>
+            <a href="{% url 'admin_panel:calls_list' %}?status=PENDING" class="bg-amber-500/10 text-amber-400 px-4 py-2 rounded-lg text-xs font-semibold hover:bg-amber-500/20 transition-colors no-underline">Review All</a>
+        </div>
+        <div class="divide-y divide-border-dark">
+            {% for call in pending_approvals_list %}
+            <div class="flex items-center justify-between px-6 py-4">
+                <div class="flex items-center gap-3">
+                    <div class="size-8 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-amber-400 text-[16px]">pending</span>
+                    </div>
+                    <div>
+                        <span class="text-white text-sm font-medium block">{{ call.symbol }}</span>
+                        <span class="text-text-secondary text-[10px]">by {{ call.created_by.get_full_name|default:call.created_by.email }} · {{ call.created_at|timesince }} ago</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <a href="{% url 'admin_panel:call_detail' call.id %}" class="text-xs text-text-secondary hover:text-white transition-colors px-3 py-1.5 rounded-lg hover:bg-white/5 no-underline">View</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
+    {% endif %}
 </div>
-{% endif %}
 {% endblock %}

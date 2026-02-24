@@ -1,0 +1,21 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block title %}Delete Portfolio{% endblock %}
+
+{% block content %}
+<div style="max-width:500px;margin:4rem auto;text-align:center;">
+    <div style="font-size:3rem;margin-bottom:1rem;">⚠️</div>
+    <h2>Delete Portfolio?</h2>
+    <p style="color:#888;margin:1rem 0;">
+        This will permanently delete the portfolio for <strong>{{ object.user.email }}</strong>
+        and all {{ object.items.count }} holdings inside it. This action cannot be undone.
+    </p>
+    <div style="display:flex;gap:12px;justify-content:center;margin-top:2rem;">
+        <a href="{% url 'admin_panel:portfolios_list' %}" class="btn btn-secondary">Cancel</a>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Yes, Delete</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

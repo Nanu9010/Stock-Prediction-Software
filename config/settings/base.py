@@ -104,9 +104,9 @@ DATABASES = {
 AUTH_USER_MODEL = 'authentication.User'
 
 # Authentication URLs
-LOGIN_URL = '/auth/login/'
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/auth/login/'
+LOGIN_URL = 'authentication:login'
+LOGIN_REDIRECT_URL = 'dashboard:dashboard'
+LOGOUT_REDIRECT_URL = 'authentication:login'
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [

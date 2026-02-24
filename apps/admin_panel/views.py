@@ -29,7 +29,7 @@ class AdminRequiredMixin(UserPassesTestMixin):
     
     def handle_no_permission(self):
         messages.error(self.request, 'You do not have permission to access the admin panel.')
-        return redirect('dashboard:home')
+        return redirect('dashboard:dashboard')
 
 
 class AdminDashboardView(LoginRequiredMixin, AdminRequiredMixin, TemplateView):
@@ -76,11 +76,13 @@ class AdminDashboardView(LoginRequiredMixin, AdminRequiredMixin, TemplateView):
             'broker', 'created_by'
         ).order_by('-created_at')[:10]
         
-        # Pending approvals
-        context['pending_approvals'] = ResearchCall.objects.filter(
+        # Pending approvals — count for stats card, queryset for table loop
+        pending_qs = ResearchCall.objects.filter(
             status='PENDING_APPROVAL'
-        ).count()
-        
+        ).select_related('broker', 'created_by').order_by('-created_at')
+        context['pending_approvals'] = pending_qs.count()
+        context['pending_approvals_list'] = pending_qs[:20]
+
         return context
 
 

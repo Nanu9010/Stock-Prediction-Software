@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block title %}Top Performing Brokers — StockPro{% endblock %}
+
+{% block page_content %}
+<div class="space-y-8">
+    <!-- Page Header -->
+    <div class="flex items-center gap-3">
+        <span class="size-10 rounded-xl bg-accent-gold/10 flex items-center justify-center">
+            <span class="material-symbols-outlined text-accent-gold text-xl">emoji_events</span>
+        </span>
+        <div>
+            <h1 class="text-2xl font-extrabold text-text-main m-0">Top Performing Brokers</h1>
+            <p class="text-sm text-text-muted m-0">Ranked by research call accuracy</p>
+        </div>
+    </div>
+
+    <!-- Brokers Table Card -->
+    <div class="bg-surface rounded-2xl shadow-soft overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="border-b border-gray-100">
+                        <th class="text-left px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Rank</th>
+                        <th class="text-left px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Broker</th>
+                        <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Total Calls</th>
+                        <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Accuracy</th>
+                        <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Rating</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    {% for broker in top_brokers %}
+                    <tr class="hover:bg-gray-50/50 transition-colors">
+                        <td class="px-6 py-4">
+                            {% if forloop.counter <= 3 %}
+                            <div class="size-8 rounded-lg {% if forloop.counter == 1 %}bg-yellow-50 text-yellow-600{% elif forloop.counter == 2 %}bg-gray-100 text-gray-500{% else %}bg-orange-50 text-orange-500{% endif %} flex items-center justify-center font-bold text-sm">
+                                {{ forloop.counter }}
+                            </div>
+                            {% else %}
+                            <span class="text-sm text-text-muted font-semibold pl-2">{{ forloop.counter }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <div class="size-10 rounded-xl bg-accent-teal/10 flex items-center justify-center text-accent-teal font-bold text-sm">
+                                    {{ broker.name|first|upper }}
+                                </div>
+                                <div>
+                                    <p class="font-bold text-text-main text-sm m-0">{{ broker.name }}</p>
+                                    <p class="text-xs text-text-muted m-0">{{ broker.firm_name|default:"Independent" }}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="text-sm font-bold text-text-main">{{ broker.total_calls }}</span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold
+                                {% if broker.overall_accuracy >= 70 %}bg-green-50 text-green-600
+                                {% elif broker.overall_accuracy >= 50 %}bg-yellow-50 text-yellow-600
+                                {% else %}bg-red-50 text-red-500{% endif %}">
+                                {{ broker.overall_accuracy|floatformat:1 }}%
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <div class="flex items-center justify-center gap-0.5">
+                                {% with stars=broker.overall_accuracy|floatformat:0 %}
+                                {% if broker.overall_accuracy >= 80 %}
+                                    <span class="material-symbols-outlined text-yellow-400 text-base">star</span>
+                                    <span class="material-symbols-outlined text-yellow-400 text-base">star</span>
+                                    <span class="material-symbols-outlined text-yellow-400 text-base">star</span>
+                                    <span class="material-symbols-outlined text-yellow-400 text-base">star</span>
+                                    <span class="material-symbols-outlined text-yellow-400 text-base">star</span>
+                                {% elif broker.overall_accuracy >= 60 %}
+                                    <span class="material-symbols-outlined text-yellow-400 text-base">star</span>
+                                    <span class="material-symbols-outlined text-yellow-400 text-base">star</span>
+                                    <span class="material-symbols-outlined text-yellow-400 text-base">star</span>
+                                    <span class="material-symbols-outlined text-yellow-400 text-base">star</span>
+                                    <span class="material-symbols-outlined text-gray-300 text-base">star</span>
+                                {% elif broker.overall_accuracy >= 40 %}
+                                    <span class="material-symbols-outlined text-yellow-400 text-base">star</span>
+                                    <span class="material-symbols-outlined text-yellow-400 text-base">star</span>
+                                    <span class="material-symbols-outlined text-yellow-400 text-base">star</span>
+                                    <span class="material-symbols-outlined text-gray-300 text-base">star</span>
+                                    <span class="material-symbols-outlined text-gray-300 text-base">star</span>
+                                {% else %}
+                                    <span class="material-symbols-outlined text-yellow-400 text-base">star</span>
+                                    <span class="material-symbols-outlined text-yellow-400 text-base">star</span>
+                                    <span class="material-symbols-outlined text-gray-300 text-base">star</span>
+                                    <span class="material-symbols-outlined text-gray-300 text-base">star</span>
+                                    <span class="material-symbols-outlined text-gray-300 text-base">star</span>
+                                {% endif %}
+                                {% endwith %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="px-6 py-12 text-center">
+                            <span class="material-symbols-outlined text-5xl text-gray-300 mb-3 block">groups</span>
+                            <p class="text-text-muted text-sm m-0">No broker data available yet</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

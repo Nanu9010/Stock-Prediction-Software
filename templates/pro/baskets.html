@@ -3,7 +3,7 @@
 
 {% block title %}PRO Baskets - Stock Prediction System{% endblock %}
 
-{% block extra_css %}
+{% block page_css %}
 <style>
     .baskets-container {
         padding: 40px 0;
@@ -140,9 +140,9 @@
         font-weight: 700;
     }
 </style>
-{% endblock %}
+{% endblock page_css %}
 
-{% block content %}
+{% block page_content %}
 <div class="baskets-container">
     <div class="container">
         <div class="baskets-header">
@@ -150,6 +150,7 @@
             <p>Curated portfolios of top-performing stocks for long-term wealth creation</p>
         </div>
 
+        {% if is_pro %}
         <div class="basket-grid">
             <!-- NIFTY Bluechip -->
             <div class="basket-card">
@@ -247,6 +248,37 @@
                 </div>
             </div>
         </div>
+        {% else %}
+        <!-- Non-PRO: show upgrade CTA -->
+        <div style="text-align:center;padding:60px 20px;">
+            <div style="font-size:4rem;margin-bottom:1rem;">🔒</div>
+            <h2 style="font-size:2rem;font-weight:800;color:#111827;margin-bottom:12px;">PRO Baskets Locked</h2>
+            <p style="font-size:1.1rem;color:#6b7280;margin-bottom:32px;max-width:480px;margin-left:auto;margin-right:auto;">
+                Unlock curated stock baskets with proven track records. Upgrade to PRO and start building wealth with expert-curated portfolios.
+            </p>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;max-width:800px;margin:0 auto 40px;">
+                <div style="background:#f3f4f6;padding:20px;border-radius:12px;text-align:left;">
+                    <div style="font-size:1.5rem;margin-bottom:8px;">🎯</div>
+                    <strong>Curated Picks</strong>
+                    <p style="color:#6b7280;font-size:14px;margin-top:4px;">Expert-selected baskets across sectors</p>
+                </div>
+                <div style="background:#f3f4f6;padding:20px;border-radius:12px;text-align:left;">
+                    <div style="font-size:1.5rem;margin-bottom:8px;">📈</div>
+                    <strong>Track Record</strong>
+                    <p style="color:#6b7280;font-size:14px;margin-top:4px;">30-40%+ CAGR over 3 years</p>
+                </div>
+                <div style="background:#f3f4f6;padding:20px;border-radius:12px;text-align:left;">
+                    <div style="font-size:1.5rem;margin-bottom:8px;">🔄</div>
+                    <strong>Auto Rebalance</strong>
+                    <p style="color:#6b7280;font-size:14px;margin-top:4px;">Quarterly rebalancing included</p>
+                </div>
+            </div>
+            <a href="{% url 'payments:membership' %}" style="display:inline-block;background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;padding:16px 48px;border-radius:8px;font-weight:700;font-size:1.1rem;text-decoration:none;">
+                ⚡ Upgrade to PRO
+            </a>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
+

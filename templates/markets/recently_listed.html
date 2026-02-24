@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Recently Listed — StockPro{% endblock %}
+
+{% block page_content %}
+<div class="space-y-8">
+    <!-- Page Header -->
+    <div class="flex items-center gap-3">
+        <span class="size-10 rounded-xl bg-blue-50 flex items-center justify-center">
+            <span class="material-symbols-outlined text-blue-500 text-xl">new_releases</span>
+        </span>
+        <div>
+            <h1 class="text-2xl font-extrabold text-text-main m-0">Recently Listed</h1>
+            <p class="text-sm text-text-muted m-0">Newly listed stocks and IPOs on the exchange</p>
+        </div>
+    </div>
+
+    <!-- Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for stock in recently_listed %}
+        <div class="bg-surface rounded-2xl shadow-soft p-6 hover:shadow-soft-hover transition-all group">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <div class="size-10 rounded-xl bg-accent-teal/10 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-accent-teal">apartment</span>
+                    </div>
+                    <div>
+                        <p class="font-bold text-text-main text-sm m-0">{{ stock.symbol|default:stock.name }}</p>
+                        <p class="text-xs text-text-muted m-0">{{ stock.exchange|default:"NSE" }}</p>
+                    </div>
+                </div>
+                <span class="px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-bold">New</span>
+            </div>
+
+            <div class="space-y-3">
+                {% if stock.listing_price or stock.ltp %}
+                <div class="flex justify-between items-center">
+                    <span class="text-xs text-text-muted">Listing Price</span>
+                    <span class="text-sm font-bold text-text-main">₹{{ stock.listing_price|default:stock.ltp|floatformat:2 }}</span>
+                </div>
+                {% endif %}
+                {% if stock.issue_price %}
+                <div class="flex justify-between items-center">
+                    <span class="text-xs text-text-muted">Issue Price</span>
+                    <span class="text-sm font-bold text-text-main">₹{{ stock.issue_price|floatformat:2 }}</span>
+                </div>
+                {% endif %}
+                {% if stock.listing_gain or stock.pct_change %}
+                <div class="flex justify-between items-center">
+                    <span class="text-xs text-text-muted">Listing Gain</span>
+                    <span class="text-sm font-bold {% if stock.listing_gain > 0 or stock.pct_change > 0 %}text-green-500{% else %}text-red-500{% endif %}">
+                        {{ stock.listing_gain|default:stock.pct_change|floatformat:2 }}%
+                    </span>
+                </div>
+                {% endif %}
+                {% if stock.listing_date or stock.date %}
+                <div class="flex justify-between items-center">
+                    <span class="text-xs text-text-muted">Listed On</span>
+                    <span class="text-xs font-semibold text-text-muted">{{ stock.listing_date|default:stock.date }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-full bg-surface rounded-2xl shadow-soft p-12 text-center">
+            <span class="material-symbols-outlined text-5xl text-gray-300 mb-3 block">inventory_2</span>
+            <p class="text-text-muted text-sm m-0">No recently listed stocks available right now</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

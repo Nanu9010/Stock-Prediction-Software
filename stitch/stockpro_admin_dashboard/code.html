@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>StockPro Admin Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#111827",secondary: "#6b7280",
+                        "background-light": "#ffffff",
+                        "background-dark": "#0f0f0f",
+                    },
+                    fontFamily: {
+                        display: ["Manrope", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.25rem",
+                        lg: "0.5rem",
+                        xl: "0.75rem",
+                        '2xl': "1rem",
+                        full: "9999px",
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-gray-50 dark:bg-black text-slate-800 dark:text-slate-200 font-display antialiased">
+<div class="relative flex min-h-screen w-full flex-row overflow-hidden">
+<div class="hidden w-[260px] shrink-0 flex-col justify-between bg-white dark:bg-black p-6 lg:flex z-20">
+<div class="flex flex-col gap-8">
+<div class="flex gap-3 items-center px-2">
+<div class="flex items-center justify-center rounded-lg bg-slate-900 text-white size-8">
+<span class="material-symbols-outlined text-[20px]">trending_up</span>
+</div>
+<h1 class="text-slate-900 dark:text-white text-xl font-bold tracking-tight">StockPro</h1>
+</div>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-gray-50 text-slate-900 dark:bg-white/10 dark:text-white group transition-all" href="#">
+<span class="material-symbols-outlined text-slate-900 dark:text-white" style="font-size: 20px; font-variation-settings: 'FILL' 1;">dashboard</span>
+<p class="text-sm font-semibold">Dashboard</p>
+<div class="ml-auto w-1.5 h-1.5 rounded-full bg-slate-900 dark:bg-white"></div>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-gray-50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/5 transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform" style="font-size: 20px;">campaign</span>
+<p class="text-sm font-medium">Research Calls</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-gray-50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/5 transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform" style="font-size: 20px;">group</span>
+<p class="text-sm font-medium">Management</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-gray-50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/5 transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform" style="font-size: 20px;">database</span>
+<p class="text-sm font-medium">Data</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-gray-50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/5 transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:scale-110 transition-transform" style="font-size: 20px;">settings</span>
+<p class="text-sm font-medium">System</p>
+</a>
+</nav>
+</div>
+<div class="flex items-center gap-3 px-2 py-3">
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-9 shrink-0 grayscale hover:grayscale-0 transition-all duration-500" data-alt="Profile picture of administrator" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAfycqDxDzyeG3KktgoR1RJwam7pIACjvwmYvahRSbFmD2Jp1fs5YK3lI2NJj5j3Y7_WqRkyjuOnplXkL0m5OjRFOwsEUvzWz6-3yVB0OxWZOp6_RKcLALj-A9KIBQ9GvMTVnsEvzN7obSklWTK1rISUIeEEVj7jeQhwqvIG7UDOO59npi58qNtbrH2dFmSto79NguQS7emBe2PGUmS9QQWybvH7BdltWPxS3PogxRmELTiw26p15jTwONur_F6tBQL4rqU5qUM3lk");'></div>
+<div class="flex flex-col overflow-hidden">
+<p class="text-slate-900 dark:text-white text-sm font-semibold truncate">Alex Morgan</p>
+<p class="text-slate-400 text-xs truncate">Super Admin</p>
+</div>
+</div>
+</div>
+<div class="flex h-screen w-full flex-col overflow-y-auto bg-white/50 dark:bg-neutral-900/50">
+<div class="flex items-center justify-between border-b border-gray-100 dark:border-white/10 bg-white dark:bg-black px-6 py-4 lg:hidden">
+<div class="flex items-center gap-3">
+<div class="flex items-center justify-center rounded-lg bg-slate-900 text-white size-8">
+<span class="material-symbols-outlined text-[20px]">trending_up</span>
+</div>
+<h1 class="text-slate-900 dark:text-white text-lg font-bold">StockPro</h1>
+</div>
+<button class="text-slate-500 dark:text-white">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+<div class="flex-1 px-6 py-8 md:px-12 md:py-10 w-full flex flex-col gap-10 max-w-[1600px] mx-auto">
+<div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+<div>
+<h2 class="text-3xl md:text-4xl font-bold tracking-tight text-slate-900 dark:text-white">Dashboard</h2>
+<p class="text-slate-400 dark:text-slate-500 mt-2 font-light">Market sentiment is <span class="text-emerald-600 font-medium">bullish</span> today.</p>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 rounded-lg bg-white border border-gray-100 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-gray-50 hover:text-slate-900 hover:border-gray-200 transition-all dark:bg-white/5 dark:border-white/10 dark:text-slate-300 dark:hover:bg-white/10">
+<span class="material-symbols-outlined text-[18px]">cloud_download</span>
+                            Export
+                        </button>
+<button class="flex items-center gap-2 rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition-all dark:bg-white dark:text-black dark:hover:bg-gray-200">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                            New Call
+                        </button>
+</div>
+</div>
+<div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+<div class="flex flex-col gap-3 group">
+<div class="flex items-center justify-between">
+<p class="text-sm font-medium text-slate-400 uppercase tracking-wide">Total Users</p>
+</div>
+<div>
+<p class="text-5xl font-light text-slate-900 dark:text-white tracking-tight">14,205</p>
+<div class="flex items-center gap-2 mt-2">
+<span class="flex items-center text-sm font-medium text-emerald-600">
+<span class="material-symbols-outlined text-[16px] mr-1">arrow_upward</span>
+                                    12%
+                                </span>
+<span class="text-slate-400 text-sm">vs last month</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-3 group">
+<div class="flex items-center justify-between">
+<p class="text-sm font-medium text-slate-400 uppercase tracking-wide">Active Calls</p>
+</div>
+<div>
+<p class="text-5xl font-light text-slate-900 dark:text-white tracking-tight">342</p>
+<div class="flex items-center gap-2 mt-2">
+<span class="flex items-center text-sm font-medium text-emerald-600">
+<span class="material-symbols-outlined text-[16px] mr-1">arrow_upward</span>
+                                    5%
+                                </span>
+<span class="text-slate-400 text-sm">vs last week</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-3 group">
+<div class="flex items-center justify-between">
+<p class="text-sm font-medium text-slate-400 uppercase tracking-wide">Revenue</p>
+</div>
+<div>
+<p class="text-5xl font-light text-slate-900 dark:text-white tracking-tight">$45.2k</p>
+<div class="flex items-center gap-2 mt-2">
+<span class="flex items-center text-sm font-medium text-emerald-600">
+<span class="material-symbols-outlined text-[16px] mr-1">arrow_upward</span>
+                                    8.4%
+                                </span>
+<span class="text-slate-400 text-sm">vs last month</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-3 group">
+<div class="flex items-center justify-between">
+<p class="text-sm font-medium text-slate-400 uppercase tracking-wide">New Subs</p>
+</div>
+<div>
+<p class="text-5xl font-light text-slate-900 dark:text-white tracking-tight">128</p>
+<div class="flex items-center gap-2 mt-2">
+<span class="flex items-center text-sm font-medium text-rose-500">
+<span class="material-symbols-outlined text-[16px] mr-1">arrow_downward</span>
+                                    2.1%
+                                </span>
+<span class="text-slate-400 text-sm">vs yesterday</span>
+</div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 gap-12 xl:grid-cols-3">
+<div class="flex flex-col gap-6 xl:col-span-2">
+<div class="flex items-center justify-between border-b border-gray-100 dark:border-white/10 pb-4">
+<h3 class="text-xl font-semibold text-slate-900 dark:text-white">Pending Approvals</h3>
+<a class="text-sm font-medium text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors" href="#">View All</a>
+</div>
+<div class="w-full overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left text-sm">
+<thead class="text-slate-400 dark:text-slate-500 font-medium border-b border-gray-50 dark:border-white/5">
+<tr>
+<th class="px-2 py-4 font-normal uppercase text-xs tracking-wider w-[25%]">Analyst</th>
+<th class="px-2 py-4 font-normal uppercase text-xs tracking-wider w-[25%]">Stock</th>
+<th class="px-2 py-4 font-normal uppercase text-xs tracking-wider">Type</th>
+<th class="px-2 py-4 font-normal uppercase text-xs tracking-wider">Submitted</th>
+<th class="px-2 py-4 font-normal uppercase text-xs tracking-wider text-right">Action</th>
+</tr>
+</thead>
+<tbody class="text-slate-700 dark:text-slate-300">
+<tr class="group hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors border-b border-gray-50 dark:border-white/5 last:border-0">
+<td class="px-2 py-5">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-slate-200 bg-cover grayscale group-hover:grayscale-0 transition-all" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCiQngQ6J00D2IOS9h6tgUTQvDWQiXhpI3XeHcUpI_YErmHYIXP8L_XFdGFJgC5PUZJFdYI6OAwqnP9KmVNFk7k5Jz6JMv4TtCpzLwkh1uS3vZuTiFxRpltixmvnzTfQ361ib5McRTQ7aROxBF-5zOUJayoA-YSI1Q6-8Uv_giWRbMYH5wyDtOUdcrzffPfTov2sKQrBX5TIsX7n-G9vzu7XBl5T0ul-Tv7ybWHTQiVKIbI3QuoUkwp3C3uJgWGWTONZQj3aQ5GwSo");'></div>
+<span class="font-medium text-slate-900 dark:text-white">John Doe</span>
+</div>
+</td>
+<td class="px-2 py-5">
+<div class="flex items-center gap-2">
+<div class="flex size-8 items-center justify-center rounded bg-gray-100 dark:bg-white/10 font-bold text-xs text-slate-900 dark:text-white">AAPL</div>
+<span class="font-medium text-slate-500 dark:text-slate-400">Apple Inc.</span>
+</div>
+</td>
+<td class="px-2 py-5">
+<span class="inline-flex items-center text-sm font-medium text-emerald-600 dark:text-emerald-400">Buy Call</span>
+</td>
+<td class="px-2 py-5 text-slate-400">2 mins ago</td>
+<td class="px-2 py-5 text-right">
+<button class="text-sm font-medium text-slate-900 dark:text-white hover:underline">Review</button>
+</td>
+</tr>
+<tr class="group hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors border-b border-gray-50 dark:border-white/5 last:border-0">
+<td class="px-2 py-5">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-slate-200 bg-cover grayscale group-hover:grayscale-0 transition-all" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBDL0avZvf_3YR-dhl2p7FAHt49fG6-7Pkmqo3b_BjWkXPTxIq9IbcuKjbZSdaIZS7ru1OyoF_RePp2HFql7coYVgrOuVncQT8puWiTKu9zaTIvbOCKFIoCMq1vysEZXmLT9h7jCWvRDjbIokPnoXf4hueoe7hAY7sHHt0MIH5nQ399vtJIhFpqHB-RPT_ncxH-lRa3QhL0q5Jeoy-PFtE_FOo2U_KGpVD2BUr-oZC_bm2bA54nj5K7DKxljoO_WJLcT2Ujqu1pjSo");'></div>
+<span class="font-medium text-slate-900 dark:text-white">Jane Smith</span>
+</div>
+</td>
+<td class="px-2 py-5">
+<div class="flex items-center gap-2">
+<div class="flex size-8 items-center justify-center rounded bg-gray-100 dark:bg-white/10 font-bold text-xs text-slate-900 dark:text-white">TSLA</div>
+<span class="font-medium text-slate-500 dark:text-slate-400">Tesla</span>
+</div>
+</td>
+<td class="px-2 py-5">
+<span class="inline-flex items-center text-sm font-medium text-rose-500 dark:text-rose-400">Sell Put</span>
+</td>
+<td class="px-2 py-5 text-slate-400">15 mins ago</td>
+<td class="px-2 py-5 text-right">
+<button class="text-sm font-medium text-slate-900 dark:text-white hover:underline">Review</button>
+</td>
+</tr>
+<tr class="group hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors border-b border-gray-50 dark:border-white/5 last:border-0">
+<td class="px-2 py-5">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-slate-200 bg-cover grayscale group-hover:grayscale-0 transition-all" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBsTtmRsMtBAt0t2LqXq6kRnjpPGb7X4e2pt_PB9XtBMgDmeIYvf-ddwekG1nbjyO07JvVIaipkqW9EDBpIzgQwmqpF0ff9Id1O3gkkxFaw53zKMot1MjDpBw91mM1m-cKp1URE69w5hmThJYJFJrZilfp4yxa7ICMeiPw9e4QMvBt-5Np-coz8ELy3MitAm6ArUT89fTaa2BtXnfB8e9sCpIZEJeA_CW7kVD2i955m9tad-dDpIf_gsyLWfpfDk3xr9QNIu_9pB-I");'></div>
+<span class="font-medium text-slate-900 dark:text-white">Robert Fox</span>
+</div>
+</td>
+<td class="px-2 py-5">
+<div class="flex items-center gap-2">
+<div class="flex size-8 items-center justify-center rounded bg-gray-100 dark:bg-white/10 font-bold text-xs text-slate-900 dark:text-white">NVDA</div>
+<span class="font-medium text-slate-500 dark:text-slate-400">Nvidia</span>
+</div>
+</td>
+<td class="px-2 py-5">
+<span class="inline-flex items-center text-sm font-medium text-amber-500 dark:text-amber-400">Hold</span>
+</td>
+<td class="px-2 py-5 text-slate-400">1 hour ago</td>
+<td class="px-2 py-5 text-right">
+<button class="text-sm font-medium text-slate-900 dark:text-white hover:underline">Review</button>
+</td>
+</tr>
+<tr class="group hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors border-b border-gray-50 dark:border-white/5 last:border-0">
+<td class="px-2 py-5">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-slate-200 bg-cover grayscale group-hover:grayscale-0 transition-all" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAlqLHv7r8ToSxmVvZrW7cvaTfkzB1qNzjqobnMmSXiDEAtpwj3T8JoPb8IgLu6y6DSg2jcM3xtSGX61-CDYPue6DiITq1woNqbKpi4cPhp9VHoOgXjlaZBwEDag78BUh-3K8PngnRtNOiewRNBvWrbi7hhudDAhSWwyx_Z9bJBDQ3A9J_lwqMOdj9vmcTc4t9yd3viIbfK_WRNKyHp9laoPu6Vw3IxJ-4FYvqHriI_fSUs0UlKgs1x6Lp0TRzwxWEe_0OXN82nZRo");'></div>
+<span class="font-medium text-slate-900 dark:text-white">Emily White</span>
+</div>
+</td>
+<td class="px-2 py-5">
+<div class="flex items-center gap-2">
+<div class="flex size-8 items-center justify-center rounded bg-gray-100 dark:bg-white/10 font-bold text-xs text-slate-900 dark:text-white">MSFT</div>
+<span class="font-medium text-slate-500 dark:text-slate-400">Microsoft</span>
+</div>
+</td>
+<td class="px-2 py-5">
+<span class="inline-flex items-center text-sm font-medium text-emerald-600 dark:text-emerald-400">Buy Call</span>
+</td>
+<td class="px-2 py-5 text-slate-400">2 hours ago</td>
+<td class="px-2 py-5 text-right">
+<button class="text-sm font-medium text-slate-900 dark:text-white hover:underline">Review</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-6">
+<div class="flex items-center justify-between border-b border-gray-100 dark:border-white/10 pb-4">
+<h3 class="text-xl font-semibold text-slate-900 dark:text-white">Recent Activity</h3>
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</div>
+<div class="flex flex-col pt-2">
+<div class="flex gap-4 pb-8 relative group">
+<div class="absolute left-[5px] top-3 bottom-0 w-px bg-gray-200 dark:bg-white/10 group-last:hidden"></div>
+<div class="relative z-10 flex size-2.5 mt-2 shrink-0 rounded-full bg-blue-500 ring-4 ring-white dark:ring-black"></div>
+<div class="flex flex-col gap-0.5 -mt-0.5">
+<p class="text-sm font-medium text-slate-900 dark:text-white">New PRO Subscriber</p>
+<p class="text-sm text-slate-500 dark:text-slate-400">Michael T. upgraded to PRO plan</p>
+<p class="text-xs text-slate-400 mt-1">5 mins ago</p>
+</div>
+</div>
+<div class="flex gap-4 pb-8 relative group">
+<div class="absolute left-[5px] top-3 bottom-0 w-px bg-gray-200 dark:bg-white/10 group-last:hidden"></div>
+<div class="relative z-10 flex size-2.5 mt-2 shrink-0 rounded-full bg-purple-500 ring-4 ring-white dark:ring-black"></div>
+<div class="flex flex-col gap-0.5 -mt-0.5">
+<p class="text-sm font-medium text-slate-900 dark:text-white">Call Approved</p>
+<p class="text-sm text-slate-500 dark:text-slate-400">AAPL Buy Call approved by Admin</p>
+<p class="text-xs text-slate-400 mt-1">32 mins ago</p>
+</div>
+</div>
+<div class="flex gap-4 pb-8 relative group">
+<div class="absolute left-[5px] top-3 bottom-0 w-px bg-gray-200 dark:bg-white/10 group-last:hidden"></div>
+<div class="relative z-10 flex size-2.5 mt-2 shrink-0 rounded-full bg-orange-400 ring-4 ring-white dark:ring-black"></div>
+<div class="flex flex-col gap-0.5 -mt-0.5">
+<p class="text-sm font-medium text-slate-900 dark:text-white">System Alert</p>
+<p class="text-sm text-slate-500 dark:text-slate-400">API Latency spike detected</p>
+<p class="text-xs text-slate-400 mt-1">2 hours ago</p>
+</div>
+</div>
+<div class="flex gap-4 relative group">
+<div class="absolute left-[5px] top-3 bottom-0 w-px bg-gray-200 dark:bg-white/10 group-last:hidden"></div>
+<div class="relative z-10 flex size-2.5 mt-2 shrink-0 rounded-full bg-slate-400 ring-4 ring-white dark:ring-black"></div>
+<div class="flex flex-col gap-0.5 -mt-0.5">
+<p class="text-sm font-medium text-slate-900 dark:text-white">Admin Logout</p>
+<p class="text-sm text-slate-500 dark:text-slate-400">Sarah J. logged out</p>
+<p class="text-xs text-slate-400 mt-1">4 hours ago</p>
+</div>
+</div>
+</div>
+<div class="mt-8 pt-6 border-t border-gray-100 dark:border-white/10">
+<div class="flex items-center justify-between mb-4">
+<h4 class="text-sm font-semibold text-slate-900 dark:text-white">Load</h4>
+<span class="text-xs font-mono text-slate-400">Live</span>
+</div>
+<div class="flex h-16 items-end gap-1.5 opacity-80">
+<div class="h-[40%] flex-1 bg-slate-200 dark:bg-white/10 rounded-sm"></div>
+<div class="h-[60%] flex-1 bg-slate-200 dark:bg-white/10 rounded-sm"></div>
+<div class="h-[50%] flex-1 bg-slate-200 dark:bg-white/10 rounded-sm"></div>
+<div class="h-[70%] flex-1 bg-slate-200 dark:bg-white/10 rounded-sm"></div>
+<div class="h-[55%] flex-1 bg-slate-200 dark:bg-white/10 rounded-sm"></div>
+<div class="h-[80%] flex-1 bg-slate-200 dark:bg-white/10 rounded-sm"></div>
+<div class="h-[65%] flex-1 bg-slate-200 dark:bg-white/10 rounded-sm"></div>
+<div class="h-[90%] flex-1 bg-slate-900 dark:bg-white rounded-sm relative group"></div>
+<div class="h-[75%] flex-1 bg-slate-200 dark:bg-white/10 rounded-sm"></div>
+<div class="h-[60%] flex-1 bg-slate-200 dark:bg-white/10 rounded-sm"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</body></html>

@@ -5,10 +5,10 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    
-    # App URLs
+
+    # App URLs — Template/HTML views
     path('auth/', include('apps.authentication.urls')),
-    path('', include('apps.dashboard.urls')),  # Dashboard as home
+    path('', include('apps.dashboard.urls')),        # Dashboard as home
     path('calls/', include('apps.research_calls.urls')),
     path('portfolio/', include('apps.portfolios.urls')),
     path('watchlist/', include('apps.watchlists.urls')),
@@ -16,6 +16,14 @@ urlpatterns = [
     path('trades/', include('apps.trades.urls')),
     path('admin-panel/', include('apps.admin_panel.urls')),
     path('payments/', include('apps.payments.urls')),
+
+    # REST API endpoints
+    path('api/core/', include('apps.core.urls', namespace='core')),
+    path('api/brokers/', include('apps.brokers.urls', namespace='brokers')),
+    # notifications: HTML inbox at /api/notifications/inbox/ + REST at /api/notifications/
+    path('api/notifications/', include('apps.notifications.urls', namespace='notifications')),
+    path('api/subscriptions/', include('apps.subscriptions.urls', namespace='subscriptions')),
+    path('api/audit/', include('apps.audit.urls', namespace='audit')),
 ]
 
 # Serve media files in development

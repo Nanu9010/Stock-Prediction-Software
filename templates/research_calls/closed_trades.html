@@ -3,7 +3,7 @@
 
 {% block title %}Closed Trades - Stock Research Platform{% endblock %}
 
-{% block extra_css %}
+{% block page_css %}
 <style>
 .trades-page { padding: 32px 0; max-width: 1280px; margin: 0 auto; padding: 0 24px 48px; }
 
@@ -126,9 +126,9 @@
     .perf-summary { flex-direction: column; }
 }
 </style>
-{% endblock %}
+{% endblock page_css %}
 
-{% block content %}
+{% block page_content %}
 <div class="trades-page">
     <div class="page-header">
         <h1>Closed Trades</h1>
@@ -223,4 +223,4 @@
         {% endfor %}
     </div>
 </div>
-{% endblock %}
+{% endblock page_content %}

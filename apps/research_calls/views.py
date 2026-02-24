@@ -87,21 +87,15 @@ def call_detail_view(request, pk):
         pk=pk
     )
     
-    # Check permission for ACTIVE calls
-    if call.status == 'ACTIVE':
-        # Safely check for active subscription
-        has_active_sub = False
-        if request.user.is_authenticated:
-            subscription = getattr(request.user, 'subscription', None)
-            if subscription:
-                # Check method or property
-                has_active_sub = subscription.is_active() if callable(getattr(subscription, 'is_active', None)) else subscription.is_active
-        
-        is_pro = has_active_sub
-        
-        if not is_pro and not request.user.role == 'ADMIN':
-            messages.warning(request, 'You must be a PRO member to view this active trade.')
-            return redirect('payments:membership')
+    # Check PRO access for ACTIVE calls
+    has_active_sub = False
+    if request.user.is_authenticated:
+        subscription = getattr(request.user, 'subscription', None)
+        if subscription:
+            has_active_sub = subscription.is_active() if callable(getattr(subscription, 'is_active', None)) else subscription.is_active
+
+    is_pro = has_active_sub or request.user.role == 'ADMIN'
+    is_locked = call.status == 'ACTIVE' and not is_pro
 
     # Check if user has this in portfolio
     in_portfolio = False
@@ -124,6 +118,7 @@ def call_detail_view(request, pk):
         'call': call,
         'in_portfolio': in_portfolio,
         'portfolio_item': portfolio_item,
+        'is_locked': is_locked,
     }
     
     return render(request, 'research_calls/call_detail.html', context)

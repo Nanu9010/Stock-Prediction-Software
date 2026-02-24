@@ -3,7 +3,7 @@
 
 {% block title %}Profile - Stock Research Platform{% endblock %}
 
-{% block content %}
+{% block page_content %}
 <div class="container">
     <div class="page-header">
         <h1>My Profile</h1>
@@ -67,6 +67,9 @@
                 <button class="btn btn-outline" onclick="alert('Change password functionality coming soon!')">
                     Change Password
                 </button>
+                <a href="{% url 'authentication:logout' %}" class="btn btn-outline">
+                    <span class="di-icon">🚪</span> Logout
+                </a>
             </div>
         </div>
 

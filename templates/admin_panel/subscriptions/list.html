@@ -1,0 +1,65 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block title %}Subscription Plans — Admin{% endblock %}
+
+{% block content %}
+<div class="page-header" style="display:flex;justify-content:space-between;align-items:center;">
+    <div>
+        <h1>Subscription Plans</h1>
+        <p class="text-secondary">{{ plans.count }} plan(s) configured</p>
+    </div>
+    <a href="{% url 'admin_panel:subscription_create' %}" class="btn btn-primary">+ New Plan</a>
+</div>
+
+<div class="data-table-wrapper">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Monthly (₹)</th>
+                <th>Yearly (₹)</th>
+                <th>Featured</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for plan in plans %}
+            <tr>
+                <td>
+                    <strong>{{ plan.name }}</strong>
+                    <small style="display:block;color:#888;">{{ plan.slug }}</small>
+                </td>
+                <td>₹{{ plan.price_monthly }}</td>
+                <td>₹{{ plan.price_yearly }}</td>
+                <td>{% if plan.is_featured %}<span class="badge badge-success">⭐ Featured</span>{% else %}—{% endif %}</td>
+                <td>
+                    {% if plan.is_active %}
+                        <span class="badge badge-active">Active</span>
+                    {% else %}
+                        <span class="badge badge-inactive">Inactive</span>
+                    {% endif %}
+                </td>
+                <td>{{ plan.created_at|date:"d M Y" }}</td>
+                <td>
+                    <a href="{% url 'admin_panel:subscription_update' plan.pk %}" class="btn btn-sm btn-secondary">Edit</a>
+                    <form method="post" action="{% url 'admin_panel:subscription_delete' plan.pk %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-danger"
+                            onclick="return confirm('Delete plan {{ plan.name }}?')">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="text-center" style="padding:2rem;color:#888;">
+                    No subscription plans yet.
+                    <a href="{% url 'admin_panel:subscription_create' %}" class="btn btn-sm btn-primary" style="margin-left:12px;">Create First Plan</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

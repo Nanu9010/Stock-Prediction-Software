@@ -1,7 +1,7 @@
 """
 Views for dashboard and home page — powered by live market data services
 """
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Avg, Q
 from django.utils import timezone
@@ -10,68 +10,18 @@ from apps.research_calls.models import ResearchCall
 from apps.brokers.models import Broker
 
 
-def home_view(request):
-    """Market Hero — professional landing page with live data"""
-    from services.market_hero_service import (
-        get_today_top10_gainers, get_today_top10_losers,
-        get_weekly_top_gainers, get_weekly_top_losers,
-        get_market_indices,
-    )
-    from services.commodity_service import get_indian_commodity_prices
-    from services.ipo_service import get_upcoming_ipos, get_recently_listed, get_ipo_stats
-    from services.sip_mf_etf_service import (
-        get_top_etfs, get_top_mutual_funds, get_top_sip_funds,
-        get_bonds_data, get_liquidity_data,
-    )
-    from services.recommendation_service import get_market_sentiment
-
-    # Statistics
-    total_calls = ResearchCall.objects.count()
-    active_calls = ResearchCall.objects.filter(status='ACTIVE').count()
-    closed_calls = ResearchCall.objects.filter(status='CLOSED')
-    successful_calls = closed_calls.filter(actual_return_percentage__gt=0).count()
-    total_closed = closed_calls.count()
-    success_rate = (successful_calls / total_closed * 100) if total_closed > 0 else 87
-
-    # Top brokers
-    top_brokers = Broker.objects.annotate(
-        total_calls=Count('research_calls')
-    ).filter(total_calls__gt=0).order_by('-overall_accuracy')[:4]
-
-    context = {
-        # Stats
-        'total_calls': total_calls,
-        'active_calls': active_calls,
-        'success_rate': f"{success_rate:.1f}",
-        'top_brokers': top_brokers,
-        'now': timezone.now(),
-
-        # Market Hero Sections
-        'market_indices': get_market_indices(),
-        'today_gainers': get_today_top10_gainers(),
-        'today_losers': get_today_top10_losers(),
-        'weekly_gainers': get_weekly_top_gainers(),
-        'weekly_losers': get_weekly_top_losers(),
-
-        # Widgets
-        'commodities': get_indian_commodity_prices(),
-        'upcoming_ipos': get_upcoming_ipos(),
-        'recently_listed': get_recently_listed(),
-        'ipo_stats': get_ipo_stats(),
-        'etfs': get_top_etfs(),
-        'mutual_funds': get_top_mutual_funds(),
-        'sip_funds': get_top_sip_funds(),
-        'bonds': get_bonds_data(),
-        'liquidity': get_liquidity_data(),
-        'sentiment': get_market_sentiment(),
-    }
-
-    return render(request, 'home.html', context)
+def landing_page_view(request):
+    """Redirect to dashboard (authenticated) or login (unauthenticated)"""
+    if request.user.is_authenticated:
+        return redirect('dashboard:dashboard')
+    return redirect('authentication:login')
 
 
 @login_required
 def dashboard_home_view(request):
     """Dashboard home — redirect based on role"""
+    # If user hits /app/ directly, ensure they are logged in (handled by decorator)
+    
     if request.user.role == 'CUSTOMER':
         from apps.portfolios.models import Portfolio, PortfolioItem
         from services.recommendation_service import get_user_recommendations, get_market_sentiment
@@ -109,9 +59,12 @@ def dashboard_home_view(request):
         }
         return render(request, 'dashboard/customer_dashboard.html', context)
     elif request.user.role == 'ADMIN':
-        return render(request, 'dashboard/admin_dashboard.html')
+        # Redirect to admin panel which uses AdminDashboardView with full stats context
+        from django.shortcuts import redirect
+        return redirect('admin_panel:dashboard')
     else:
         return render(request, 'dashboard/home.html')
+
 
 
 def markets_view(request):
@@ -240,3 +193,49 @@ def trades_dashboard_view(request):
         'active_tab': tab,
     }
     return render(request, 'trades/dashboard.html', context)
+
+
+def gainers_losers_view(request):
+    """Today's Top 10 Gainers & Losers"""
+    from services.market_hero_service import get_today_top10_gainers, get_today_top10_losers
+    try:
+        top_gainers = get_today_top10_gainers()
+        top_losers = get_today_top10_losers()
+    except Exception as e:
+        import logging
+        logging.error(f"Error in gainers_losers_view: {e}")
+        top_gainers = []
+        top_losers = []
+
+    context = {
+        'top_gainers': top_gainers,
+        'top_losers': top_losers,
+    }
+    return render(request, 'markets/gainers_losers.html', context)
+
+
+def recently_listed_view(request):
+    """Recently Listed IPOs / Stocks"""
+    from services.ipo_service import get_recently_listed
+    try:
+        recently_listed = get_recently_listed()
+    except Exception as e:
+        import logging
+        logging.error(f"Error in recently_listed_view: {e}")
+        recently_listed = []
+
+    context = {
+        'recently_listed': recently_listed,
+    }
+    return render(request, 'markets/recently_listed.html', context)
+
+
+def top_brokers_view(request):
+    """Top Performing Brokers by accuracy"""
+    top_brokers = Broker.objects.annotate(
+        total_calls=Count('research_calls'),
+    ).filter(total_calls__gt=0).order_by('-overall_accuracy')[:20]
+    context = {
+        'top_brokers': top_brokers,
+    }
+    return render(request, 'markets/top_brokers.html', context)

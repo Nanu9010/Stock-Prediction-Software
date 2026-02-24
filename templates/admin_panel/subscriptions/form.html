@@ -1,0 +1,37 @@
+{% extends 'admin_panel/base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}{% if form.instance.pk %}Edit Plan{% else %}New Plan{% endif %} — Admin{% endblock %}
+
+{% block content %}
+<div class="page-header" style="display:flex;justify-content:space-between;align-items:center;">
+    <h1>{% if form.instance.pk %}Edit: {{ form.instance.name }}{% else %}Create Subscription Plan{% endif %}</h1>
+    <a href="{% url 'admin_panel:subscriptions_list' %}" class="btn btn-secondary">← Back</a>
+</div>
+
+<div class="dashboard-section" style="max-width:700px;">
+    <form method="post">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="form-group" style="margin-bottom:1.25rem;">
+            <label style="display:block;font-size:13px;font-weight:600;color:rgba(255,255,255,0.7);margin-bottom:6px;">
+                {{ field.label }}{% if field.field.required %} *{% endif %}
+            </label>
+            {% render_field field class="form-input" %}
+            {% if field.errors %}
+                <small style="color:#ff5252;">{{ field.errors|join:", " }}</small>
+            {% endif %}
+            {% if field.help_text %}
+                <small style="color:#888;">{{ field.help_text }}</small>
+            {% endif %}
+        </div>
+        {% endfor %}
+        <div style="display:flex;gap:12px;margin-top:2rem;">
+            <button type="submit" class="btn btn-primary">
+                {% if form.instance.pk %}Save Changes{% else %}Create Plan{% endif %}
+            </button>
+            <a href="{% url 'admin_panel:subscriptions_list' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

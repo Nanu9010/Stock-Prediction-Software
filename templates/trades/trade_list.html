@@ -3,7 +3,7 @@
 
 {% block title %}{{ trade_type }} Trades - StockPro{% endblock %}
 
-{% block extra_css %}
+{% block page_css %}
 <link rel="stylesheet" href="{% static 'css/market_hero.css' %}">
 <style>
 .page-header {
@@ -260,9 +260,9 @@
     }
 }
 </style>
-{% endblock %}
+{% endblock page_css %}
 
-{% block content %}
+{% block page_content %}
 <div class="page-header">
     <div class="header-content">
         <h1 class="page-title">{{ trade_type }} Trades</h1>

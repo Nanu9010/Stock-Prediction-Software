@@ -1,0 +1,16 @@
+{% extends 'admin_panel/base.html' %}
+{% block title %}Delete Plan{% endblock %}
+{% block content %}
+<div style="max-width:500px;margin:4rem auto;text-align:center;">
+    <div style="font-size:3rem;margin-bottom:1rem;">⚠️</div>
+    <h2>Delete Subscription Plan?</h2>
+    <p style="color:#888;margin:1rem 0;">
+        Are you sure you want to delete <strong>{{ object.name }}</strong>?
+        Existing user subscriptions on this plan may be affected.
+    </p>
+    <div style="display:flex;gap:12px;justify-content:center;margin-top:2rem;">
+        <a href="{% url 'admin_panel:subscriptions_list' %}" class="btn btn-secondary">Cancel</a>
+        <form method="post">{% csrf_token %}<button type="submit" class="btn btn-danger">Yes, Delete</button></form>
+    </div>
+</div>
+{% endblock %}

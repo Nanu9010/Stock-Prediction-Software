@@ -13,7 +13,7 @@ from services.auth_service import AuthService
 def register_view(request):
     """User registration view"""
     if request.user.is_authenticated:
-        return redirect('dashboard:home')
+        return redirect('dashboard:dashboard')
     
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
@@ -21,7 +21,7 @@ def register_view(request):
             user = AuthService.register_user(request, form)
             
             messages.success(request, f'Welcome {user.get_full_name()}! Your account has been created successfully.')
-            return redirect('dashboard:home')
+            return redirect('dashboard:dashboard')
         else:
             print("Registration Form Errors:", form.errors)
     else:
@@ -33,7 +33,7 @@ def register_view(request):
 def login_view(request):
     """User login view"""
     if request.user.is_authenticated:
-        return redirect('dashboard:home')
+        return redirect('dashboard:dashboard')
     
     if request.method == 'POST':
         form = UserLoginForm(request.POST)
@@ -43,7 +43,7 @@ def login_view(request):
             messages.success(request, f'Welcome back, {user.get_full_name()}!')
             
             # Redirect to next or dashboard
-            next_url = request.GET.get('next', 'dashboard:home')
+            next_url = request.GET.get('next', 'dashboard:dashboard')
             return redirect(next_url)
         else:
             print("Login Form Errors:", form.errors)

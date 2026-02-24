@@ -1,310 +1,240 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{{ call.symbol }} - Research Call Details{% endblock %}
+{% block title %}{{ call.symbol }} — Research Call{% endblock %}
 
-{% block content %}
-<div class="container">
-    <div class="breadcrumb">
-        <a href="{% url 'research_calls:live_calls' %}">Research Calls</a> / {{ call.symbol }}
+{% block page_css %}
+<style>
+    .blur-locked { filter: blur(8px); pointer-events: none; user-select: none; }
+</style>
+{% endblock %}
+
+{% block page_content %}
+<div class="max-w-5xl mx-auto py-6">
+
+    <!-- Breadcrumb -->
+    <div class="flex items-center gap-2 text-sm mb-8">
+        <a class="text-text-muted hover:text-text-main transition-colors no-underline" href="{% url 'research_calls:live_calls' %}">Research Calls</a>
+        <span class="text-text-muted">/</span>
+        <span class="text-text-main font-medium">{{ call.symbol }}</span>
     </div>
 
-    <div class="call-detail-container">
-        <!-- Main Call Info -->
-        <div class="call-main-section">
-            <div class="call-header-detail">
-                <div>
-                    <h1>{{ call.symbol }}</h1>
-                    <div class="badges">
-                        <span class="badge badge-{{ call.action|lower }}">{{ call.action }}</span>
-                        <span class="badge badge-{{ call.call_type|lower }}">{{ call.call_type }}</span>
-                        <span class="badge badge-{{ call.status|lower }}">{{ call.status }}</span>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Main Content -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Call Header Card -->
+            <div class="bg-surface border border-gray-200 rounded-2xl p-8 shadow-soft">
+                <div class="flex items-start justify-between mb-6 flex-wrap gap-4">
+                    <div>
+                        <h1 class="text-4xl font-bold text-text-main tracking-tight mb-3">{{ call.symbol }}</h1>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="text-[10px] font-bold uppercase px-3 py-1 rounded-full {% if call.action == 'BUY' %}bg-accent-teal/10 text-accent-teal{% else %}bg-accent-coral/10 text-accent-coral{% endif %}">{{ call.action }}</span>
+                            <span class="text-[10px] font-bold uppercase px-3 py-1 rounded-full bg-blue-50 text-blue-600">{{ call.call_type }}</span>
+                            {% if call.status == 'ACTIVE' %}
+                            <span class="text-[10px] font-bold uppercase px-3 py-1 rounded-full bg-accent-teal/10 text-accent-teal">Active</span>
+                            {% elif call.status == 'CLOSED' %}
+                            <span class="text-[10px] font-bold uppercase px-3 py-1 rounded-full bg-gray-100 text-text-muted">Closed</span>
+                            {% else %}
+                            <span class="text-[10px] font-bold uppercase px-3 py-1 rounded-full bg-amber-50 text-amber-600">{{ call.status }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-text-muted text-xs font-medium">{{ call.broker.name }}</div>
+                        <div class="text-text-muted text-[10px] mt-1">{{ call.published_at|date:"M d, Y" }}</div>
                     </div>
                 </div>
-                <div class="call-meta-detail">
-                    <p><strong>Broker:</strong> {{ call.broker.name }}</p>
-                    <p><strong>Published:</strong> {{ call.published_at|date:"M d, Y H:i" }}</p>
-                </div>
-            </div>
 
-            <!-- Price Levels -->
-            <div class="price-levels-section">
-                <h2>Price Levels</h2>
-                <div class="price-levels-grid">
-                    <div class="level-card entry">
-                        <label>Entry Price</label>
-                        <span class="level-price">₹{{ call.entry_price }}</span>
+                {% if not is_locked %}
+                <!-- Price Levels Grid — visible only for PRO / ADMIN -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 text-center">
+                        <div class="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-2">Entry</div>
+                        <div class="text-xl font-bold text-text-main">₹{{ call.entry_price }}</div>
                     </div>
-                    <div class="level-card target">
-                        <label>Target 1</label>
-                        <span class="level-price">₹{{ call.target_1 }}</span>
+                    <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-4 text-center">
+                        <div class="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-2">Target 1</div>
+                        <div class="text-xl font-bold text-emerald-600">₹{{ call.target_1 }}</div>
                     </div>
                     {% if call.target_2 %}
-                    <div class="level-card target">
-                        <label>Target 2</label>
-                        <span class="level-price">₹{{ call.target_2 }}</span>
+                    <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-4 text-center">
+                        <div class="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-2">Target 2</div>
+                        <div class="text-xl font-bold text-emerald-600">₹{{ call.target_2 }}</div>
                     </div>
                     {% endif %}
                     {% if call.target_3 %}
-                    <div class="level-card target">
-                        <label>Target 3</label>
-                        <span class="level-price">₹{{ call.target_3 }}</span>
+                    <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-4 text-center">
+                        <div class="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-2">Target 3</div>
+                        <div class="text-xl font-bold text-emerald-600">₹{{ call.target_3 }}</div>
                     </div>
                     {% endif %}
-                    <div class="level-card stoploss">
-                        <label>Stop Loss</label>
-                        <span class="level-price">₹{{ call.stop_loss }}</span>
+                    <div class="bg-red-50 border border-red-100 rounded-xl p-4 text-center">
+                        <div class="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-2">Stop Loss</div>
+                        <div class="text-xl font-bold text-red-500">₹{{ call.stop_loss }}</div>
                     </div>
                 </div>
+                {% else %}
+                <!-- LOCKED: Blurred Price Levels -->
+                <div class="relative">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 blur-locked select-none">
+                        <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 text-center">
+                            <div class="text-[10px] font-bold uppercase text-text-muted mb-2">Entry</div>
+                            <div class="text-xl font-bold text-text-main">₹•••.••</div>
+                        </div>
+                        <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-4 text-center">
+                            <div class="text-[10px] font-bold uppercase text-text-muted mb-2">Target 1</div>
+                            <div class="text-xl font-bold text-emerald-600">₹•••.••</div>
+                        </div>
+                        <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-4 text-center">
+                            <div class="text-[10px] font-bold uppercase text-text-muted mb-2">Target 2</div>
+                            <div class="text-xl font-bold text-emerald-600">₹•••.••</div>
+                        </div>
+                        <div class="bg-red-50 border border-red-100 rounded-xl p-4 text-center">
+                            <div class="text-[10px] font-bold uppercase text-text-muted mb-2">Stop Loss</div>
+                            <div class="text-xl font-bold text-red-500">₹•••.••</div>
+                        </div>
+                    </div>
+
+                    <!-- PRO Overlay -->
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="bg-surface/95 backdrop-blur-xl border border-accent-gold/20 rounded-2xl p-8 text-center max-w-sm shadow-soft-hover">
+                            <div class="size-14 rounded-2xl bg-accent-gold/10 flex items-center justify-center mx-auto mb-4">
+                                <span class="material-symbols-outlined text-accent-gold text-[28px]">lock</span>
+                            </div>
+                            <h3 class="text-lg font-bold text-text-main mb-2">Unlock Pro Analysis</h3>
+                            <p class="text-text-muted text-sm mb-6 leading-relaxed">Get entry price, targets, stop-loss, and expert rationale for this call.</p>
+                            <a href="{% url 'payments:membership' %}" class="inline-flex items-center gap-2 bg-gradient-to-r from-accent-gold to-orange-500 text-white px-6 py-3 rounded-xl text-sm font-bold hover:opacity-90 transition-opacity no-underline">
+                                <span class="material-symbols-outlined text-[18px]">workspace_premium</span>
+                                Upgrade to StockPro
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
             </div>
 
             <!-- Call Metrics -->
-            <div class="metrics-section">
-                <h2>Call Metrics</h2>
-                <div class="metrics-grid">
-                    <div class="metric-item">
-                        <label>Expected Return</label>
-                        <span class="metric-value text-success">{{ call.expected_return_percentage }}%</span>
+            {% if not is_locked %}
+            <div class="bg-surface border border-gray-200 rounded-2xl p-8 shadow-soft">
+                <h2 class="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-5">Call Metrics</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
+                    <div>
+                        <div class="text-text-muted text-xs mb-1">Expected Return</div>
+                        <div class="text-lg font-bold text-accent-teal">{{ call.expected_return_percentage|default:"—" }}%</div>
                     </div>
-                    <div class="metric-item">
-                        <label>Risk/Reward Ratio</label>
-                        <span class="metric-value">{{ call.risk_reward_ratio }}</span>
+                    <div>
+                        <div class="text-text-muted text-xs mb-1">Risk/Reward</div>
+                        <div class="text-lg font-bold text-text-main">{{ call.risk_reward_ratio|default:"—" }}</div>
                     </div>
-                    <div class="metric-item">
-                        <label>Duration</label>
-                        <span class="metric-value">{{ call.duration_days }} days</span>
+                    <div>
+                        <div class="text-text-muted text-xs mb-1">Duration</div>
+                        <div class="text-lg font-bold text-text-main">{{ call.duration_days|default:"—" }} days</div>
                     </div>
-                    <div class="metric-item">
-                        <label>Expiry Date</label>
-                        <span class="metric-value">{{ call.expiry_date|date:"M d, Y" }}</span>
+                    <div>
+                        <div class="text-text-muted text-xs mb-1">Expiry Date</div>
+                        <div class="text-lg font-bold text-text-main">{{ call.expiry_date|date:"M d, Y"|default:"—" }}</div>
                     </div>
                 </div>
             </div>
 
             <!-- Rationale -->
             {% if call.rationale %}
-            <div class="rationale-section">
-                <h2>Rationale</h2>
-                <p>{{ call.rationale }}</p>
+            <div class="bg-surface border border-gray-200 rounded-2xl p-8 shadow-soft">
+                <h2 class="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-5">Rationale & Analysis</h2>
+                <p class="text-text-main text-sm leading-relaxed">{{ call.rationale }}</p>
             </div>
             {% endif %}
 
             <!-- Actions -->
-            <div class="call-actions-detail">
+            <div class="flex items-center gap-3 flex-wrap">
                 {% if user.role == 'CUSTOMER' %}
-                <button class="btn btn-primary" onclick="addToPortfolio({{ call.id }})">Add to Portfolio</button>
-                <button class="btn btn-outline" onclick="addToWatchlist({{ call.id }})">Add to Watchlist</button>
+                <button class="bg-text-main text-white px-6 py-3 rounded-xl text-sm font-bold hover:opacity-90 transition-opacity flex items-center gap-2" onclick="addToPortfolio({{ call.id }})">
+                    <span class="material-symbols-outlined text-[18px]">add_circle</span>
+                    Add to Portfolio
+                </button>
+                <button class="bg-surface border border-gray-200 text-text-main px-6 py-3 rounded-xl text-sm font-semibold hover:bg-background-base transition-all flex items-center gap-2 shadow-soft" onclick="addToWatchlist({{ call.id }})">
+                    <span class="material-symbols-outlined text-[18px]">visibility</span>
+                    Add to Watchlist
+                </button>
                 {% endif %}
                 {% if user.role == 'ADMIN' %}
                     {% if call.status == 'PENDING_APPROVAL' %}
-                    <a href="{% url 'research_calls:approve' call.pk %}" class="btn btn-success">Approve Call</a>
+                    <a href="{% url 'research_calls:approve' call.pk %}" class="bg-accent-teal text-white px-6 py-3 rounded-xl text-sm font-bold hover:opacity-90 transition-opacity no-underline flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[18px]">check</span>
+                        Approve Call
+                    </a>
                     {% endif %}
                     {% if call.status == 'APPROVED' %}
-                    <a href="{% url 'research_calls:publish' call.pk %}" class="btn btn-primary">Publish Call</a>
+                    <a href="{% url 'research_calls:publish' call.pk %}" class="bg-blue-600 text-white px-6 py-3 rounded-xl text-sm font-bold hover:opacity-90 transition-opacity no-underline flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[18px]">publish</span>
+                        Publish Call
+                    </a>
                     {% endif %}
                 {% endif %}
             </div>
+            {% endif %}
         </div>
 
-        <!-- Sidebar -->
-        <div class="call-sidebar">
+        <!-- Right Sidebar -->
+        <div class="space-y-6">
             <!-- Event History -->
-            <div class="events-section">
-                <h3>Event History</h3>
-                <div class="events-timeline">
+            <div class="bg-surface border border-gray-200 rounded-2xl p-6 shadow-soft">
+                <h3 class="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-5">Event History</h3>
+                <div class="space-y-4">
                     {% for event in events %}
-                    <div class="event-item">
-                        <div class="event-icon">
-                            {% if event.event_type == 'CREATED' %}📝
-                            {% elif event.event_type == 'APPROVED' %}✅
-                            {% elif event.event_type == 'PUBLISHED' %}📢
-                            {% elif event.event_type == 'TARGET_HIT' %}🎯
-                            {% elif event.event_type == 'STOP_LOSS_HIT' %}🛑
-                            {% elif event.event_type == 'CLOSED' %}🔒
-                            {% else %}📌{% endif %}
+                    <div class="flex gap-3 items-start">
+                        <div class="size-8 rounded-lg bg-background-base flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <span class="material-symbols-outlined text-text-muted text-[16px]">
+                                {% if event.event_type == 'CREATED' %}edit_note
+                                {% elif event.event_type == 'APPROVED' %}check_circle
+                                {% elif event.event_type == 'PUBLISHED' %}campaign
+                                {% elif event.event_type == 'TARGET_HIT' %}gps_fixed
+                                {% elif event.event_type == 'STOP_LOSS_HIT' %}shield
+                                {% elif event.event_type == 'CLOSED' %}lock
+                                {% else %}push_pin{% endif %}
+                            </span>
                         </div>
-                        <div class="event-content">
-                            <strong>{{ event.get_event_type_display }}</strong>
-                            <p>{{ event.notes }}</p>
-                            <small>{{ event.timestamp|date:"M d, Y H:i" }}</small>
+                        <div>
+                            <div class="text-text-main text-sm font-semibold">{{ event.get_event_type_display }}</div>
+                            {% if event.notes %}<p class="text-text-muted text-xs mt-0.5">{{ event.notes }}</p>{% endif %}
+                            <div class="text-text-muted/50 text-[10px] mt-1">{{ event.timestamp|date:"M d, Y H:i" }}</div>
                             {% if event.triggered_by %}
-                            <small>by {{ event.triggered_by.get_full_name }}</small>
+                            <div class="text-text-muted/50 text-[10px]">by {{ event.triggered_by.get_full_name }}</div>
                             {% endif %}
                         </div>
                     </div>
                     {% empty %}
-                    <p class="text-secondary">No events recorded</p>
+                    <p class="text-text-muted text-sm text-center py-4">No events recorded</p>
                     {% endfor %}
                 </div>
             </div>
+
+            <!-- Broker Info -->
+            <div class="bg-surface border border-gray-200 rounded-2xl p-6 shadow-soft">
+                <h3 class="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-4">Broker Info</h3>
+                <div class="flex items-center gap-3">
+                    <div class="size-10 rounded-xl bg-blue-50 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-blue-600 text-[20px]">storefront</span>
+                    </div>
+                    <div>
+                        <div class="text-text-main text-sm font-bold">{{ call.broker.name }}</div>
+                        <div class="text-text-muted text-xs">{{ call.broker.overall_accuracy|floatformat:1 }}% accuracy</div>
+                    </div>
+                </div>
+            </div>
+
+            {% if is_locked %}
+            <!-- PRO CTA Sidebar -->
+            <div class="bg-gradient-to-br from-accent-gold/10 to-orange-100 border border-accent-gold/20 rounded-2xl p-6 text-center shadow-soft">
+                <span class="material-symbols-outlined text-accent-gold text-[32px] mb-3 block">workspace_premium</span>
+                <h3 class="text-text-main font-bold text-sm mb-2">Go PRO</h3>
+                <p class="text-text-muted text-xs mb-4 leading-relaxed">Unlock all research calls, targets, and expert analysis.</p>
+                <a href="{% url 'payments:membership' %}" class="block bg-gradient-to-r from-accent-gold to-orange-500 text-white py-2.5 rounded-lg text-xs font-bold hover:opacity-90 transition-opacity no-underline">
+                    View Plans
+                </a>
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>
-
-<style>
-.breadcrumb {
-    margin-bottom: 1.5rem;
-    color: var(--text-secondary);
-}
-
-.breadcrumb a {
-    color: var(--primary-color);
-    text-decoration: none;
-}
-
-.call-detail-container {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 2rem;
-}
-
-.call-main-section, .call-sidebar {
-    background: white;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.call-header-detail {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 2rem;
-    padding-bottom: 2rem;
-    border-bottom: 2px solid var(--border-color);
-}
-
-.call-header-detail h1 {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin: 0 0 1rem 0;
-}
-
-.badges {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.call-meta-detail p {
-    margin: 0.5rem 0;
-}
-
-.price-levels-section, .metrics-section, .rationale-section {
-    margin-bottom: 2rem;
-}
-
-.price-levels-section h2, .metrics-section h2, .rationale-section h2 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-}
-
-.price-levels-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 1rem;
-}
-
-.level-card {
-    padding: 1.5rem;
-    border-radius: 8px;
-    text-align: center;
-}
-
-.level-card.entry {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-}
-
-.level-card.target {
-    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-    color: white;
-}
-
-.level-card.stoploss {
-    background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
-    color: white;
-}
-
-.level-card label {
-    display: block;
-    font-size: 0.875rem;
-    margin-bottom: 0.5rem;
-    opacity: 0.9;
-}
-
-.level-price {
-    font-size: 1.5rem;
-    font-weight: 700;
-}
-
-.metrics-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
-}
-
-.metric-item {
-    padding: 1rem;
-    background: var(--bg-secondary);
-    border-radius: 8px;
-}
-
-.metric-item label {
-    display: block;
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-    margin-bottom: 0.5rem;
-}
-
-.metric-value {
-    font-size: 1.25rem;
-    font-weight: 600;
-}
-
-.call-actions-detail {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-}
-
-.events-timeline {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.event-item {
-    display: flex;
-    gap: 1rem;
-    padding: 1rem;
-    background: var(--bg-secondary);
-    border-radius: 8px;
-}
-
-.event-icon {
-    font-size: 1.5rem;
-}
-
-.event-content strong {
-    display: block;
-    margin-bottom: 0.25rem;
-}
-
-.event-content p {
-    margin: 0.25rem 0;
-    font-size: 0.875rem;
-}
-
-.event-content small {
-    display: block;
-    color: var(--text-secondary);
-    font-size: 0.75rem;
-}
-
-@media (max-width: 768px) {
-    .call-detail-container {
-        grid-template-columns: 1fr;
-    }
-}
-</style>
 {% endblock %}

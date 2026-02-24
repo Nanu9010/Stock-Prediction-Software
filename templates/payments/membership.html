@@ -1,287 +1,143 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Membership Plans - Stock Research Platform{% endblock %}
+{% block title %}Membership Plans — StockPro{% endblock %}
 
-{% block extra_css %}
-<style>
-.membership-container {
-    padding: 60px 0;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    min-height: 100vh;
-}
+{% block page_content %}
+<!-- Hero Header -->
+<div class="text-center py-12 px-4">
+    <div class="inline-flex items-center gap-2 bg-accent-teal/10 border border-accent-teal/20 text-accent-teal text-xs font-bold px-4 py-1.5 rounded-full mb-6">
+        <span class="material-symbols-outlined text-[14px]">stars</span>
+        MEMBERSHIP PLANS
+    </div>
+    <h1 class="text-4xl md:text-5xl font-bold text-text-main tracking-tight mb-4">Choose the plan that<br>fits your goals</h1>
+    <p class="text-text-muted text-base max-w-lg mx-auto font-light">Unlock premium research calls, advanced analytics, and expert trading insights.</p>
 
-.membership-header {
-    text-align: center;
-    color: white;
-    margin-bottom: 48px;
-}
-
-.membership-header h1 {
-    font-size: 48px;
-    font-weight: 700;
-    margin-bottom: 16px;
-}
-
-.membership-header p {
-    font-size: 20px;
-    opacity: 0.9;
-}
-
-/* Billing Toggle */
-.billing-toggle {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 48px;
-}
-
-.billing-toggle label {
-    color: white;
-    font-size: 16px;
-    font-weight: 500;
-}
-
-.toggle-switch {
-    position: relative;
-    width: 60px;
-    height: 30px;
-    background: rgba(255,255,255,0.3);
-    border-radius: 30px;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.toggle-switch.active {
-    background: rgba(255,255,255,0.5);
-}
-
-.toggle-slider {
-    position: absolute;
-    top: 3px;
-    left: 3px;
-    width: 24px;
-    height: 24px;
-    background: white;
-    border-radius: 50%;
-    transition: all 0.3s;
-}
-
-.toggle-switch.active .toggle-slider {
-    left: 33px;
-}
-
-/* Pricing Cards */
-.pricing-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 32px;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-.pricing-card {
-    background: white;
-    border-radius: 20px;
-    padding: 40px 32px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-    transition: transform 0.3s;
-    position: relative;
-}
-
-.pricing-card:hover {
-    transform: translateY(-8px);
-}
-
-.pricing-card.featured {
-    border: 3px solid #fbbf24;
-    transform: scale(1.05);
-}
-
-.pricing-card.featured::before {
-    content: 'MOST POPULAR';
-    position: absolute;
-    top: -15px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #fbbf24;
-    color: #78350f;
-    padding: 6px 20px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 700;
-}
-
-.plan-name {
-    font-size: 24px;
-    font-weight: 700;
-    color: #1f2937;
-    margin-bottom: 16px;
-}
-
-.plan-price {
-    margin-bottom: 24px;
-}
-
-.price-amount {
-    font-size: 48px;
-    font-weight: 700;
-    color: #667eea;
-}
-
-.price-period {
-    font-size: 16px;
-    color: #6b7280;
-}
-
-.price-yearly {
-    display: none;
-}
-
-.plan-features {
-    list-style: none;
-    padding: 0;
-    margin: 32px 0;
-}
-
-.plan-features li {
-    padding: 12px 0;
-    color: #374151;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.plan-features li::before {
-    content: '✓';
-    color: #10b981;
-    font-weight: 700;
-    font-size: 18px;
-}
-
-.subscribe-btn {
-    width: 100%;
-    padding: 16px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.subscribe-btn:hover {
-    transform: scale(1.02);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
-.subscribe-btn.featured {
-    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-    color: #78350f;
-}
-
-.current-plan {
-    background: #10b981;
-    color: white;
-}
-
-.current-plan:hover {
-    transform: none;
-    cursor: default;
-}
-
-@media (max-width: 768px) {
-    .pricing-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .pricing-card.featured {
-        transform: scale(1);
-    }
-}
-</style>
-{% endblock %}
-
-{% block content %}
-<div class="membership-container">
-    <div class="container">
-        <!-- Header -->
-        <div class="membership-header">
-            <h1>Choose Your Plan</h1>
-            <p>Unlock premium research calls and advanced features</p>
-        </div>
-
-        <!-- Billing Toggle -->
-        <div class="billing-toggle">
-            <label>Monthly</label>
-            <div class="toggle-switch" id="billingToggle">
-                <div class="toggle-slider"></div>
-            </div>
-            <label>Yearly <span style="background: rgba(255,255,255,0.2); padding: 4px 8px; border-radius: 8px; font-size: 12px;">Save 17%</span></label>
-        </div>
-
-        <!-- Pricing Cards -->
-        <div class="pricing-grid">
-            {% for plan in plans %}
-            <div class="pricing-card {% if plan.plan_type == 'PRO' %}featured{% endif %}">
-                <h3 class="plan-name">{{ plan.name }}</h3>
-                
-                <div class="plan-price">
-                    <div class="price-monthly">
-                        <span class="price-amount">₹{{ plan.price_monthly|floatformat:0 }}</span>
-                        <span class="price-period">/month</span>
-                    </div>
-                    <div class="price-yearly" style="display: none;">
-                        <span class="price-amount">₹{{ plan.price_yearly|floatformat:0 }}</span>
-                        <span class="price-period">/year</span>
-                    </div>
-                </div>
-
-                <ul class="plan-features">
-                    {% for feature in plan.features %}
-                    <li>{{ feature }}</li>
-                    {% endfor %}
-                </ul>
-
-                {% if current_subscription and current_subscription.plan_type == plan.plan_type %}
-                <button class="subscribe-btn current-plan" disabled>Current Plan</button>
-                {% else %}
-                <button class="subscribe-btn {% if plan.plan_type == 'PRO' %}featured{% endif %}" 
-                        onclick="initiatePayment('{{ plan.plan_type }}')">
-                    Subscribe Now
-                </button>
-                {% endif %}
-            </div>
-            {% endfor %}
-        </div>
+    <!-- Billing Toggle -->
+    <div class="flex items-center justify-center gap-4 mt-10">
+        <span class="text-sm font-semibold text-text-main" id="monthlyLabel">Monthly</span>
+        <button id="billingToggle" class="relative w-14 h-7 rounded-full bg-gray-200 border border-gray-300 transition-all" onclick="toggleBilling()">
+            <div id="toggleDot" class="absolute top-1 left-1 w-5 h-5 rounded-full bg-text-main transition-all duration-300"></div>
+        </button>
+        <span class="text-sm font-semibold text-text-muted" id="yearlyLabel">
+            Yearly
+            <span class="text-[10px] ml-1 bg-accent-teal/10 text-accent-teal font-bold px-2 py-0.5 rounded-full">Save 17%</span>
+        </span>
     </div>
 </div>
 
+<!-- Pricing Cards -->
+<div class="max-w-5xl mx-auto pb-20">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+        {% for plan in plans %}
+        <div class="relative group">
+            {% if plan.plan_type == 'PRO' %}
+            <!-- PRO badge -->
+            <div class="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
+                <span class="bg-gradient-to-r from-accent-gold to-orange-500 text-white text-[10px] font-bold uppercase tracking-wider px-4 py-1 rounded-full">Most Popular</span>
+            </div>
+            {% endif %}
+
+            <div class="bg-surface border {% if plan.plan_type == 'PRO' %}border-accent-gold/30 ring-1 ring-accent-gold/20{% else %}border-gray-200{% endif %} rounded-2xl p-8 transition-all hover:shadow-soft-hover shadow-soft">
+                <!-- Plan Name -->
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="size-10 rounded-xl {% if plan.plan_type == 'PRO' %}bg-accent-gold/10{% else %}bg-accent-teal/10{% endif %} flex items-center justify-center">
+                        <span class="material-symbols-outlined {% if plan.plan_type == 'PRO' %}text-accent-gold{% else %}text-accent-teal{% endif %} text-[20px]">
+                            {% if plan.plan_type == 'PRO' %}workspace_premium{% else %}person{% endif %}
+                        </span>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-text-main">{{ plan.name }}</h3>
+                        <p class="text-xs text-text-muted">{% if plan.plan_type == 'PRO' %}For serious traders{% else %}Get started free{% endif %}</p>
+                    </div>
+                </div>
+
+                <!-- Price -->
+                <div class="mb-8">
+                    <div class="price-monthly">
+                        <span class="text-4xl font-bold text-text-main">₹{{ plan.price_monthly|floatformat:0 }}</span>
+                        <span class="text-text-muted text-sm font-medium">/month</span>
+                    </div>
+                    <div class="price-yearly" style="display:none;">
+                        <span class="text-4xl font-bold text-text-main">₹{{ plan.price_yearly|floatformat:0 }}</span>
+                        <span class="text-text-muted text-sm font-medium">/year</span>
+                    </div>
+                </div>
+
+                <!-- CTA -->
+                {% if current_subscription and current_subscription.plan_type == plan.plan_type %}
+                <button disabled class="w-full py-3.5 rounded-xl text-sm font-bold bg-accent-teal/10 text-accent-teal border border-accent-teal/20 cursor-not-allowed flex items-center justify-center gap-2 mb-8">
+                    <span class="material-symbols-outlined text-[18px]">check_circle</span>
+                    Current Plan
+                </button>
+                {% else %}
+                <button onclick="initiatePayment('{{ plan.plan_type }}')" class="w-full py-3.5 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 mb-8 {% if plan.plan_type == 'PRO' %}bg-gradient-to-r from-accent-gold to-orange-500 text-white hover:opacity-90 shadow-lg{% else %}bg-text-main text-white hover:opacity-90{% endif %}">
+                    Subscribe Now
+                    <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+                </button>
+                {% endif %}
+
+                <!-- Features -->
+                <div class="border-t border-gray-200 pt-6">
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-4">What's included</p>
+                    <ul class="space-y-3">
+                        {% for feature in plan.features %}
+                        <li class="flex items-start gap-3 text-sm text-text-main">
+                            <span class="material-symbols-outlined text-accent-teal text-[18px] mt-0.5 flex-shrink-0">check_circle</span>
+                            {{ feature }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Trust Bar -->
+    <div class="mt-16 text-center">
+        <div class="flex items-center justify-center gap-8 flex-wrap">
+            <div class="flex items-center gap-2 text-text-muted text-sm">
+                <span class="material-symbols-outlined text-[18px]">lock</span>
+                <span>Secure Payments</span>
+            </div>
+            <div class="flex items-center gap-2 text-text-muted text-sm">
+                <span class="material-symbols-outlined text-[18px]">support_agent</span>
+                <span>24/7 Support</span>
+            </div>
+            <div class="flex items-center gap-2 text-text-muted text-sm">
+                <span class="material-symbols-outlined text-[18px]">cancel</span>
+                <span>Cancel Anytime</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_js %}
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
-// Billing toggle
-const billingToggle = document.getElementById('billingToggle');
-const monthlyPrices = document.querySelectorAll('.price-monthly');
-const yearlyPrices = document.querySelectorAll('.price-yearly');
 let isYearly = false;
 
-billingToggle.addEventListener('click', function() {
+function toggleBilling() {
     isYearly = !isYearly;
-    this.classList.toggle('active');
+    const dot = document.getElementById('toggleDot');
+    const monthlyLabel = document.getElementById('monthlyLabel');
+    const yearlyLabel = document.getElementById('yearlyLabel');
     
-    monthlyPrices.forEach(el => el.style.display = isYearly ? 'none' : 'block');
-    yearlyPrices.forEach(el => el.style.display = isYearly ? 'block' : 'none');
-});
+    dot.style.left = isYearly ? '2rem' : '0.25rem';
+    monthlyLabel.classList.toggle('text-text-main', !isYearly);
+    monthlyLabel.classList.toggle('text-text-muted', isYearly);
+    yearlyLabel.classList.toggle('text-text-main', isYearly);
+    yearlyLabel.classList.toggle('text-text-muted', !isYearly);
+    
+    document.querySelectorAll('.price-monthly').forEach(el => el.style.display = isYearly ? 'none' : 'block');
+    document.querySelectorAll('.price-yearly').forEach(el => el.style.display = isYearly ? 'block' : 'none');
+}
 
-// Payment initiation
 function initiatePayment(planType) {
     const billingCycle = isYearly ? 'YEARLY' : 'MONTHLY';
     
-    // Create order
     fetch('{% url "payments:create_order" %}', {
         method: 'POST',
         headers: {
@@ -297,7 +153,6 @@ function initiatePayment(planType) {
             return;
         }
         
-        // Open Razorpay checkout
         const options = {
             key: data.key,
             amount: data.amount * 100,
@@ -306,11 +161,8 @@ function initiatePayment(planType) {
             description: data.description,
             order_id: data.order_id,
             prefill: data.prefill,
-            theme: {
-                color: '#667eea'
-            },
+            theme: { color: '#38B2AC' },
             handler: function(response) {
-                // Verify payment
                 verifyPayment(response);
             }
         };

@@ -1,450 +1,315 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Customer Dashboard - Stock Research Platform{% endblock %}
+{% block title %}Dashboard - StockPro{% endblock %}
 
-{% block content %}
-<div class="dashboard-container">
-    <div class="dashboard-header">
-        <h1>Welcome, {{ user.get_full_name }}</h1>
-        <p class="text-secondary">Your personalized stock research dashboard</p>
+{% block page_content %}
+<!-- Market Index Cards -->
+<div id="market-indices" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+    <div class="bg-surface rounded-2xl p-5 flex items-center justify-between shadow-soft hover:shadow-soft-hover transition-shadow cursor-default animate-pulse">
+        <div><p class="text-text-muted text-[10px] font-bold uppercase tracking-wider mb-1">NIFTY 50</p><h3 class="text-text-main text-2xl font-bold tracking-tight">--</h3></div>
+        <div class="text-right"><span class="text-text-muted bg-gray-100 px-3 py-1 rounded-full text-xs font-bold">--</span></div>
     </div>
-
-    <!-- Quick Stats -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-icon">📊</div>
-            <div class="stat-content">
-                <h3>{{ active_items.count }}</h3>
-                <p>Active Positions</p>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon">💰</div>
-            <div class="stat-content">
-                <h3>₹{{ portfolio.total_value|default:"0" }}</h3>
-                <p>Portfolio Value</p>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon">📈</div>
-            <div class="stat-content">
-                <h3>{{ today_calls.count }}</h3>
-                <p>Today's Calls</p>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon">⭐</div>
-            <div class="stat-content">
-                <h3>{{ top_brokers.count }}</h3>
-                <p>Top Brokers</p>
-            </div>
-        </div>
+    <div class="bg-surface rounded-2xl p-5 flex items-center justify-between shadow-soft hover:shadow-soft-hover transition-shadow cursor-default animate-pulse">
+        <div><p class="text-text-muted text-[10px] font-bold uppercase tracking-wider mb-1">SENSEX</p><h3 class="text-text-main text-2xl font-bold tracking-tight">--</h3></div>
+        <div class="text-right"><span class="text-text-muted bg-gray-100 px-3 py-1 rounded-full text-xs font-bold">--</span></div>
     </div>
-
-    <!-- Main Content Grid -->
-    <div class="dashboard-grid">
-        <!-- Today's Calls -->
-        <div class="dashboard-section">
-            <div class="section-header">
-                <h2>Today's Research Calls</h2>
-                <a href="{% url 'research_calls:live_calls' %}" class="btn btn-sm btn-outline">View All</a>
-            </div>
-            <div class="calls-list trade-cards-grid">
-                {% for call in today_calls %}
-                <div class="pro-trade-card">
-                    <div class="pro-card-header">
-                        <span class="posted-date">Posted: {{ call.published_at|date:"h:i A" }}</span>
-                        <span class="duration-badge">
-                            {{ call.get_call_type_display }}
-                        </span>
-                    </div>
-
-                    <div class="pro-banner">
-                        Available with all PRO plans
-                    </div>
-
-                    <div class="pro-visual-container">
-                        <div class="potential-badge">
-                            Potential left : {{ call.expected_return_percentage|floatformat:2 }} %
-                        </div>
-                        
-                        <div class="card-actions-row">
-                            <a href="{% url 'research_calls:call_detail' call.id %}" class="btn-subscribe-lock">
-                                View Trade
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                {% empty %}
-                <div class="empty-state">
-                    <p>No research calls published today</p>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <!-- Portfolio Summary -->
-        <div class="dashboard-section">
-            <div class="section-header">
-                <h2>My Portfolio</h2>
-                <a href="{% url 'portfolios:portfolio' %}" class="btn btn-sm btn-outline">View Details</a>
-            </div>
-            <div class="portfolio-summary">
-                {% for item in active_items %}
-                <div class="portfolio-item">
-                    <div class="item-header">
-                        <h4>{{ item.research_call.symbol }}</h4>
-                        <span class="badge badge-{{ item.status|lower }}">{{ item.status }}</span>
-                    </div>
-                    <div class="item-details">
-                        <div class="detail-row">
-                            <span>Entry: ₹{{ item.entry_price }}</span>
-                            <span>Qty: {{ item.quantity }}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span>Invested: ₹{{ item.invested_amount }}</span>
-                            {% if item.pnl_percentage %}
-                            <span class="{% if item.pnl_percentage > 0 %}text-success{% else %}text-danger{% endif %}">
-                                {{ item.pnl_percentage }}%
-                            </span>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-                {% empty %}
-                <div class="empty-state">
-                    <p>Your portfolio is empty</p>
-                    <small>Add research calls to start tracking</small>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <!-- Top Brokers -->
-        <div class="dashboard-section">
-            <div class="section-header">
-                <h2>Top Performing Brokers</h2>
-            </div>
-            <div class="brokers-list">
-                {% for broker in top_brokers %}
-                <div class="broker-item">
-                    <div class="broker-info">
-                        <h4>{{ broker.name }}</h4>
-                        <small>{{ broker.total_calls_published }} calls</small>
-                    </div>
-                    <div class="broker-accuracy">
-                        <span class="accuracy-badge">{{ broker.overall_accuracy }}%</span>
-                    </div>
-                </div>
-                {% empty %}
-                <div class="empty-state">
-                    <p>No broker data available</p>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
+    <div class="bg-surface rounded-2xl p-5 flex items-center justify-between shadow-soft hover:shadow-soft-hover transition-shadow cursor-default animate-pulse">
+        <div><p class="text-text-muted text-[10px] font-bold uppercase tracking-wider mb-1">Bank NIFTY</p><h3 class="text-text-main text-2xl font-bold tracking-tight">--</h3></div>
+        <div class="text-right"><span class="text-text-muted bg-gray-100 px-3 py-1 rounded-full text-xs font-bold">--</span></div>
     </div>
-
-    <!-- Market Sentiment -->
-    {% if sentiment %}
-    <div class="sentiment-section" style="margin-top: 2rem; padding: 1.5rem; background: linear-gradient(135deg, #111932, #0d1a3a); border-radius: 16px;">
-        <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 12px;">
-            <h3 style="margin: 0; color: #fff; font-size: 1.1rem;">Market Sentiment</h3>
-            <span style="padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700;
-                {% if sentiment.sentiment == 'BULLISH' %}background: rgba(0,230,118,0.15); color: #00e676;
-                {% elif sentiment.sentiment == 'BEARISH' %}background: rgba(255,82,82,0.15); color: #ff5252;
-                {% else %}background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.6);{% endif %}">
-                {{ sentiment.sentiment }}
-            </span>
-        </div>
-        <div style="display: flex; align-items: center; gap: 12px;">
-            <span style="color: #00e676; font-size: 13px; font-weight: 600; white-space: nowrap;">🐂 Buy {{ sentiment.buy_pct }}%</span>
-            <div style="flex: 1; height: 8px; background: #ff5252; border-radius: 4px; overflow: hidden;">
-                <div style="height: 100%; background: #00e676; border-radius: 4px; width: {{ sentiment.buy_pct }}%;"></div>
-            </div>
-            <span style="color: #ff5252; font-size: 13px; font-weight: 600; white-space: nowrap;">🐻 Sell {{ sentiment.sell_pct }}%</span>
-        </div>
-    </div>
-    {% endif %}
-
-    <!-- Recommended For You -->
-    {% if recommendations %}
-    <div style="margin-top: 2rem;">
-        <div class="section-header" style="background: transparent; box-shadow: none; padding: 0; margin-bottom: 1.5rem; border-bottom: none;">
-            <h2 style="font-size: 1.25rem;">🎯 Recommended For You</h2>
-            <a href="{% url 'dashboard:trades_dashboard' %}" class="btn btn-sm btn-outline">View All Trades</a>
-        </div>
-        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1rem;">
-            {% for rec in recommendations %}
-            <div style="background: white; border-radius: 12px; padding: 1.25rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-left: 4px solid {% if rec.type == 'top_broker' %}#448aff{% elif rec.type == 'sector_match' %}#00e676{% else %}#ffd740{% endif %};">
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
-                    <div>
-                        <h4 style="margin: 0; font-weight: 700; font-size: 1rem;">{{ rec.call.symbol }}</h4>
-                        <small style="color: #777;">{{ rec.call.get_call_type_display }} · {{ rec.call.get_instrument_type_display }}</small>
-                    </div>
-                    <span style="padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;
-                        {% if rec.call.action == 'BUY' %}background: rgba(0,230,118,0.12); color: #00c853;
-                        {% else %}background: rgba(255,82,82,0.12); color: #ff1744;{% endif %}">
-                        {{ rec.call.action }}
-                    </span>
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px; margin-bottom: 0.75rem;">
-                    <div><span style="color: #888;">Entry:</span> <strong>₹{{ rec.call.entry_price }}</strong></div>
-                    <div><span style="color: #888;">Target:</span> <strong style="color: #00c853;">₹{{ rec.call.target_1 }}</strong></div>
-                    <div><span style="color: #888;">SL:</span> <strong style="color: #ff1744;">₹{{ rec.call.stop_loss }}</strong></div>
-                    <div><span style="color: #888;">R:R:</span> <strong>{{ rec.call.risk_reward_ratio|default:"-" }}</strong></div>
-                </div>
-                <div style="font-size: 12px; color: #888; padding-top: 8px; border-top: 1px solid #eee;">
-                    💡 {{ rec.reason }}
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-    {% endif %}
-
 </div>
 
-<style>
-.dashboard-container {
-    padding: 2rem;
-    max-width: 1400px;
-    margin: 0 auto;
-}
+<!-- Tab Bar -->
+<div class="flex items-center gap-2 mb-8 overflow-x-auto hide-scrollbar py-2">
+    <a href="{% url 'dashboard:markets' %}" class="px-5 py-2.5 bg-text-main text-white rounded-full font-bold text-sm shadow-lg shadow-text-main/20 whitespace-nowrap transition-transform hover:-translate-y-0.5 no-underline">Markets</a>
+    <a href="{% url 'research_calls:live_calls' %}" class="px-5 py-2.5 bg-surface text-text-muted hover:text-text-main rounded-full font-bold text-sm shadow-soft hover:shadow-md whitespace-nowrap transition-all no-underline">Trades</a>
+    <a href="{% url 'dashboard:gainers_losers' %}" class="px-5 py-2.5 bg-surface text-text-muted hover:text-text-main rounded-full font-bold text-sm shadow-soft hover:shadow-md whitespace-nowrap transition-all no-underline">Gainers & Losers</a>
+    <a href="{% url 'dashboard:ipo' %}" class="px-5 py-2.5 bg-surface text-text-muted hover:text-text-main rounded-full font-bold text-sm shadow-soft hover:shadow-md whitespace-nowrap transition-all no-underline">IPO</a>
+    <a href="{% url 'dashboard:commodity' %}" class="px-5 py-2.5 bg-surface text-text-muted hover:text-text-main rounded-full font-bold text-sm shadow-soft hover:shadow-md whitespace-nowrap transition-all no-underline">Commodities</a>
+    <a href="{% url 'dashboard:etf' %}" class="px-5 py-2.5 bg-surface text-text-muted hover:text-text-main rounded-full font-bold text-sm shadow-soft hover:shadow-md whitespace-nowrap transition-all no-underline">ETFs</a>
+    <a href="{% url 'dashboard:sip' %}" class="px-5 py-2.5 bg-surface text-text-muted hover:text-text-main rounded-full font-bold text-sm shadow-soft hover:shadow-md whitespace-nowrap transition-all no-underline">SIP</a>
+    <a href="{% url 'dashboard:mutual_funds' %}" class="px-5 py-2.5 bg-surface text-text-muted hover:text-text-main rounded-full font-bold text-sm shadow-soft hover:shadow-md whitespace-nowrap transition-all no-underline">Mutual Funds</a>
+    <a href="{% url 'dashboard:bonds' %}" class="px-5 py-2.5 bg-surface text-text-muted hover:text-text-main rounded-full font-bold text-sm shadow-soft hover:shadow-md whitespace-nowrap transition-all no-underline">Bonds</a>
+    <a href="{% url 'dashboard:liquidity' %}" class="px-5 py-2.5 bg-surface text-text-muted hover:text-text-main rounded-full font-bold text-sm shadow-soft hover:shadow-md whitespace-nowrap transition-all no-underline">Liquidity</a>
+    {% comment %} <a href="{% url 'dashboard:recently_listed' %}" class="px-5 py-2.5 bg-surface text-text-muted hover:text-text-main rounded-full font-bold text-sm shadow-soft hover:shadow-md whitespace-nowrap transition-all no-underline">Recently Listed</a> {% endcomment %}
+    {% comment %} <a href="{% url 'dashboard:top_brokers' %}" class="px-5 py-2.5 bg-surface text-text-muted hover:text-text-main rounded-full font-bold text-sm shadow-soft hover:shadow-md whitespace-nowrap transition-all no-underline">Top Brokers</a> {% endcomment %}
+</div>
 
-.dashboard-header {
-    margin-bottom: 2rem;
-}
+<!-- Dashboard Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Left: Main Content (2 cols) -->
+    <div class="lg:col-span-2 flex flex-col gap-8">
+        <!-- Today's Calls Section -->
+        <div class="flex flex-col gap-5">
+            <div class="flex items-center justify-between px-1">
+                <h2 class="text-text-main text-xl font-bold flex items-center gap-3">
+                    <span class="size-8 rounded-full bg-accent-teal/10 flex items-center justify-center text-accent-teal">
+                        <span class="material-symbols-outlined text-lg">campaign</span>
+                    </span>
+                    Today's Calls
+                </h2>
+                <a class="text-text-muted text-sm font-semibold hover:text-accent-teal transition-colors no-underline" href="{% url 'research_calls:live_calls' %}">View All</a>
+            </div>
+            <div class="flex flex-col gap-4">
+                {% for call in today_calls %}
+                <a href="{% url 'research_calls:call_detail' call.pk %}" class="bg-surface rounded-2xl p-5 shadow-soft hover:shadow-soft-hover transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 group cursor-pointer relative overflow-hidden no-underline text-inherit">
+                    <div class="absolute left-0 top-0 bottom-0 w-1 {% if call.action == 'BUY' %}bg-accent-teal{% else %}bg-accent-coral{% endif %} rounded-l-2xl"></div>
+                    <div class="flex items-center gap-4 min-w-[180px]">
+                        <div class="size-12 rounded-xl bg-background-base flex items-center justify-center text-text-main font-bold shadow-inner-soft text-xs">
+                            {{ call.symbol|truncatechars:5 }}
+                        </div>
+                        <div>
+                            <h4 class="text-text-main font-bold text-lg">{{ call.symbol }}</h4>
+                            <div class="flex items-center gap-2 text-xs text-text-muted font-medium">
+                                <span>{{ call.get_exchange_display|default:"NSE" }}</span>
+                                <span class="size-1 rounded-full bg-gray-300"></span>
+                                <span>{{ call.get_instrument_type_display }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex-1 grid grid-cols-3 gap-4 border-l border-gray-100 sm:pl-6">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-text-muted font-bold uppercase tracking-wider">Entry</span>
+                            <span class="text-text-main font-bold">{{ call.entry_price }}</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-text-muted font-bold uppercase tracking-wider">Target</span>
+                            <span class="text-accent-teal font-bold">{{ call.target_1 }}</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-text-muted font-bold uppercase tracking-wider">SL</span>
+                            <span class="text-accent-coral font-bold">{{ call.stop_loss }}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between sm:justify-end gap-4 sm:pl-6 sm:border-l border-gray-100 min-w-[140px]">
+                        <span class="{% if call.action == 'BUY' %}bg-accent-teal-soft text-accent-teal{% else %}bg-accent-coral-soft text-accent-coral{% endif %} px-3 py-1 rounded-lg text-xs font-bold">{{ call.action }}</span>
+                        <span class="size-8 rounded-full bg-text-main text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                        </span>
+                    </div>
+                </a>
+                {% empty %}
+                <div class="bg-surface rounded-2xl p-8 shadow-soft text-center">
+                    <span class="material-symbols-outlined text-4xl text-text-muted mb-2">trending_flat</span>
+                    <p class="text-text-muted font-medium">No research calls published today</p>
+                </div>
+                {% endfor %}
 
-.dashboard-header h1 {
-    font-size: 2rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-}
+                <!-- Premium Calls Upsell -->
+                {% if not user.subscription %}
+                <div class="bg-gradient-to-r from-text-main to-gray-800 rounded-2xl p-5 shadow-soft flex flex-col sm:flex-row items-center justify-between gap-4 relative overflow-hidden">
+                    <div class="flex items-center gap-4 relative z-10">
+                        <div class="size-10 rounded-full bg-accent-gold/20 flex items-center justify-center text-accent-gold">
+                            <span class="material-symbols-outlined">lock</span>
+                        </div>
+                        <div>
+                            <h4 class="text-white font-bold">5+ More Premium Calls</h4>
+                            <p class="text-gray-400 text-xs">High probability setups from top experts.</p>
+                        </div>
+                    </div>
+                    <a href="{% url 'payments:membership' %}" class="bg-accent-gold text-text-main font-bold text-xs px-5 py-2.5 rounded-full hover:bg-white transition-colors relative z-10 shadow-lg whitespace-nowrap no-underline">
+                        Unlock Premium
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
 
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-}
+        <!-- Premium CTA Banner -->
+        {% if not user.subscription %}
+        <div class="w-full bg-surface rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden shadow-soft">
+            <div class="absolute -right-10 -bottom-10 size-40 bg-accent-gold/5 rounded-full blur-2xl"></div>
+            <div class="absolute -left-10 -top-10 size-40 bg-accent-teal/5 rounded-full blur-2xl"></div>
+            <div class="z-10 max-w-lg">
+                <span class="text-accent-gold text-xs font-bold tracking-widest uppercase mb-2 block">Premium Access</span>
+                <h3 class="text-text-main text-2xl font-extrabold mb-2 tracking-tight">Level up your trading game.</h3>
+                <p class="text-text-muted text-sm leading-relaxed">Access advanced charts, real-time heatmaps, and exclusive expert webinars with StockPro Premium.</p>
+            </div>
+            <a href="{% url 'payments:membership' %}" class="whitespace-nowrap bg-text-main text-white font-bold px-8 py-3.5 rounded-xl shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-1 z-10 flex items-center gap-2 no-underline">
+                <span>Try Pro for ₹499/mo</span>
+                <span class="material-symbols-outlined text-sm">rocket_launch</span>
+            </a>
+        </div>
+        {% endif %}
 
-.stat-card {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
+        <!-- Market Movers Table -->
+        <div class="bg-surface rounded-2xl shadow-soft overflow-hidden">
+            <div class="px-6 py-5 flex justify-between items-center border-b border-gray-50">
+                <h3 class="text-text-main font-bold text-lg">Market Movers</h3>
+                <div class="flex bg-background-base rounded-lg p-1">
+                    <span class="text-xs bg-white text-text-main font-bold px-3 py-1.5 rounded shadow-sm cursor-pointer transition-all" id="btn-gainers">Gainers</span>
+                    <span class="text-xs text-text-muted hover:text-text-main px-3 py-1.5 rounded cursor-pointer transition-colors" id="btn-losers">Losers</span>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left" id="movers-table">
+                    <thead class="text-xs text-text-muted uppercase bg-gray-50/50">
+                        <tr>
+                            <th class="px-6 py-4 font-semibold tracking-wider">Symbol</th>
+                            <th class="px-6 py-4 text-right font-semibold tracking-wider">Price</th>
+                            <th class="px-6 py-4 text-right font-semibold tracking-wider">Change</th>
+                            <th class="px-6 py-4 text-right font-semibold tracking-wider">Vol (M)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50" id="movers-body">
+                        <tr><td colspan="4" class="px-6 py-6 text-center text-text-muted">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-.stat-icon {
-    font-size: 2.5rem;
-}
+    <!-- Right Sidebar -->
+    <div class="flex flex-col gap-8">
+        <!-- Portfolio Widget -->
+        <div class="bg-surface rounded-2xl p-6 shadow-soft hover:shadow-soft-hover transition-shadow">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-text-main font-bold flex items-center gap-2">
+                    <span class="material-symbols-outlined text-accent-teal text-[20px]">donut_large</span>
+                    Portfolio
+                </h3>
+                <a href="{% url 'portfolios:portfolio' %}" class="text-text-muted hover:text-text-main no-underline">
+                    <span class="material-symbols-outlined">more_horiz</span>
+                </a>
+            </div>
+            <div class="flex flex-col items-center justify-center mb-8 relative">
+                {% if portfolio %}
+                <div class="size-48 rounded-full bg-[conic-gradient(var(--color-accent-teal)_70%,#F1F5F9_70%)] relative flex items-center justify-center shadow-inner-soft">
+                    <div class="size-36 rounded-full bg-surface shadow-soft flex flex-col items-center justify-center">
+                        <span class="text-text-muted text-xs font-medium uppercase tracking-wide">Total Value</span>
+                        <span class="text-text-main text-2xl font-extrabold mt-1">₹{{ portfolio.total_value|default:"0" }}</span>
+                    </div>
+                </div>
+                {% else %}
+                <div class="size-48 rounded-full bg-gray-100 relative flex items-center justify-center">
+                    <div class="size-36 rounded-full bg-surface shadow-soft flex flex-col items-center justify-center">
+                        <span class="text-text-muted text-xs font-medium">No Portfolio</span>
+                        <span class="text-text-main text-lg font-extrabold mt-1">₹0</span>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            <div class="space-y-4">
+                <div class="flex items-center justify-between p-3 rounded-xl bg-background-base">
+                    <div class="flex items-center gap-3">
+                        <span class="size-2 rounded-full bg-accent-teal ring-4 ring-white"></span>
+                        <span class="text-text-main text-sm font-bold">Equity</span>
+                    </div>
+                    <span class="text-text-muted font-medium text-sm">{{ active_items.count|default:"0" }} items</span>
+                </div>
+            </div>
+        </div>
 
-.stat-content h3 {
-    font-size: 1.75rem;
-    font-weight: 700;
-    margin: 0;
-}
+        <!-- Market Sentiment -->
+        {% if sentiment %}
+        <div class="bg-surface rounded-2xl p-6 shadow-soft hover:shadow-soft-hover transition-shadow">
+            <h3 class="text-text-main font-bold mb-6 flex items-center gap-2">
+                <span class="material-symbols-outlined text-accent-gold text-[20px]">speed</span>
+                Market Sentiment
+            </h3>
+            <div class="relative mb-8 px-2">
+                <div class="h-3 w-full bg-gray-100 rounded-full overflow-hidden">
+                    <div class="h-full w-full bg-gradient-to-r from-accent-coral via-accent-gold to-accent-teal opacity-30"></div>
+                </div>
+                <div class="absolute top-1/2 -translate-y-1/2 left-[{{ sentiment.buy_pct }}%] -ml-2">
+                    <div class="size-4 bg-white border-4 border-text-main rounded-full shadow-lg"></div>
+                </div>
+            </div>
+            <div class="flex justify-between text-[10px] font-bold uppercase tracking-wider mb-6 px-1">
+                <span class="text-accent-coral">Bearish</span>
+                <span class="text-accent-gold">Neutral</span>
+                <span class="text-accent-teal">Bullish</span>
+            </div>
+            <div class="flex items-center gap-5 bg-background-base p-4 rounded-xl">
+                <div class="text-center min-w-[60px]">
+                    <span class="block text-3xl font-extrabold text-accent-teal">{{ sentiment.buy_pct }}</span>
+                    <span class="text-[10px] text-text-muted uppercase font-bold">Score</span>
+                </div>
+                <div class="text-sm text-text-muted border-l border-gray-200 pl-5">
+                    <span class="text-text-main font-bold">{{ sentiment.sentiment }}.</span>
+                    Market {% if sentiment.sentiment == 'BULLISH' %}shows optimism. Institutional buying observed{% elif sentiment.sentiment == 'BEARISH' %}is cautious. FII selling observed{% else %}remains range-bound{% endif %}.
+                </div>
+            </div>
+        </div>
+        {% endif %}
 
-.stat-content p {
-    margin: 0;
-    color: var(--text-secondary);
-}
+        <!-- Top Brokers -->
+        {% if top_brokers %}
+        <div class="bg-surface rounded-2xl p-6 shadow-soft hover:shadow-soft-hover transition-shadow">
+            <div class="flex justify-between items-center mb-5">
+                <h3 class="text-text-main font-bold">Top Brokers</h3>
+            </div>
+            <div class="flex flex-col gap-3">
+                {% for broker in top_brokers %}
+                <div class="flex items-center justify-between p-3 rounded-xl bg-background-base">
+                    <div class="flex items-center gap-3">
+                        <div class="size-8 rounded-lg bg-accent-teal/10 flex items-center justify-center text-accent-teal font-bold text-xs">{{ forloop.counter }}</div>
+                        <span class="text-sm font-bold text-text-main">{{ broker.name }}</span>
+                    </div>
+                    <span class="text-accent-teal font-bold text-sm">{{ broker.overall_accuracy }}%</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
 
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: 2rem;
-}
-
-.dashboard-section {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid var(--border-color);
-}
-
-.section-header h2 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin: 0;
-}
-
-.call-card {
-    padding: 1rem;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    margin-bottom: 1rem;
-}
-
-.call-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: start;
-    margin-bottom: 1rem;
-}
-
-.call-header h3 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin: 0 0 0.5rem 0;
-}
-
-.price-info {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-.price-item {
-    display: flex;
-    flex-direction: column;
-}
-
-.price-item label {
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-    margin-bottom: 0.25rem;
-}
-
-.price-item span {
-    font-weight: 600;
-}
-
-.call-actions {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.portfolio-item, .broker-item {
-    padding: 1rem;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    margin-bottom: 1rem;
-}
-
-.item-header, .broker-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.5rem;
-}
-
-.detail-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 0.25rem;
-    font-size: 0.875rem;
-}
-
-.accuracy-badge {
-    background: var(--success-color);
-    color: white;
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-weight: 600;
-}
-
-.empty-state {
-    text-align: center;
-    padding: 2rem;
-    color: var(--text-secondary);
-}
-</style>
-
+{% block page_js %}
 <script>
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                // Does this cookie string begin with the name we want?
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
+// Load live market indices
+async function loadMarketIndices() {
+    try {
+        const res = await fetch('/api/core/live-ticker/', { credentials: 'same-origin' });
+        if (!res.ok) return;
+        const data = await res.json();
+        const container = document.getElementById('market-indices');
+        if (!data.length) return;
+        
+        let html = '';
+        data.forEach(item => {
+            const isUp = parseFloat(item.change_pct) >= 0;
+            const color = isUp ? 'accent-teal' : 'accent-coral';
+            const softColor = isUp ? 'accent-teal-soft' : 'accent-coral-soft';
+            const arrow = isUp ? 'arrow_upward' : 'arrow_downward';
+            html += `
+            <div class="bg-surface rounded-2xl p-5 flex items-center justify-between shadow-soft hover:shadow-soft-hover transition-shadow cursor-default">
+                <div>
+                    <p class="text-text-muted text-[10px] font-bold uppercase tracking-wider mb-1">${item.name}</p>
+                    <h3 class="text-text-main text-2xl font-bold tracking-tight">${Number(item.price).toLocaleString('en-IN', {minimumFractionDigits:2})}</h3>
+                </div>
+                <div class="text-right">
+                    <span class="text-${color} bg-${softColor} px-3 py-1 rounded-full text-xs font-bold inline-flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[14px]">${arrow}</span>
+                        ${Math.abs(parseFloat(item.change_pct)).toFixed(2)}%
+                    </span>
+                    <p class="text-text-muted text-xs mt-1 font-medium">${isUp ? '+' : ''}${Number(item.change).toFixed(2)}</p>
+                </div>
+            </div>`;
+        });
+        container.innerHTML = html;
+    } catch(e) { console.log('Ticker fetch error', e); }
+}
+
+// Load notification badge count
+async function loadNotifBadge() {
+    try {
+        const res = await fetch('/api/notifications/unread-count/', { credentials: 'same-origin' });
+        if (!res.ok) return;
+        const data = await res.json();
+        const badge = document.getElementById('notif-count-header');
+        if (data.unread_count > 0) {
+            badge.classList.remove('hidden');
         }
-        return cookieValue;
-    }
+    } catch(e) {}
+}
 
-    function addToPortfolio(callId) {
-        const csrftoken = getCookie('csrftoken');
-        
-        // Simple prompt for quantity (in a real app, use a modal)
-        const quantity = prompt("Enter quantity:", "1");
-        if (!quantity) return;
-        
-        const entryPrice = prompt("Enter entry price (leave empty for current market price):", "");
-
-        const formData = new FormData();
-        formData.append('call_id', callId);
-        formData.append('quantity', quantity);
-        if (entryPrice) formData.append('entry_price', entryPrice);
-
-        fetch("{% url 'portfolios:add' %}", {
-            method: 'POST',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': csrftoken
-            },
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Success: ' + data.message);
-                location.reload(); // Reload to update stats
-            } else {
-                alert('Error: ' + (data.error || 'Unknown error'));
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred. Please try again.');
-        });
-    }
-
-    function addToWatchlist(callId) {
-        const csrftoken = getCookie('csrftoken');
-        const formData = new FormData();
-        formData.append('call_id', callId);
-
-        fetch("{% url 'watchlists:add' %}", {
-            method: 'POST',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': csrftoken
-            },
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Success: ' + data.message);
-            } else {
-                alert('Info: ' + (data.message || data.error));
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred. Please try again.');
-        });
-    }
+document.addEventListener('DOMContentLoaded', function() {
+    loadMarketIndices();
+    loadNotifBadge();
+    setInterval(loadMarketIndices, 60000);
+});
 </script>
 {% endblock %}
