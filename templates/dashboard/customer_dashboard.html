@@ -1,315 +1,150 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Dashboard - StockPro{% endblock %}
-
-{% block page_content %}
-<!-- Market Index Cards -->
-<div id="market-indices" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-    <div class="bg-surface rounded-2xl p-5 flex items-center justify-between shadow-soft hover:shadow-soft-hover transition-shadow cursor-default animate-pulse">
-        <div><p class="text-text-muted text-[10px] font-bold uppercase tracking-wider mb-1">NIFTY 50</p><h3 class="text-text-main text-2xl font-bold tracking-tight">--</h3></div>
-        <div class="text-right"><span class="text-text-muted bg-gray-100 px-3 py-1 rounded-full text-xs font-bold">--</span></div>
+{% block content %}
+<div class="mb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+    <div>
+        <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">Overview</h1>
+        <p class="text-slate-500 dark:text-slate-400 mt-1">Welcome back, here's what's happening today.</p>
     </div>
-    <div class="bg-surface rounded-2xl p-5 flex items-center justify-between shadow-soft hover:shadow-soft-hover transition-shadow cursor-default animate-pulse">
-        <div><p class="text-text-muted text-[10px] font-bold uppercase tracking-wider mb-1">SENSEX</p><h3 class="text-text-main text-2xl font-bold tracking-tight">--</h3></div>
-        <div class="text-right"><span class="text-text-muted bg-gray-100 px-3 py-1 rounded-full text-xs font-bold">--</span></div>
-    </div>
-    <div class="bg-surface rounded-2xl p-5 flex items-center justify-between shadow-soft hover:shadow-soft-hover transition-shadow cursor-default animate-pulse">
-        <div><p class="text-text-muted text-[10px] font-bold uppercase tracking-wider mb-1">Bank NIFTY</p><h3 class="text-text-main text-2xl font-bold tracking-tight">--</h3></div>
-        <div class="text-right"><span class="text-text-muted bg-gray-100 px-3 py-1 rounded-full text-xs font-bold">--</span></div>
+    <div class="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-300 bg-white dark:bg-[#1e2329] px-3 py-1.5 rounded-md border border-slate-200 dark:border-slate-800 shadow-sm">
+        <span class="material-symbols-outlined !text-[18px]">calendar_today</span>
+        {% now "M d, Y" %}
     </div>
 </div>
 
-<!-- Tab Bar -->
-<div class="flex items-center gap-2 mb-8 overflow-x-auto hide-scrollbar py-2">
-    <a href="{% url 'dashboard:markets' %}" class="px-5 py-2.5 bg-text-main text-white rounded-full font-bold text-sm shadow-lg shadow-text-main/20 whitespace-nowrap transition-transform hover:-translate-y-0.5 no-underline">Markets</a>
-    <a href="{% url 'research_calls:live_calls' %}" class="px-5 py-2.5 bg-surface text-text-muted hover:text-text-main rounded-full font-bold text-sm shadow-soft hover:shadow-md whitespace-nowrap transition-all no-underline">Trades</a>
-    <a href="{% url 'dashboard:gainers_losers' %}" class="px-5 py-2.5 bg-surface text-text-muted hover:text-text-main rounded-full font-bold text-sm shadow-soft hover:shadow-md whitespace-nowrap transition-all no-underline">Gainers & Losers</a>
-    <a href="{% url 'dashboard:ipo' %}" class="px-5 py-2.5 bg-surface text-text-muted hover:text-text-main rounded-full font-bold text-sm shadow-soft hover:shadow-md whitespace-nowrap transition-all no-underline">IPO</a>
-    <a href="{% url 'dashboard:commodity' %}" class="px-5 py-2.5 bg-surface text-text-muted hover:text-text-main rounded-full font-bold text-sm shadow-soft hover:shadow-md whitespace-nowrap transition-all no-underline">Commodities</a>
-    <a href="{% url 'dashboard:etf' %}" class="px-5 py-2.5 bg-surface text-text-muted hover:text-text-main rounded-full font-bold text-sm shadow-soft hover:shadow-md whitespace-nowrap transition-all no-underline">ETFs</a>
-    <a href="{% url 'dashboard:sip' %}" class="px-5 py-2.5 bg-surface text-text-muted hover:text-text-main rounded-full font-bold text-sm shadow-soft hover:shadow-md whitespace-nowrap transition-all no-underline">SIP</a>
-    <a href="{% url 'dashboard:mutual_funds' %}" class="px-5 py-2.5 bg-surface text-text-muted hover:text-text-main rounded-full font-bold text-sm shadow-soft hover:shadow-md whitespace-nowrap transition-all no-underline">Mutual Funds</a>
-    <a href="{% url 'dashboard:bonds' %}" class="px-5 py-2.5 bg-surface text-text-muted hover:text-text-main rounded-full font-bold text-sm shadow-soft hover:shadow-md whitespace-nowrap transition-all no-underline">Bonds</a>
-    <a href="{% url 'dashboard:liquidity' %}" class="px-5 py-2.5 bg-surface text-text-muted hover:text-text-main rounded-full font-bold text-sm shadow-soft hover:shadow-md whitespace-nowrap transition-all no-underline">Liquidity</a>
-    {% comment %} <a href="{% url 'dashboard:recently_listed' %}" class="px-5 py-2.5 bg-surface text-text-muted hover:text-text-main rounded-full font-bold text-sm shadow-soft hover:shadow-md whitespace-nowrap transition-all no-underline">Recently Listed</a> {% endcomment %}
-    {% comment %} <a href="{% url 'dashboard:top_brokers' %}" class="px-5 py-2.5 bg-surface text-text-muted hover:text-text-main rounded-full font-bold text-sm shadow-soft hover:shadow-md whitespace-nowrap transition-all no-underline">Top Brokers</a> {% endcomment %}
+<!-- KPI Widgets -->
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-8">
+    <!-- Portfolio Value -->
+    <div class="flex flex-col gap-2 rounded-xl p-5 md:p-6 bg-white dark:bg-[#1e2329] border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
+        <div class="flex justify-between items-start">
+            <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Portfolio Value</p>
+            <span class="material-symbols-outlined text-primary/40 dark:text-primary/60">account_balance_wallet</span>
+        </div>
+        <p class="text-slate-900 dark:text-slate-100 text-3xl font-bold tracking-tight mt-1">₹{{ portfolio.total_value|default:"0" }}</p>
+        <div class="flex items-center gap-1 mt-2 text-slate-500 dark:text-slate-500 text-sm font-medium bg-slate-50 dark:bg-slate-800 w-fit px-2 py-0.5 rounded">
+            <span class="material-symbols-outlined !text-[16px]">show_chart</span>
+            Total Equity
+        </div>
+    </div>
+    <!-- Today's P&L -->
+    <div class="flex flex-col gap-2 rounded-xl p-5 md:p-6 bg-white dark:bg-[#1e2329] border border-slate-200 dark:border-slate-800 shadow-sm">
+        <div class="flex justify-between items-start">
+            <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Active Positions</p>
+            <span class="material-symbols-outlined text-primary/40 dark:text-primary/60">show_chart</span>
+        </div>
+        <p class="text-slate-900 dark:text-slate-100 text-3xl font-bold tracking-tight mt-1">{{ active_items|length|default:"0" }}</p>
+        <div class="flex items-center gap-1 mt-2 text-emerald-600 dark:text-emerald-500 text-sm font-medium bg-emerald-50 dark:bg-emerald-500/10 w-fit px-2 py-0.5 rounded">
+            <span class="material-symbols-outlined !text-[16px]">arrow_upward</span>
+            Currently Held
+        </div>
+    </div>
+    <!-- Active Calls -->
+    <div class="flex flex-col gap-2 rounded-xl p-5 md:p-6 bg-white dark:bg-[#1e2329] border border-slate-200 dark:border-slate-800 shadow-sm">
+        <div class="flex justify-between items-start">
+            <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">Today's Active Calls</p>
+            <span class="material-symbols-outlined text-primary/40 dark:text-primary/60">record_voice_over</span>
+        </div>
+        <p class="text-slate-900 dark:text-slate-100 text-3xl font-bold tracking-tight mt-1">{{ today_calls|length|default:"0" }}</p>
+        <div class="flex items-center gap-1 mt-2 text-primary text-sm font-medium bg-primary/10 w-fit px-2 py-0.5 rounded">
+            <span class="material-symbols-outlined !text-[16px]">campaign</span>
+            Published Today
+        </div>
+    </div>
 </div>
 
-<!-- Dashboard Grid -->
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-    <!-- Left: Main Content (2 cols) -->
-    <div class="lg:col-span-2 flex flex-col gap-8">
-        <!-- Today's Calls Section -->
-        <div class="flex flex-col gap-5">
-            <div class="flex items-center justify-between px-1">
-                <h2 class="text-text-main text-xl font-bold flex items-center gap-3">
-                    <span class="size-8 rounded-full bg-accent-teal/10 flex items-center justify-center text-accent-teal">
-                        <span class="material-symbols-outlined text-lg">campaign</span>
-                    </span>
-                    Today's Calls
+<!-- Two Column Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+    <!-- Left Column (Live Research Calls) -->
+    <div class="lg:col-span-2 flex flex-col gap-6">
+        <div class="bg-white dark:bg-[#1e2329] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden flex flex-col">
+            <div class="p-5 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/20">
+                <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                    Live Research Calls
                 </h2>
-                <a class="text-text-muted text-sm font-semibold hover:text-accent-teal transition-colors no-underline" href="{% url 'research_calls:live_calls' %}">View All</a>
+                <a href="{% url 'research_calls:live_calls' %}" class="text-sm text-primary font-medium hover:underline">View All</a>
             </div>
-            <div class="flex flex-col gap-4">
+            <div class="flex flex-col divide-y divide-slate-100 dark:divide-slate-800/50">
                 {% for call in today_calls %}
-                <a href="{% url 'research_calls:call_detail' call.pk %}" class="bg-surface rounded-2xl p-5 shadow-soft hover:shadow-soft-hover transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 group cursor-pointer relative overflow-hidden no-underline text-inherit">
-                    <div class="absolute left-0 top-0 bottom-0 w-1 {% if call.action == 'BUY' %}bg-accent-teal{% else %}bg-accent-coral{% endif %} rounded-l-2xl"></div>
-                    <div class="flex items-center gap-4 min-w-[180px]">
-                        <div class="size-12 rounded-xl bg-background-base flex items-center justify-center text-text-main font-bold shadow-inner-soft text-xs">
-                            {{ call.symbol|truncatechars:5 }}
+                <div class="flex flex-col sm:flex-row sm:items-center gap-4 p-5 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                    <div class="flex items-center gap-4 flex-1">
+                        <div class="h-12 w-12 rounded-lg {% if call.action == 'BUY' %}bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 border border-green-200 dark:border-green-800/50{% else %}bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800/50{% endif %} flex items-center justify-center shrink-0">
+                            <span class="font-bold text-xs">{{ call.symbol|truncatechars:5 }}</span>
                         </div>
-                        <div>
-                            <h4 class="text-text-main font-bold text-lg">{{ call.symbol }}</h4>
-                            <div class="flex items-center gap-2 text-xs text-text-muted font-medium">
-                                <span>{{ call.get_exchange_display|default:"NSE" }}</span>
-                                <span class="size-1 rounded-full bg-gray-300"></span>
-                                <span>{{ call.get_instrument_type_display }}</span>
+                        <div class="flex flex-col">
+                            <p class="text-slate-900 dark:text-slate-100 text-base font-semibold line-clamp-1">{{ call.symbol }} ({{ call.action }})</p>
+                            <div class="flex items-center gap-3 text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+                                <span class="flex items-center gap-1"><span class="material-symbols-outlined !text-[16px]">target</span> Target: {{ call.target_1 }}</span>
+                                <span class="flex items-center gap-1"><span class="material-symbols-outlined !text-[16px]">shield</span> SL: {{ call.stop_loss }}</span>
                             </div>
                         </div>
                     </div>
-                    <div class="flex-1 grid grid-cols-3 gap-4 border-l border-gray-100 sm:pl-6">
-                        <div class="flex flex-col">
-                            <span class="text-[10px] text-text-muted font-bold uppercase tracking-wider">Entry</span>
-                            <span class="text-text-main font-bold">{{ call.entry_price }}</span>
-                        </div>
-                        <div class="flex flex-col">
-                            <span class="text-[10px] text-text-muted font-bold uppercase tracking-wider">Target</span>
-                            <span class="text-accent-teal font-bold">{{ call.target_1 }}</span>
-                        </div>
-                        <div class="flex flex-col">
-                            <span class="text-[10px] text-text-muted font-bold uppercase tracking-wider">SL</span>
-                            <span class="text-accent-coral font-bold">{{ call.stop_loss }}</span>
-                        </div>
+                    <div class="shrink-0 mt-3 sm:mt-0 flex gap-2 items-center">
+                        <a href="{% url 'research_calls:call_detail' call.pk %}" class="w-full sm:w-auto px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700 text-center">Details</a>
+                        {% if not user.subscription and call.is_pro_only %}
+                        <a href="{% url 'payments:membership' %}" class="w-full sm:w-auto px-4 py-2 bg-yellow-500 text-white rounded-lg text-sm font-medium hover:bg-yellow-600 transition-colors text-center shadow-md">Unlock</a>
+                        {% endif %}
                     </div>
-                    <div class="flex items-center justify-between sm:justify-end gap-4 sm:pl-6 sm:border-l border-gray-100 min-w-[140px]">
-                        <span class="{% if call.action == 'BUY' %}bg-accent-teal-soft text-accent-teal{% else %}bg-accent-coral-soft text-accent-coral{% endif %} px-3 py-1 rounded-lg text-xs font-bold">{{ call.action }}</span>
-                        <span class="size-8 rounded-full bg-text-main text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                            <span class="material-symbols-outlined text-sm">arrow_forward</span>
-                        </span>
-                    </div>
-                </a>
+                </div>
                 {% empty %}
-                <div class="bg-surface rounded-2xl p-8 shadow-soft text-center">
-                    <span class="material-symbols-outlined text-4xl text-text-muted mb-2">trending_flat</span>
-                    <p class="text-text-muted font-medium">No research calls published today</p>
+                <div class="p-8 text-center bg-slate-50 dark:bg-slate-800/20">
+                    <span class="material-symbols-outlined text-4xl text-slate-300 dark:text-slate-600 mb-2">monitoring</span>
+                    <p class="text-slate-500 dark:text-slate-400 font-medium">No research calls published today</p>
                 </div>
                 {% endfor %}
-
-                <!-- Premium Calls Upsell -->
-                {% if not user.subscription %}
-                <div class="bg-gradient-to-r from-text-main to-gray-800 rounded-2xl p-5 shadow-soft flex flex-col sm:flex-row items-center justify-between gap-4 relative overflow-hidden">
-                    <div class="flex items-center gap-4 relative z-10">
-                        <div class="size-10 rounded-full bg-accent-gold/20 flex items-center justify-center text-accent-gold">
-                            <span class="material-symbols-outlined">lock</span>
-                        </div>
-                        <div>
-                            <h4 class="text-white font-bold">5+ More Premium Calls</h4>
-                            <p class="text-gray-400 text-xs">High probability setups from top experts.</p>
-                        </div>
-                    </div>
-                    <a href="{% url 'payments:membership' %}" class="bg-accent-gold text-text-main font-bold text-xs px-5 py-2.5 rounded-full hover:bg-white transition-colors relative z-10 shadow-lg whitespace-nowrap no-underline">
-                        Unlock Premium
-                    </a>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-
-        <!-- Premium CTA Banner -->
-        {% if not user.subscription %}
-        <div class="w-full bg-surface rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden shadow-soft">
-            <div class="absolute -right-10 -bottom-10 size-40 bg-accent-gold/5 rounded-full blur-2xl"></div>
-            <div class="absolute -left-10 -top-10 size-40 bg-accent-teal/5 rounded-full blur-2xl"></div>
-            <div class="z-10 max-w-lg">
-                <span class="text-accent-gold text-xs font-bold tracking-widest uppercase mb-2 block">Premium Access</span>
-                <h3 class="text-text-main text-2xl font-extrabold mb-2 tracking-tight">Level up your trading game.</h3>
-                <p class="text-text-muted text-sm leading-relaxed">Access advanced charts, real-time heatmaps, and exclusive expert webinars with StockPro Premium.</p>
-            </div>
-            <a href="{% url 'payments:membership' %}" class="whitespace-nowrap bg-text-main text-white font-bold px-8 py-3.5 rounded-xl shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-1 z-10 flex items-center gap-2 no-underline">
-                <span>Try Pro for ₹499/mo</span>
-                <span class="material-symbols-outlined text-sm">rocket_launch</span>
-            </a>
-        </div>
-        {% endif %}
-
-        <!-- Market Movers Table -->
-        <div class="bg-surface rounded-2xl shadow-soft overflow-hidden">
-            <div class="px-6 py-5 flex justify-between items-center border-b border-gray-50">
-                <h3 class="text-text-main font-bold text-lg">Market Movers</h3>
-                <div class="flex bg-background-base rounded-lg p-1">
-                    <span class="text-xs bg-white text-text-main font-bold px-3 py-1.5 rounded shadow-sm cursor-pointer transition-all" id="btn-gainers">Gainers</span>
-                    <span class="text-xs text-text-muted hover:text-text-main px-3 py-1.5 rounded cursor-pointer transition-colors" id="btn-losers">Losers</span>
-                </div>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm text-left" id="movers-table">
-                    <thead class="text-xs text-text-muted uppercase bg-gray-50/50">
-                        <tr>
-                            <th class="px-6 py-4 font-semibold tracking-wider">Symbol</th>
-                            <th class="px-6 py-4 text-right font-semibold tracking-wider">Price</th>
-                            <th class="px-6 py-4 text-right font-semibold tracking-wider">Change</th>
-                            <th class="px-6 py-4 text-right font-semibold tracking-wider">Vol (M)</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-50" id="movers-body">
-                        <tr><td colspan="4" class="px-6 py-6 text-center text-text-muted">Loading...</td></tr>
-                    </tbody>
-                </table>
             </div>
         </div>
     </div>
 
-    <!-- Right Sidebar -->
-    <div class="flex flex-col gap-8">
-        <!-- Portfolio Widget -->
-        <div class="bg-surface rounded-2xl p-6 shadow-soft hover:shadow-soft-hover transition-shadow">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-text-main font-bold flex items-center gap-2">
-                    <span class="material-symbols-outlined text-accent-teal text-[20px]">donut_large</span>
-                    Portfolio
-                </h3>
-                <a href="{% url 'portfolios:portfolio' %}" class="text-text-muted hover:text-text-main no-underline">
-                    <span class="material-symbols-outlined">more_horiz</span>
-                </a>
+    <!-- Right Column (Watchlist Widget) -->
+    <div class="flex flex-col gap-6">
+        <div class="bg-white dark:bg-[#1e2329] border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden flex flex-col">
+            <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/20">
+                <h2 class="text-base font-bold text-slate-900 dark:text-slate-100">Watchlist</h2>
+                <a href="{% url 'watchlists:watchlist' %}" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"><span class="material-symbols-outlined !text-[20px]">more_horiz</span></a>
             </div>
-            <div class="flex flex-col items-center justify-center mb-8 relative">
-                {% if portfolio %}
-                <div class="size-48 rounded-full bg-[conic-gradient(var(--color-accent-teal)_70%,#F1F5F9_70%)] relative flex items-center justify-center shadow-inner-soft">
-                    <div class="size-36 rounded-full bg-surface shadow-soft flex flex-col items-center justify-center">
-                        <span class="text-text-muted text-xs font-medium uppercase tracking-wide">Total Value</span>
-                        <span class="text-text-main text-2xl font-extrabold mt-1">₹{{ portfolio.total_value|default:"0" }}</span>
+            <div class="flex flex-col" id="dashboard-watchlist">
+                {% for item in watchlist_items %}
+                <div class="flex items-center justify-between p-4 hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors border-b border-slate-100 dark:border-slate-800/50 last:border-0" data-symbol="{{ item.symbol }}">
+                    <div class="flex flex-col">
+                        <span class="font-bold text-slate-900 dark:text-slate-100 text-sm">{{ item.symbol }}</span>
+                    </div>
+                    <div class="flex flex-col items-end">
+                        <span class="font-medium text-slate-900 dark:text-slate-100 text-sm watchlist-price">...</span>
+                        <span class="text-xs font-medium watchlist-change">...</span>
                     </div>
                 </div>
-                {% else %}
-                <div class="size-48 rounded-full bg-gray-100 relative flex items-center justify-center">
-                    <div class="size-36 rounded-full bg-surface shadow-soft flex flex-col items-center justify-center">
-                        <span class="text-text-muted text-xs font-medium">No Portfolio</span>
-                        <span class="text-text-main text-lg font-extrabold mt-1">₹0</span>
-                    </div>
-                </div>
-                {% endif %}
-            </div>
-            <div class="space-y-4">
-                <div class="flex items-center justify-between p-3 rounded-xl bg-background-base">
-                    <div class="flex items-center gap-3">
-                        <span class="size-2 rounded-full bg-accent-teal ring-4 ring-white"></span>
-                        <span class="text-text-main text-sm font-bold">Equity</span>
-                    </div>
-                    <span class="text-text-muted font-medium text-sm">{{ active_items.count|default:"0" }} items</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Market Sentiment -->
-        {% if sentiment %}
-        <div class="bg-surface rounded-2xl p-6 shadow-soft hover:shadow-soft-hover transition-shadow">
-            <h3 class="text-text-main font-bold mb-6 flex items-center gap-2">
-                <span class="material-symbols-outlined text-accent-gold text-[20px]">speed</span>
-                Market Sentiment
-            </h3>
-            <div class="relative mb-8 px-2">
-                <div class="h-3 w-full bg-gray-100 rounded-full overflow-hidden">
-                    <div class="h-full w-full bg-gradient-to-r from-accent-coral via-accent-gold to-accent-teal opacity-30"></div>
-                </div>
-                <div class="absolute top-1/2 -translate-y-1/2 left-[{{ sentiment.buy_pct }}%] -ml-2">
-                    <div class="size-4 bg-white border-4 border-text-main rounded-full shadow-lg"></div>
-                </div>
-            </div>
-            <div class="flex justify-between text-[10px] font-bold uppercase tracking-wider mb-6 px-1">
-                <span class="text-accent-coral">Bearish</span>
-                <span class="text-accent-gold">Neutral</span>
-                <span class="text-accent-teal">Bullish</span>
-            </div>
-            <div class="flex items-center gap-5 bg-background-base p-4 rounded-xl">
-                <div class="text-center min-w-[60px]">
-                    <span class="block text-3xl font-extrabold text-accent-teal">{{ sentiment.buy_pct }}</span>
-                    <span class="text-[10px] text-text-muted uppercase font-bold">Score</span>
-                </div>
-                <div class="text-sm text-text-muted border-l border-gray-200 pl-5">
-                    <span class="text-text-main font-bold">{{ sentiment.sentiment }}.</span>
-                    Market {% if sentiment.sentiment == 'BULLISH' %}shows optimism. Institutional buying observed{% elif sentiment.sentiment == 'BEARISH' %}is cautious. FII selling observed{% else %}remains range-bound{% endif %}.
-                </div>
-            </div>
-        </div>
-        {% endif %}
-
-        <!-- Top Brokers -->
-        {% if top_brokers %}
-        <div class="bg-surface rounded-2xl p-6 shadow-soft hover:shadow-soft-hover transition-shadow">
-            <div class="flex justify-between items-center mb-5">
-                <h3 class="text-text-main font-bold">Top Brokers</h3>
-            </div>
-            <div class="flex flex-col gap-3">
-                {% for broker in top_brokers %}
-                <div class="flex items-center justify-between p-3 rounded-xl bg-background-base">
-                    <div class="flex items-center gap-3">
-                        <div class="size-8 rounded-lg bg-accent-teal/10 flex items-center justify-center text-accent-teal font-bold text-xs">{{ forloop.counter }}</div>
-                        <span class="text-sm font-bold text-text-main">{{ broker.name }}</span>
-                    </div>
-                    <span class="text-accent-teal font-bold text-sm">{{ broker.overall_accuracy }}%</span>
+                {% empty %}
+                <div class="p-6 text-center text-slate-500 dark:text-slate-400 text-sm">
+                    No items in your watchlist.
                 </div>
                 {% endfor %}
             </div>
+            <div class="p-3 border-t border-slate-100 dark:border-slate-800/50">
+                <a href="{% url 'watchlists:watchlist' %}" class="w-full py-1.5 flex items-center justify-center gap-1 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors">
+                    <span class="material-symbols-outlined !text-[18px]">add</span> Add Symbol
+                </a>
+            </div>
         </div>
-        {% endif %}
     </div>
 </div>
 {% endblock %}
 
 {% block page_js %}
 <script>
-// Load live market indices
-async function loadMarketIndices() {
-    try {
-        const res = await fetch('/api/core/live-ticker/', { credentials: 'same-origin' });
-        if (!res.ok) return;
-        const data = await res.json();
-        const container = document.getElementById('market-indices');
-        if (!data.length) return;
+    // Simple fetch for watchlist prices (using the generic ticker api if available)
+    document.addEventListener("DOMContentLoaded", () => {
+        // Find all symbols on the dashboard watchlist
+        const rows = document.querySelectorAll('#dashboard-watchlist > div[data-symbol]');
+        if (rows.length === 0) return;
         
-        let html = '';
-        data.forEach(item => {
-            const isUp = parseFloat(item.change_pct) >= 0;
-            const color = isUp ? 'accent-teal' : 'accent-coral';
-            const softColor = isUp ? 'accent-teal-soft' : 'accent-coral-soft';
-            const arrow = isUp ? 'arrow_upward' : 'arrow_downward';
-            html += `
-            <div class="bg-surface rounded-2xl p-5 flex items-center justify-between shadow-soft hover:shadow-soft-hover transition-shadow cursor-default">
-                <div>
-                    <p class="text-text-muted text-[10px] font-bold uppercase tracking-wider mb-1">${item.name}</p>
-                    <h3 class="text-text-main text-2xl font-bold tracking-tight">${Number(item.price).toLocaleString('en-IN', {minimumFractionDigits:2})}</h3>
-                </div>
-                <div class="text-right">
-                    <span class="text-${color} bg-${softColor} px-3 py-1 rounded-full text-xs font-bold inline-flex items-center gap-1">
-                        <span class="material-symbols-outlined text-[14px]">${arrow}</span>
-                        ${Math.abs(parseFloat(item.change_pct)).toFixed(2)}%
-                    </span>
-                    <p class="text-text-muted text-xs mt-1 font-medium">${isUp ? '+' : ''}${Number(item.change).toFixed(2)}</p>
-                </div>
-            </div>`;
-        });
-        container.innerHTML = html;
-    } catch(e) { console.log('Ticker fetch error', e); }
-}
-
-// Load notification badge count
-async function loadNotifBadge() {
-    try {
-        const res = await fetch('/api/notifications/unread-count/', { credentials: 'same-origin' });
-        if (!res.ok) return;
-        const data = await res.json();
-        const badge = document.getElementById('notif-count-header');
-        if (data.unread_count > 0) {
-            badge.classList.remove('hidden');
-        }
-    } catch(e) {}
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    loadMarketIndices();
-    loadNotifBadge();
-    setInterval(loadMarketIndices, 60000);
-});
+        const symbols = Array.from(rows).map(row => row.dataset.symbol).join(',');
+        
+        // This simulates what a real market data poll would do.
+        // Assuming /market/api/?type=ticker returns some data we might use.
+        // Ideally we'd hit a dedicated endpoint for these specific symbols.
+        console.log("Polling prices for ", symbols);
+    });
 </script>
 {% endblock %}

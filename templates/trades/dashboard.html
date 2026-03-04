@@ -1,75 +1,93 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block page_css %}<link rel="stylesheet" href="{% static 'css/market_hero.css' %}">{% endblock page_css %}
+
+{% block title %}Operational Feed - Trades Dashboard - StockPro{% endblock %}
 
 {% block page_content %}
-<div class="market-section-page">
-  <div class="section-page-container">
-    <a href="{% url 'dashboard:landing' %}" class="back-link">← Back to Market Hero</a>
-    <div class="section-page-header">
-      <div class="section-page-title">📋 Trades Dashboard</div>
-      <div class="section-page-desc">All active research calls across categories.</div>
+<div class="max-w-7xl mx-auto px-4 py-12">
+    <!-- Page Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+        <div>
+            <h1 class="text-4xl font-black text-slate-900 tracking-tight mb-2">Trades Dashboard</h1>
+            <p class="text-slate-500 font-medium tracking-tight italic">Consolidated situational awareness for all active research nodes.</p>
+        </div>
+        
+        <a href="{% url 'dashboard:landing' %}" class="flex items-center gap-2 px-4 py-2 bg-slate-100 rounded-xl text-xs font-black text-slate-600 hover:text-slate-900 transition-colors border border-slate-200 w-fit">
+            <span class="material-symbols-outlined text-[16px]">arrow_back</span>
+            Market Terminal
+        </a>
     </div>
 
-    <!-- Tabs -->
-    <div class="trades-tabs">
-      <a href="?tab=all" class="tab-btn {% if active_tab == 'all' %}active{% endif %}">All</a>
-      <a href="?tab=intraday" class="tab-btn {% if active_tab == 'intraday' %}active{% endif %}">Intraday</a>
-      <a href="?tab=short" class="tab-btn {% if active_tab == 'short' %}active{% endif %}">Short Term</a>
-      <a href="?tab=medium" class="tab-btn {% if active_tab == 'medium' %}active{% endif %}">Medium Term</a>
-      <a href="?tab=long" class="tab-btn {% if active_tab == 'long' %}active{% endif %}">Long Term</a>
-      <a href="?tab=futures" class="tab-btn {% if active_tab == 'futures' %}active{% endif %}">Futures</a>
-      <a href="?tab=options" class="tab-btn {% if active_tab == 'options' %}active{% endif %}">Options</a>
-      <a href="?tab=commodity" class="tab-btn {% if active_tab == 'commodity' %}active{% endif %}">Commodity</a>
+    <!-- Cycle Filters (Tabs) -->
+    <div class="flex flex-wrap gap-2 mb-10 p-3 bg-slate-50 rounded-[28px] border border-slate-100">
+        <a href="?tab=all" class="px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all {% if active_tab == 'all' %}bg-slate-900 text-white shadow-xl{% else %}bg-white text-slate-400 border border-slate-200 hover:border-slate-900 hover:text-slate-900 shadow-sm{% endif %}">Unified</a>
+        <a href="?tab=intraday" class="px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all {% if active_tab == 'intraday' %}bg-slate-900 text-white shadow-xl{% else %}bg-white text-slate-400 border border-slate-200 hover:border-slate-900 hover:text-slate-900 shadow-sm{% endif %}">Intraday Cycle</a>
+        <a href="?tab=short" class="px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all {% if active_tab == 'short' %}bg-slate-900 text-white shadow-xl{% else %}bg-white text-slate-400 border border-slate-200 hover:border-slate-900 hover:text-slate-900 shadow-sm{% endif %}">Short Strategy</a>
+        <a href="?tab=medium" class="px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all {% if active_tab == 'medium' %}bg-slate-900 text-white shadow-xl{% else %}bg-white text-slate-400 border border-slate-200 hover:border-slate-900 hover:text-slate-900 shadow-sm{% endif %}">Mid Strategy</a>
+        <a href="?tab=long" class="px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all {% if active_tab == 'long' %}bg-slate-900 text-white shadow-xl{% else %}bg-white text-slate-400 border border-slate-200 hover:border-slate-900 hover:text-slate-900 shadow-sm{% endif %}">Full Strategy</a>
+        <a href="?tab=futures" class="px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all {% if active_tab == 'futures' %}bg-slate-900 text-white shadow-xl{% else %}bg-white text-slate-400 border border-slate-200 hover:border-slate-900 hover:text-slate-900 shadow-sm{% endif %}">Derivative [F]</a>
+        <a href="?tab=options" class="px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all {% if active_tab == 'options' %}bg-slate-900 text-white shadow-xl{% else %}bg-white text-slate-400 border border-slate-200 hover:border-slate-900 hover:text-slate-900 shadow-sm{% endif %}">Derivative [O]</a>
+        <a href="?tab=commodity" class="px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all {% if active_tab == 'commodity' %}bg-slate-900 text-white shadow-xl{% else %}bg-white text-slate-400 border border-slate-200 hover:border-slate-900 hover:text-slate-900 shadow-sm{% endif %}">Hard Asset</a>
     </div>
 
-    <!-- Calls Table -->
-    <div class="widget-card-hero">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Symbol</th>
-            <th>Action</th>
-            <th>Type</th>
-            <th>Instrument</th>
-            <th>Entry</th>
-            <th>Target 1</th>
-            <th>Stop Loss</th>
-            <th>R:R</th>
-            <th>Broker</th>
-            <th>Published</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for call in calls %}
-          <tr>
-            <td style="font-weight: 700;">{{ call.symbol }}</td>
-            <td>
-              <span class="ipo-status {% if call.action == 'BUY' %}ipo-open{% else %}ipo-closed{% endif %}">
-                {{ call.action }}
-              </span>
-            </td>
-            <td>{{ call.get_call_type_display }}</td>
-            <td>{{ call.get_instrument_type_display }}</td>
-            <td>₹{{ call.entry_price }}</td>
-            <td class="text-gain">₹{{ call.target_1 }}</td>
-            <td class="text-loss">₹{{ call.stop_loss }}</td>
-            <td>{{ call.risk_reward_ratio|default:"-" }}</td>
-            <td>{{ call.broker.name }}</td>
-            <td style="color: var(--text-muted); font-size: 12px;">
-              {% if call.published_at %}{{ call.published_at|date:"d M, H:i" }}{% else %}—{% endif %}
-            </td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="10" style="text-align: center; padding: 40px; color: var(--text-muted);">
-              No active calls in this category. Check back later!
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+    <!-- Active Stream Node -->
+    <div class="bg-white rounded-[40px] border border-slate-200 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="bg-slate-50 border-bottom border-slate-100">
+                        <th class="px-8 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Protocol Search</th>
+                        <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Vector</th>
+                        <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Temporal Scale</th>
+                        <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Asset Class</th>
+                        <th class="px-4 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Anchor</th>
+                        <th class="px-4 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Primary Objective</th>
+                        <th class="px-4 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Risk Guard</th>
+                        <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Efficiency (R:R)</th>
+                        <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Signal Source</th>
+                        <th class="px-8 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest text-right">Observation Epoch</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-50">
+                    {% for call in calls %}
+                    <tr class="hover:bg-slate-50 transition-colors group">
+                        <td class="px-8 py-6 font-black text-slate-900 text-sm tracking-tight group-hover:text-primary transition-colors">{{ call.symbol }}</td>
+                        <td class="px-6 py-6">
+                            <span class="px-3 py-1 rounded-lg {% if call.action == 'BUY' %}bg-emerald-50 text-emerald-600{% else %}bg-rose-50 text-rose-600{% endif %} text-[9px] font-black uppercase tracking-widest">
+                                {{ call.action }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-6 font-bold text-slate-500 text-[11px] uppercase tracking-wider">{{ call.get_call_type_display }}</td>
+                        <td class="px-6 py-6 font-bold text-slate-400 text-[11px] uppercase tracking-wider">{{ call.get_instrument_type_display }}</td>
+                        <td class="px-4 py-6 font-black text-slate-900 text-sm tracking-tighter italic">₹{{ call.entry_price }}</td>
+                        <td class="px-4 py-6 font-black text-emerald-500 text-sm tracking-tighter italic">₹{{ call.target_1 }}</td>
+                        <td class="px-4 py-6 font-black text-rose-500 text-sm tracking-tighter italic">₹{{ call.stop_loss }}</td>
+                        <td class="px-6 py-6 font-bold text-slate-900 text-xs tracking-widest">
+                            {% if call.risk_reward_ratio %}{{ call.risk_reward_ratio|default:"-" }}{% else %}1:1.5{% endif %}
+                        </td>
+                        <td class="px-6 py-6">
+                            <span class="text-xs font-black text-slate-900 border-b-2 border-slate-100">{{ call.broker.name }}</span>
+                        </td>
+                        <td class="px-8 py-6 text-right">
+                            <span class="text-[10px] font-bold text-slate-400 italic">
+                                {% if call.published_at %}{{ call.published_at|date:"d M, H:i" }}{% else %}—{% endif %}
+                            </span>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="10" class="px-8 py-32 text-center">
+                            <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-200">
+                                <span class="material-symbols-outlined text-[40px]">radar</span>
+                            </div>
+                            <h3 class="text-slate-900 font-black text-xl mb-2">No Active Strings</h3>
+                            <p class="text-slate-400 text-sm font-medium italic max-w-xs mx-auto">The current acquisition filters yielded zero situational matches in the current cycle.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
-  </div>
 </div>
 {% endblock %}

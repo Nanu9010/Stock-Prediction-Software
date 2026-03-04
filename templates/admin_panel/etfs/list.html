@@ -1,0 +1,145 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+
+{% block title %}Basket Assets Oversight - ETFs - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Page Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+        <div>
+            <h1 class="text-3xl font-black text-slate-900 tracking-tight">Basket Assets Oversight</h1>
+            <p class="text-slate-500 font-medium tracking-tight">Managing diversified exchange-traded funds and index allocations.</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <a href="{% url 'admin_panel:etf_create' %}" class="px-6 py-3 bg-slate-900 text-white rounded-xl font-black text-sm hover:bg-slate-800 transition-all shadow-lg shadow-slate-200 flex items-center gap-2 no-underline">
+                <span class="material-symbols-outlined text-[20px]">add_task</span>
+                New ETF
+            </a>
+        </div>
+    </div>
+
+    <!-- Filter Engine -->
+    <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm mb-8">
+        <form method="get" class="flex flex-wrap items-center gap-4">
+            <div class="flex-1 min-w-[280px] relative">
+                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
+                <input type="text" name="search" value="{{ search_query }}" placeholder="Filter by ETF name or symbol..."
+                       class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-slate-300">
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <select name="category" class="px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-xs font-black focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer min-w-[160px]">
+                    <option value="">All Categories</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat }}" {% if selected_category == cat %}selected{% endif %}>Cat: {{ cat }}</option>
+                    {% endfor %}
+                </select>
+                
+                <button type="submit" class="px-6 py-3 bg-primary text-white rounded-xl font-black text-[11px] uppercase tracking-widest hover:bg-primary/90 transition-all border-none cursor-pointer">Execute</button>
+                
+                {% if selected_category or search_query %}
+                <a href="{% url 'admin_panel:etfs_list' %}" class="p-3 bg-slate-100 text-slate-400 hover:text-slate-600 rounded-xl transition-all" title="Reset Filters">
+                    <span class="material-symbols-outlined text-[20px]">restart_alt</span>
+                </a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <!-- Data Table -->
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-50/50 border-bottom border-slate-100">
+                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Fund Entity</th>
+                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Classification</th>
+                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">yFinance Node</th>
+                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Pipeline Rank</th>
+                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Lifecycle</th>
+                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Operations</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-50">
+                    {% for etf in etfs %}
+                    <tr class="hover:bg-slate-50/50 transition-colors group">
+                        <td class="px-6 py-5">
+                            <div class="flex flex-col">
+                                <span class="text-sm font-black text-slate-900 leading-tight">{{ etf.name }}</span>
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ etf.short_name }}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-5">
+                            <span class="px-2 py-1 rounded-lg bg-indigo-50 text-indigo-600 text-[9px] font-black uppercase tracking-wider">{{ etf.category }}</span>
+                        </td>
+                        <td class="px-6 py-5">
+                            <code class="px-2 py-1 bg-slate-900 text-white rounded text-[10px] font-bold tracking-wider">{{ etf.symbol }}</code>
+                        </td>
+                        <td class="px-6 py-5 text-center text-[10px] font-black text-slate-900">
+                            #{{ etf.display_order }}
+                        </td>
+                        <td class="px-6 py-5">
+                            {% if etf.is_active %}
+                            <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-600 text-[9px] font-black uppercase tracking-wider flex items-center gap-1 w-fit">
+                                <span class="material-symbols-outlined text-[14px]">bolt</span>
+                                Active
+                            </span>
+                            {% else %}
+                            <span class="px-2.5 py-1 rounded-lg bg-rose-50 text-rose-600 text-[9px] font-black uppercase tracking-wider flex items-center gap-1 w-fit">
+                                <span class="material-symbols-outlined text-[14px]">pause_circle</span>
+                                Disabled
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-5">
+                            <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <a href="{% url 'admin_panel:etf_update' etf.id %}" class="p-2 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all" title="Modify Fund">
+                                    <span class="material-symbols-outlined text-[20px]">edit_note</span>
+                                </a>
+                                <a href="{% url 'admin_panel:etf_delete' etf.id %}" class="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all" title="Purge Record">
+                                    <span class="material-symbols-outlined text-[20px]">delete</span>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="px-6 py-20 text-center">
+                            <div class="flex flex-col items-center">
+                                <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4 text-slate-300">
+                                    <span class="material-symbols-outlined text-[32px]">dataset</span>
+                                </div>
+                                <h3 class="text-slate-900 font-bold">No Funds Found</h3>
+                                <p class="text-slate-500 text-sm">The ETF repository is currently empty.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if is_paginated %}
+        <div class="px-6 py-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between">
+            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                Ledger {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </p>
+            <div class="flex items-center gap-2">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}" class="p-2 bg-white border border-slate-200 rounded-lg text-slate-400 hover:text-slate-900 transition-all no-underline">
+                    <span class="material-symbols-outlined text-[20px]">west</span>
+                </a>
+                {% endif %}
+                
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}" class="p-2 bg-white border border-slate-200 rounded-lg text-slate-400 hover:text-slate-900 transition-all no-underline">
+                    <span class="material-symbols-outlined text-[20px]">east</span>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

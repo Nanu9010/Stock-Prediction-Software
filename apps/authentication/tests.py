@@ -82,9 +82,10 @@ class UserSessionTest(TestCase):
         """Test creating a user session"""
         session = UserSession.objects.create(
             user=self.user,
-            session_key='test_session_key',
+            session_token='test_session_key',
             ip_address='127.0.0.1',
-            user_agent='Test Browser'
+            user_agent='Test Browser',
+            expires_at=timezone.now() + timedelta(days=7),
         )
         
         self.assertEqual(session.user, self.user)
@@ -95,8 +96,9 @@ class UserSessionTest(TestCase):
         """Test session string representation"""
         session = UserSession.objects.create(
             user=self.user,
-            session_key='test_key',
-            ip_address='127.0.0.1'
+            session_token='test_key',
+            ip_address='127.0.0.1',
+            expires_at=timezone.now() + timedelta(days=7),
         )
         
         self.assertIn(self.user.email, str(session))

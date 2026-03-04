@@ -1,42 +1,53 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Commodities Market — StockPro{% endblock %}
+{% block title %}Hard Assets - Commodities Market - StockPro{% endblock %}
 
 {% block page_content %}
-<div class="space-y-10">
+<div class="max-w-7xl mx-auto px-4 py-12">
     <!-- Page Header -->
-    <div class="flex items-center gap-3">
-        <span class="size-10 rounded-xl bg-accent-teal/10 flex items-center justify-center">
-            <span class="material-symbols-outlined text-accent-teal text-xl">oil_barrel</span>
-        </span>
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
         <div>
-            <h1 class="text-2xl font-extrabold text-text-main m-0">Commodities Market</h1>
-            <p class="text-sm text-text-muted m-0">Live commodity prices — Gold, Silver, Crude Oil, Natural Gas, and more.</p>
+            <h1 class="text-4xl font-black text-slate-900 tracking-tight mb-2">Hard Assets</h1>
+            <p class="text-slate-500 font-medium tracking-tight italic">Real-time valuation of global commodities and industrial raw materials.</p>
+        </div>
+        <div class="flex items-center gap-2 px-4 py-2 bg-slate-100 rounded-xl text-slate-500 text-[10px] font-black uppercase tracking-widest border border-slate-200">
+            <span class="material-symbols-outlined text-[16px]">public</span>
+            Global Supply Chain Pulse
         </div>
     </div>
 
     <!-- Indian Market Section -->
-    <div class="space-y-4">
-        <div class="flex items-center gap-2 px-1">
-            <span class="text-xl">🇮🇳</span>
-            <h2 class="text-lg font-bold text-text-main m-0">Indian Market (MCX)</h2>
+    <div class="mb-16">
+        <div class="flex items-center gap-3 mb-8">
+            <div class="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center text-white text-xs font-black">IN</div>
+            <h2 class="text-xl font-black text-slate-900 tracking-tight">Institutional Domestic (MCX)</h2>
         </div>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {% for item in indian_commodities %}
-            <div class="bg-surface p-6 rounded-2xl shadow-soft border border-gray-50 flex items-center justify-between hover:scale-[1.02] transition-transform cursor-default">
-                <div class="flex items-center gap-4">
-                    <span class="text-3xl">{{ item.icon }}</span>
-                    <div>
-                        <h3 class="text-sm font-bold text-text-main m-0">{{ item.name }}</h3>
-                        <p class="text-[10px] uppercase tracking-wider text-text-muted font-bold m-0">{{ item.unit }}</p>
+            <div class="bg-white p-6 rounded-[32px] border border-slate-200 shadow-sm hover:shadow-md transition-all group overflow-hidden relative">
+                <div class="flex items-start justify-between mb-4 relative z-10">
+                    <div class="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                        {{ item.icon }}
+                    </div>
+                    <div class="text-right">
+                        <span class="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-1">Delta %</span>
+                        <div class="px-2 py-0.5 rounded-lg {% if item.change_pct >= 0 %}bg-emerald-50 text-emerald-600{% else %}bg-rose-50 text-rose-600{% endif %} text-[10px] font-black">
+                            {% if item.change_pct >= 0 %}+{% endif %}{{ item.change_pct }}%
+                        </div>
                     </div>
                 </div>
-                <div class="text-right">
-                    <div class="text-lg font-extrabold text-text-main">₹{{ item.price|floatformat:2 }}</div>
-                    <div class="text-xs font-bold {% if item.change_pct >= 0 %}text-green-500{% else %}text-red-500{% endif %}">
-                        {% if item.change_pct >= 0 %}+{% endif %}{{ item.change_pct }}%
+                <div class="relative z-10">
+                    <h3 class="text-sm font-black text-slate-900 mb-1 tracking-tight">{{ item.name }}</h3>
+                    <div class="flex items-end gap-2">
+                        <span class="text-2xl font-black text-slate-900">₹{{ item.price|floatformat:0 }}</span>
+                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">/ {{ item.unit }}</span>
                     </div>
+                </div>
+                <!-- Subtle background icon -->
+                <div class="absolute -right-4 -bottom-4 text-slate-50 text-6xl font-black select-none pointer-events-none group-hover:text-slate-100 transition-colors">
+                    {{ item.icon }}
                 </div>
             </div>
             {% endfor %}
@@ -44,47 +55,46 @@
     </div>
 
     <!-- Global Market Section -->
-    <div class="space-y-4">
-        <div class="flex items-center gap-2 px-1">
-            <span class="text-xl">🌐</span>
-            <h2 class="text-lg font-bold text-text-main m-0">Global Market (USD)</h2>
+    <div>
+        <div class="flex items-center gap-3 mb-8">
+            <div class="w-8 h-8 bg-slate-100 border border-slate-200 rounded-lg flex items-center justify-center text-slate-900 text-xs font-black">GL</div>
+            <h2 class="text-xl font-black text-slate-900 tracking-tight">Global Synthetic Spot (USD)</h2>
         </div>
 
-        <div class="bg-surface rounded-2xl shadow-soft overflow-hidden border border-gray-50">
+        <div class="bg-white rounded-[40px] border border-slate-200 shadow-sm overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full">
+                <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="border-b border-gray-100">
-                            <th class="w-12"></th>
-                            <th class="text-left px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Commodity</th>
-                            <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Price</th>
-                            <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Change</th>
-                            <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Change %</th>
-                            <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Unit</th>
+                        <tr class="bg-slate-50/50">
+                            <th class="px-8 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Asset Class</th>
+                            <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest text-right">Reference Price</th>
+                            <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest text-right">Variance</th>
+                            <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest text-right">Delta (%)</th>
+                            <th class="px-8 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest text-right">Unit Node</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-50">
+                    <tbody class="divide-y divide-slate-50">
                         {% for item in global_commodities %}
-                        <tr class="hover:bg-gray-50/50 transition-colors">
-                            <td class="pl-6 py-4 text-2xl text-center">{{ item.icon }}</td>
-                            <td class="px-6 py-4">
-                                <span class="font-bold text-text-main text-sm">{{ item.name }}</span>
+                        <tr class="hover:bg-slate-50/50 transition-colors group">
+                            <td class="px-8 py-6">
+                                <div class="flex items-center gap-4">
+                                    <span class="text-2xl">{{ item.icon }}</span>
+                                    <span class="text-sm font-black text-slate-900 group-hover:text-primary transition-colors">{{ item.name }}</span>
+                                </div>
                             </td>
-                            <td class="px-6 py-4 text-center">
-                                <span class="text-sm font-bold text-text-main">${{ item.price|floatformat:2 }}</span>
+                            <td class="px-6 py-6 text-right font-black text-slate-900 text-sm">
+                                ${{ item.price|floatformat:2 }}
                             </td>
-                            <td class="px-6 py-4 text-center">
-                                <span class="text-sm font-bold {% if item.change >= 0 %}text-green-500{% else %}text-red-500{% endif %}">
-                                    {% if item.change >= 0 %}+{% endif %}{{ item.change|floatformat:2 }}
-                                </span>
+                            <td class="px-6 py-6 text-right font-bold {% if item.change >= 0 %}text-emerald-500{% else %}text-rose-500{% endif %} text-xs">
+                                {% if item.change >= 0 %}+{% endif %}{{ item.change|floatformat:2 }}
                             </td>
-                            <td class="px-6 py-4 text-center">
-                                <span class="text-sm font-bold {% if item.change_pct >= 0 %}text-green-500{% else %}text-red-500{% endif %}">
+                            <td class="px-6 py-6 text-right">
+                                <span class="px-2.5 py-1 rounded-lg {% if item.change_pct >= 0 %}bg-emerald-50 text-emerald-600{% else %}bg-rose-50 text-rose-600{% endif %} text-[10px] font-black">
                                     {% if item.change_pct >= 0 %}+{% endif %}{{ item.change_pct }}%
                                 </span>
                             </td>
-                            <td class="px-6 py-4 text-center">
-                                <span class="text-xs font-bold text-text-muted">{{ item.unit }}</span>
+                            <td class="px-8 py-6 text-right font-bold text-slate-400 text-[10px] uppercase tracking-widest">
+                                {{ item.unit }}
                             </td>
                         </tr>
                         {% endfor %}

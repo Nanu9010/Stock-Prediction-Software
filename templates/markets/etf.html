@@ -1,65 +1,74 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Exchange Traded Funds (ETFs) — StockPro{% endblock %}
+{% block title %}Strategic Baskets - ETFs - StockPro{% endblock %}
 
 {% block page_content %}
-<div class="space-y-8">
+<div class="max-w-7xl mx-auto px-4 py-12">
     <!-- Page Header -->
-    <div class="flex items-center gap-3">
-        <span class="size-10 rounded-xl bg-accent-teal/10 flex items-center justify-center">
-            <span class="material-symbols-outlined text-accent-teal text-xl">package</span>
-        </span>
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
         <div>
-            <h1 class="text-2xl font-extrabold text-text-main m-0">Exchange Traded Funds (ETFs)</h1>
-            <p class="text-sm text-text-muted m-0">Popular ETFs with live prices from NSE.</p>
+            <h1 class="text-4xl font-black text-slate-900 tracking-tight mb-2">Strategic Baskets</h1>
+            <p class="text-slate-500 font-medium tracking-tight italic">Exchange Traded Funds curated for thematic institutional exposure.</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <div class="flex -space-x-2">
+                <div class="w-8 h-8 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center text-[10px] font-black">EQ</div>
+                <div class="w-8 h-8 rounded-full bg-slate-900 border-2 border-white flex items-center justify-center text-[10px] font-black text-white">GL</div>
+            </div>
+            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Global Allocation Stream</span>
         </div>
     </div>
 
     <!-- ETF Table Card -->
-    <div class="bg-surface rounded-2xl shadow-soft overflow-hidden">
+    <div class="bg-white rounded-[40px] border border-slate-200 shadow-sm overflow-hidden min-h-[400px]">
         <div class="overflow-x-auto">
-            <table class="w-full">
+            <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="border-b border-gray-100">
-                        <th class="text-left px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">ETF Name</th>
-                        <th class="text-left px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Symbol</th>
-                        <th class="text-left px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Category</th>
-                        <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Price</th>
-                        <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Change</th>
-                        <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Change %</th>
+                    <tr class="bg-slate-50/50">
+                        <th class="px-8 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">ETF Vehicle</th>
+                        <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Identifier</th>
+                        <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Classification</th>
+                        <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest text-right">NAV Node</th>
+                        <th class="px-8 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest text-right">Delta (1D)</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-50">
+                <tbody class="divide-y divide-slate-50">
                     {% for etf in etfs %}
-                    <tr class="hover:bg-gray-50/50 transition-colors">
-                        <td class="px-6 py-4">
-                            <span class="font-bold text-text-main text-sm">{{ etf.name }}</span>
+                    <tr class="hover:bg-slate-50/50 transition-colors group">
+                        <td class="px-8 py-6">
+                            <span class="text-sm font-black text-slate-900 group-hover:text-primary transition-colors">{{ etf.name }}</span>
                         </td>
-                        <td class="px-6 py-4">
-                            <span class="text-xs font-bold text-text-muted bg-gray-100 px-2 py-1 rounded">{{ etf.symbol }}</span>
+                        <td class="px-6 py-6">
+                            <span class="px-2 py-1 bg-slate-100 text-slate-600 text-[10px] font-black rounded-lg uppercase tracking-wider">{{ etf.symbol }}</span>
                         </td>
-                        <td class="px-6 py-4">
-                            <span class="text-sm text-text-muted">{{ etf.category }}</span>
+                        <td class="px-6 py-6 font-bold text-slate-500 text-xs">
+                            {{ etf.category }}
                         </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="text-sm font-bold text-text-main">₹{{ etf.price }}</span>
+                        <td class="px-6 py-6 text-right font-black text-slate-900 text-sm">
+                            ₹{{ etf.price }}
                         </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="text-sm font-bold {% if etf.change >= 0 %}text-green-500{% else %}text-red-500{% endif %}">
-                                {% if etf.change >= 0 %}+{% endif %}{{ etf.change }}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="text-sm font-bold {% if etf.change_pct >= 0 %}text-green-500{% else %}text-red-500{% endif %}">
-                                {% if etf.change_pct >= 0 %}+{% endif %}{{ etf.change_pct }}%
-                            </span>
+                        <td class="px-8 py-6 text-right">
+                            <div class="flex flex-col items-end">
+                                <span class="text-sm font-black {% if etf.change >= 0 %}text-emerald-500{% else %}text-rose-500{% endif %}">
+                                    {% if etf.change >= 0 %}+{% endif %}{{ etf.change }}
+                                </span>
+                                <span class="text-[10px] font-bold opacity-60">
+                                    {% if etf.change_pct >= 0 %}+{% endif %}{{ etf.change_pct }}%
+                                </span>
+                            </div>
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="6" class="px-6 py-12 text-center">
-                            <span class="material-symbols-outlined text-5xl text-gray-300 mb-3 block">inventory_2</span>
-                            <p class="text-text-muted text-sm m-0">No ETF data available right now</p>
+                        <td colspan="5" class="px-8 py-24 text-center">
+                            <div class="flex flex-col items-center">
+                                <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-4 text-slate-200">
+                                    <span class="material-symbols-outlined text-[40px]">inventory_2</span>
+                                </div>
+                                <h3 class="text-slate-900 font-black text-lg">Inventory Depleted</h3>
+                                <p class="text-slate-400 text-sm font-medium italic">ETF movement data is currently desynchronized or building.</p>
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}

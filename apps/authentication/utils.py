@@ -10,7 +10,7 @@ from django.utils.html import strip_tags
 
 def generate_verification_token():
     """Generate a secure random token for email verification"""
-    return secrets.token_urlsafe(32)
+    return secrets.token_hex(32)
 
 
 def send_verification_email(user, token):

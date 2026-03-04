@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Popular Stocks - StockPro{% endblock %}
+
+{% block page_content %}
+<section class="py-8">
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-bold text-text-main">Popular Stocks</h1>
+        <a href="{% url 'market_data:indices' %}" class="text-sm text-accent-teal no-underline">View Indices</a>
+    </div>
+
+    <div class="bg-surface rounded-2xl shadow-soft overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full text-sm">
+                <thead class="bg-background-base">
+                    <tr>
+                        <th class="px-4 py-3 text-left font-semibold text-text-muted">Symbol</th>
+                        <th class="px-4 py-3 text-left font-semibold text-text-muted">Company</th>
+                        <th class="px-4 py-3 text-right font-semibold text-text-muted">Price</th>
+                        <th class="px-4 py-3 text-right font-semibold text-text-muted">Change</th>
+                        <th class="px-4 py-3 text-right font-semibold text-text-muted">Change %</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stock in stocks %}
+                    <tr class="border-t border-gray-100">
+                        <td class="px-4 py-3 font-semibold text-text-main">{{ stock.symbol }}</td>
+                        <td class="px-4 py-3 text-text-muted">{{ stock.company_name }}</td>
+                        <td class="px-4 py-3 text-right font-medium text-text-main">{{ stock.current_price }}</td>
+                        <td class="px-4 py-3 text-right {% if stock.change >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                            {{ stock.change }}
+                        </td>
+                        <td class="px-4 py-3 text-right {% if stock.change_percent >= 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                            {{ stock.change_percent }}%
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="px-4 py-8 text-center text-text-muted">No stock data available yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}

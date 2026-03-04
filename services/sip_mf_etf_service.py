@@ -14,18 +14,7 @@ logging.getLogger('yfinance').setLevel(logging.CRITICAL)
 CACHE_TTL = 600  # 10 minutes
 
 # ─── ETF Data (live from yfinance) ──────────────────────────
-
-POPULAR_ETFS = [
-    {'name': 'Nippon India Nifty BeES', 'symbol': 'NIFTYBEES.NS', 'short': 'NIFTYBEES', 'category': 'Index'},
-    {'name': 'Nippon India Bank BeES', 'symbol': 'BANKBEES.NS', 'short': 'BANKBEES', 'category': 'Banking'},
-    {'name': 'Nippon India Gold BeES', 'symbol': 'GOLDBEES.NS', 'short': 'GOLDBEES', 'category': 'Gold'},
-    {'name': 'SBI ETF Nifty 50', 'symbol': 'SETFNIF50.NS', 'short': 'SETFNIF50', 'category': 'Index'},
-    {'name': 'Nippon India Junior BeES', 'symbol': 'JUNIORBEES.NS', 'short': 'JUNIORBEES', 'category': 'Index'},
-    {'name': 'Nippon India Silver ETF', 'symbol': 'SILVERBEES.NS', 'short': 'SILVERBEES', 'category': 'Silver'},
-    {'name': 'Nippon India Liquid BeES', 'symbol': 'LIQUIDBEES.NS', 'short': 'LIQUIDBEES', 'category': 'Liquid'},
-    {'name': 'ICICI Pru Bharat 22 ETF', 'symbol': 'ICICIB22.NS', 'short': 'ICICIB22', 'category': 'Thematic'},
-]
-
+from apps.market_data.models import ETF
 
 def get_top_etfs(force_refresh=False):
     """Get popular ETFs with live prices"""
@@ -35,10 +24,12 @@ def get_top_etfs(force_refresh=False):
         if cached:
             return cached
 
+    etfs = ETF.objects.filter(is_active=True)
+    
     results = []
-    for etf in POPULAR_ETFS:
+    for etf in etfs:
         try:
-            ticker = yf.Ticker(etf['symbol'])
+            ticker = yf.Ticker(etf.symbol)
             hist = ticker.history(period='2d')
             if hist.empty:
                 continue
@@ -49,15 +40,15 @@ def get_top_etfs(force_refresh=False):
             change_pct = (change / prev * 100) if prev else 0
 
             results.append({
-                'name': etf['name'],
-                'symbol': etf['short'],
-                'category': etf['category'],
+                'name': etf.name,
+                'symbol': etf.short_name,
+                'category': etf.category,
                 'price': round(current, 2),
                 'change': round(change, 2),
                 'change_pct': round(change_pct, 2),
             })
         except Exception as e:
-            logger.debug(f"Skipping ETF {etf['name']}: {e}")
+            logger.debug(f"Skipping ETF {etf.name}: {e}")
 
     if not results:
         results = _fallback_etfs()
@@ -314,10 +305,4 @@ def get_liquidity_data():
 # ─── Fallback ETF data ──────────────────────────────────────
 
 def _fallback_etfs():
-    return [
-        {'name': 'Nippon India Nifty BeES', 'symbol': 'NIFTYBEES', 'category': 'Index', 'price': 234.50, 'change': 1.85, 'change_pct': 0.80},
-        {'name': 'Nippon India Bank BeES', 'symbol': 'BANKBEES', 'category': 'Banking', 'price': 468.20, 'change': 5.10, 'change_pct': 1.10},
-        {'name': 'Nippon India Gold BeES', 'symbol': 'GOLDBEES', 'category': 'Gold', 'price': 54.30, 'change': 0.16, 'change_pct': 0.30},
-        {'name': 'SBI ETF Nifty 50', 'symbol': 'SETFNIF50', 'category': 'Index', 'price': 245.80, 'change': 2.10, 'change_pct': 0.86},
-        {'name': 'Nippon India Silver ETF', 'symbol': 'SILVERBEES', 'category': 'Silver', 'price': 72.10, 'change': -0.14, 'change_pct': -0.19},
-    ]
+    return []

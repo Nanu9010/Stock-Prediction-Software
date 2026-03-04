@@ -1,54 +1,85 @@
 {% load static %}
-{# ─── Admin Sidebar ─────────────────────────────────────────────────────────── #}
-<aside class="admin-sidebar" id="adminSidebar">
-    <nav class="sidebar-nav">
-        <a href="{% url 'admin_panel:dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
-            <span class="nav-icon">📊</span>
-            <span class="nav-label">Dashboard</span>
+<!-- SideNavBar -->
+<aside class="w-64 border-r border-slate-200 bg-white flex flex-col h-full shrink-0 z-20 transition-transform duration-300 md:translate-x-0 -translate-x-full fixed md:relative" id="admin-sidebar">
+    <div class="h-16 flex items-center justify-between px-6 border-b border-slate-200">
+        <div class="flex items-center gap-3">
+            <div class="size-8 bg-primary rounded-lg flex items-center justify-center text-white">
+                <span class="material-symbols-outlined text-[18px]">trending_up</span>
+            </div>
+            <div>
+                <h1 class="text-slate-900 text-sm font-bold leading-tight">StockPro</h1>
+                <p class="text-slate-500 text-[10px] uppercase tracking-wider font-semibold">Admin Panel</p>
+            </div>
+        </div>
+        <button id="close-sidebar-btn" class="md:hidden text-slate-500">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+    </div>
+    
+    <nav class="flex-1 px-4 py-4 flex flex-col gap-1 overflow-y-auto w-full">
+        <!-- Overview -->
+        <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg no-underline font-medium transition-colors {% if request.resolver_match.url_name == 'dashboard' %}bg-primary text-white{% else %}text-slate-600 hover:bg-slate-100{% endif %}" href="{% url 'admin_panel:dashboard' %}">
+            <span class="material-symbols-outlined !text-[20px]">dashboard</span>
+            <span class="text-sm">Overview</span>
+        </a>
+        
+        <div class="mt-4 px-3">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Management</p>
+        </div>
+
+        <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg no-underline font-medium transition-colors {% if 'users' in request.resolver_match.url_name %}bg-primary text-white{% else %}text-slate-600 hover:bg-slate-100{% endif %}" href="{% url 'admin_panel:users_list' %}">
+            <span class="material-symbols-outlined !text-[20px]">group</span>
+            <span class="text-sm">Users</span>
         </a>
 
-        <div class="nav-section">Research Calls</div>
-        <a href="{% url 'admin_panel:calls_list' %}" class="nav-item {% if 'calls' in request.resolver_match.url_name %}active{% endif %}">
-            <span class="nav-icon">📈</span>
-            <span class="nav-label">All Calls</span>
+        <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg no-underline font-medium transition-colors {% if 'brokers' in request.resolver_match.url_name %}bg-primary text-white{% else %}text-slate-600 hover:bg-slate-100{% endif %}" href="{% url 'admin_panel:brokers_list' %}">
+            <span class="material-symbols-outlined !text-[20px]">storefront</span>
+            <span class="text-sm">Brokers</span>
+        </a>
+        
+        <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg no-underline font-medium transition-colors {% if 'calls' in request.resolver_match.url_name %}bg-primary text-white{% else %}text-slate-600 hover:bg-slate-100{% endif %}" href="{% url 'admin_panel:calls_list' %}">
+            <span class="material-symbols-outlined !text-[20px]">call</span>
+            <span class="text-sm">Research Calls</span>
         </a>
 
-        <div class="nav-section">Management</div>
-        <a href="{% url 'admin_panel:brokers_list' %}" class="nav-item {% if 'brokers' in request.resolver_match.url_name %}active{% endif %}">
-            <span class="nav-icon">🏢</span>
-            <span class="nav-label">Brokers</span>
+        <div class="mt-4 px-3">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Data</p>
+        </div>
+
+        <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg no-underline font-medium transition-colors {% if 'ipos' in request.path %}bg-primary text-white{% else %}text-slate-600 hover:bg-slate-100{% endif %}" href="{% url 'admin_panel:ipos_list' %}">
+            <span class="material-symbols-outlined !text-[20px]">rocket_launch</span>
+            <span class="text-sm">IPOs</span>
         </a>
-        <a href="{% url 'admin_panel:users_list' %}" class="nav-item {% if 'users' in request.resolver_match.url_name %}active{% endif %}">
-            <span class="nav-icon">👥</span>
-            <span class="nav-label">Users</span>
+        
+        <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg no-underline font-medium transition-colors {% if 'commodities' in request.path %}bg-primary text-white{% else %}text-slate-600 hover:bg-slate-100{% endif %}" href="{% url 'admin_panel:commodities_list' %}">
+            <span class="material-symbols-outlined !text-[20px]">oil_barrel</span>
+            <span class="text-sm">Commodities</span>
         </a>
 
-        <div class="nav-section">Data</div>
-        <a href="{% url 'admin_panel:portfolios_list' %}" class="nav-item {% if 'portfolios' in request.resolver_match.url_name %}active{% endif %}">
-            <span class="nav-icon">💼</span>
-            <span class="nav-label">Portfolios</span>
-        </a>
-        <a href="{% url 'admin_panel:watchlists_list' %}" class="nav-item {% if 'watchlists' in request.resolver_match.url_name %}active{% endif %}">
-            <span class="nav-icon">👁️</span>
-            <span class="nav-label">Watchlists</span>
+        <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg no-underline font-medium transition-colors {% if 'etfs' in request.path %}bg-primary text-white{% else %}text-slate-600 hover:bg-slate-100{% endif %}" href="{% url 'admin_panel:etfs_list' %}">
+            <span class="material-symbols-outlined !text-[20px]">candlestick_chart</span>
+            <span class="text-sm">ETFs</span>
         </a>
 
-        <div class="nav-section">System</div>
-        <a href="{% url 'admin_panel:subscriptions_list' %}" class="nav-item {% if 'subscription' in request.resolver_match.url_name %}active{% endif %}">
-            <span class="nav-icon">📦</span>
-            <span class="nav-label">Subscriptions</span>
+        <div class="mt-4 px-3">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">System</p>
+        </div>
+        
+        <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg no-underline font-medium transition-colors {% if 'subscriptions' in request.path %}bg-primary text-white{% else %}text-slate-600 hover:bg-slate-100{% endif %}" href="{% url 'admin_panel:subscriptions_list' %}">
+            <span class="material-symbols-outlined !text-[20px]">workspace_premium</span>
+            <span class="text-sm">Subscriptions</span>
         </a>
-        <a href="{% url 'admin_panel:payments_list' %}" class="nav-item {% if 'payment' in request.resolver_match.url_name %}active{% endif %}">
-            <span class="nav-icon">💳</span>
-            <span class="nav-label">Payments</span>
+
+        <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg no-underline font-medium transition-colors {% if 'payments' in request.path %}bg-primary text-white{% else %}text-slate-600 hover:bg-slate-100{% endif %}" href="{% url 'admin_panel:payments_list' %}">
+            <span class="material-symbols-outlined !text-[20px]">payments</span>
+            <span class="text-sm">Payments</span>
         </a>
     </nav>
-
-    {# ── Back to Site button — outside nav so it always stays at bottom ── #}
-    <div class="sidebar-footer">
-        <a href="{% url 'dashboard:dashboard' %}" class="back-to-site-btn">
-            <span class="nav-icon">←</span>
-            <span class="nav-label">Back to Site</span>
+    
+    <div class="p-4 border-t border-slate-200">
+        <a href="{% url 'dashboard:dashboard' %}" class="flex items-center justify-center gap-2 w-full py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold transition-colors no-underline">
+            <span class="material-symbols-outlined !text-[16px]">arrow_back</span>
+            Back to Site
         </a>
     </div>
 </aside>

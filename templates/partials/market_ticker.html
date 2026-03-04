@@ -1,120 +1,62 @@
 {% load static %}
 {# ─── Live Market Ticker ──────────────────────────────────────────────────── #}
 <style>
-.market-ticker {
-    background: linear-gradient(90deg, #06091a 0%, #0d1230 100%);
-    border-bottom: 1px solid rgba(108,99,255,0.18);
-    overflow: hidden;
-    height: 34px;
+@keyframes scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+.animate-scroll {
     display: flex;
-    align-items: center;
-    position: relative;
+    width: max-content;
+    animation: scroll 30s linear infinite;
 }
-.market-ticker::before,
-.market-ticker::after {
-    content: '';
-    position: absolute;
-    top: 0; bottom: 0;
-    width: 60px;
-    z-index: 2;
-    pointer-events: none;
-}
-.market-ticker::before { left: 0;  background: linear-gradient(to right,  #06091a 0%, transparent 100%); }
-.market-ticker::after  { right: 0; background: linear-gradient(to left, #06091a 0%, transparent 100%); }
-
-.ticker-track {
-    display: flex;
-    align-items: center;
-    gap: 0;
-    animation: ticker-scroll 60s linear infinite;
-    white-space: nowrap;
-    will-change: transform;
-}
-.ticker-track:hover { animation-play-state: paused; }
-
-@keyframes ticker-scroll {
-    from { transform: translateX(0); }
-    to   { transform: translateX(-50%); }
-}
-
-.ticker-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 0 24px;
-    border-right: 1px solid rgba(255,255,255,0.07);
-    font-family: 'Inter', 'Segoe UI', monospace;
-}
-.ticker-label {
-    font-size: 11px;
-    font-weight: 700;
-    color: rgba(255,255,255,0.45);
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-}
-.ticker-value {
-    font-size: 12px;
-    font-weight: 700;
-    color: #e8eaf0;
-    letter-spacing: 0.2px;
-}
-.ticker-change {
-    font-size: 11px;
-    font-weight: 600;
-    padding: 1px 6px;
-    border-radius: 4px;
-}
-.ticker-change.up   { color: #00e676; background: rgba(0,230,118,0.1); }
-.ticker-change.down { color: #ff5252; background: rgba(255,82,82,0.1); }
-.ticker-change.neutral { color: rgba(255,255,255,0.4); }
-
-.ticker-status {
-    position: absolute;
-    right: 70px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 10px;
-    color: rgba(255,255,255,0.2);
-    z-index: 3;
-    letter-spacing: 0.3px;
-}
-.ticker-dot {
-    display: inline-block;
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: #00e676;
-    margin-right: 4px;
-    animation: blink 2s ease-in-out infinite;
+.animate-scroll:hover {
+    animation-play-state: paused;
 }
 @keyframes blink {
     0%,100% { opacity: 1; }
     50%      { opacity: 0.2; }
 }
+.ticker-dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #10b981; /* emerald-500 */
+    margin-right: 4px;
+    animation: blink 2s ease-in-out infinite;
+}
 </style>
 
-<div class="market-ticker" id="marketTicker">
-    <div class="ticker-track" id="tickerTrack">
-        {# Items injected by JS; static placeholders to prevent layout shift #}
-        <div class="ticker-item">
-            <span class="ticker-label">NIFTY 50</span>
-            <span class="ticker-value">Loading…</span>
+<div class="relative w-full bg-primary/5 border-b border-primary/10 py-2 overflow-hidden whitespace-nowrap text-sm font-display flex items-center">
+    <!-- Fade Edges -->
+    <div class="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-slate-50 to-transparent z-10 pointer-events-none"></div>
+    <div class="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-slate-50 to-transparent z-10 pointer-events-none"></div>
+
+    <div class="animate-scroll gap-8 px-4" id="tickerTrack">
+        <!-- Static Placeholder during Initial Load -->
+        <div class="flex items-center gap-2 px-4 shadow-sm py-1 bg-white rounded-md border border-slate-100">
+            <span class="font-bold text-slate-700">NIFTY 50:</span> 
+            <span class="text-slate-500">Loading…</span>
         </div>
-        <div class="ticker-item">
-            <span class="ticker-label">SENSEX</span>
-            <span class="ticker-value">Loading…</span>
+        <div class="flex items-center gap-2 px-4 shadow-sm py-1 bg-white rounded-md border border-slate-100">
+            <span class="font-bold text-slate-700">SENSEX:</span> 
+            <span class="text-slate-500">Loading…</span>
         </div>
-        <div class="ticker-item">
-            <span class="ticker-label">BANKNIFTY</span>
-            <span class="ticker-value">Loading…</span>
+        <div class="flex items-center gap-2 px-4 shadow-sm py-1 bg-white rounded-md border border-slate-100">
+            <span class="font-bold text-slate-700">BANKNIFTY:</span> 
+            <span class="text-slate-500">Loading…</span>
         </div>
     </div>
-    <span class="ticker-status" id="tickerStatus"></span>
+    
+    <div class="absolute right-4 z-20 bg-slate-50 px-2 py-0.5 rounded text-[10px] font-bold text-slate-500 flex items-center shadow-sm border border-slate-200" id="tickerStatus">
+        <span class="ticker-dot"></span>LIVE
+    </div>
 </div>
 
 <script>
 (function () {
-    const TICKER_URL = '/api/core/live-ticker/';
-    const POLL_MS    = 60_000;   // refresh every 60s (yfinance cache TTL)
+    const TICKER_URL = '/api/market/data/?type=ticker';
+    const POLL_MS    = 60_000;   // refresh every 60s
     const track      = document.getElementById('tickerTrack');
     const statusEl   = document.getElementById('tickerStatus');
     let   lastFetch  = 0;
@@ -123,13 +65,21 @@
         if (!results || !results.length) return '';
         return results.map(item => {
             const dir = item.direction;
-            const cls = dir === 'up' ? 'up' : dir === 'down' ? 'down' : 'neutral';
-            const arrow = dir === 'up' ? '▲' : dir === 'down' ? '▼' : '';
+            let cls = 'text-slate-600';
+            let arrow = '';
+            
+            if (dir === 'up') {
+                cls = 'text-green-600';
+                arrow = '▲';
+            } else if (dir === 'down') {
+                cls = 'text-red-600';
+                arrow = '▼';
+            }
+
             return `
-                <div class="ticker-item">
-                    <span class="ticker-label">${item.label}</span>
-                    <span class="ticker-value">${item.price}</span>
-                    <span class="ticker-change ${cls}">${arrow} ${item.change} (${item.change_pct})</span>
+                <div class="flex items-center gap-2 px-4 bg-white rounded-md border border-slate-100 shadow-sm py-1">
+                    <span class="font-bold text-slate-700">${item.label}:</span> 
+                    <span class="${cls} font-medium">${item.price} ${arrow} ${item.change} (${item.change_pct})</span>
                 </div>`;
         }).join('');
     }
@@ -145,9 +95,9 @@
     function injectAndDuplicate(html) {
         // Duplicate for seamless loop
         track.innerHTML = html + html;
-        // Reset animation
+        // Reset animation to prevent jumping
         track.style.animation = 'none';
-        track.offsetHeight; // reflow
+        track.offsetHeight; // force reflow
         track.style.animation = '';
     }
 
@@ -156,14 +106,19 @@
             const res  = await fetch(TICKER_URL, {credentials: 'same-origin'});
             if (!res.ok) throw new Error('HTTP ' + res.status);
             const data = await res.json();
-            const html = buildItems(data.results);
-            if (html) {
+            
+            // Expected format: data.data or data.results (adjusting based on unified API)
+            const results = data.data || data.results || [];
+            
+            if (results.length > 0) {
+                const html = buildItems(results);
                 injectAndDuplicate(html);
-                setStatus(!data.cached);
+                setStatus(true); // Always treat as live for ticker
                 lastFetch = Date.now();
             }
         } catch (e) {
-            if (statusEl) statusEl.textContent = 'Market data unavailable';
+            console.error('Ticker fetch error:', e);
+            setStatus(false); 
         }
     }
 

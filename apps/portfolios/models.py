@@ -36,7 +36,7 @@ class PortfolioItem(models.Model):
     
     STATUS_CHOICES = [
         ('ACTIVE', 'Active'),
-        ('EXITED', 'Exited'),
+        ('CLOSED', 'Closed'),
     ]
     
     portfolio = models.ForeignKey(Portfolio, on_delete=models.CASCADE, related_name='items')
@@ -88,6 +88,14 @@ class PortfolioItem(models.Model):
             self.profit_loss = self.current_value - self.invested_amount
             if self.invested_amount > 0:
                 self.profit_loss_percentage = (self.profit_loss / self.invested_amount) * 100
+
+    @property
+    def pnl_amount(self):
+        return self.profit_loss
+
+    @property
+    def pnl_percentage(self):
+        return self.profit_loss_percentage
 
     def save(self, *args, **kwargs):
         # Calculate invested amount

@@ -1,115 +1,167 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block page_css %}<link rel="stylesheet" href="{% static 'css/market_hero.css' %}">{% endblock page_css %}
+
+{% block title %}Investment Genesis - IPO Centre - StockPro{% endblock %}
 
 {% block page_content %}
-<div class="market-section-page">
-  <div class="section-page-container">
-    <a href="{% url 'dashboard:landing' %}" class="back-link">← Back to Market Hero</a>
-    <div class="section-page-header">
-      <div class="section-page-title">🏢 IPO Centre</div>
-      <div class="section-page-desc">Upcoming, open, and recently listed IPOs with performance tracking.</div>
+<div class="max-w-7xl mx-auto px-4 py-12">
+    <!-- Page Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+        <div>
+            <h1 class="text-4xl font-black text-slate-900 tracking-tight mb-2">IPO Centre</h1>
+            <p class="text-slate-500 font-medium tracking-tight italic">Upcoming, active, and recently listed capital raising events.</p>
+        </div>
+        
+        <a href="{% url 'dashboard:landing' %}" class="flex items-center gap-2 px-4 py-2 bg-slate-100 rounded-xl text-xs font-black text-slate-600 hover:text-slate-900 transition-colors border border-slate-200 w-fit">
+            <span class="material-symbols-outlined text-[16px]">arrow_back</span>
+            Market Terminal
+        </a>
     </div>
 
-    <!-- IPO Stats -->
+    <!-- IPO Performance Summary -->
     {% if ipo_stats %}
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 32px;">
-      <div class="widget-card-hero" style="text-align: center; padding: 20px;">
-        <div style="font-size: 28px; font-weight: 800; color: var(--accent-green);">{{ ipo_stats.total_upcoming }}</div>
-        <div style="font-size: 13px; color: var(--text-muted);">Upcoming IPOs</div>
-      </div>
-      <div class="widget-card-hero" style="text-align: center; padding: 20px;">
-        <div style="font-size: 28px; font-weight: 800; color: var(--accent-blue);">{{ ipo_stats.total_listed }}</div>
-        <div style="font-size: 13px; color: var(--text-muted);">Recently Listed</div>
-      </div>
-      <div class="widget-card-hero" style="text-align: center; padding: 20px;">
-        <div style="font-size: 28px; font-weight: 800; color: {% if ipo_stats.avg_listing_return >= 0 %}var(--accent-green){% else %}var(--accent-red){% endif %};">{{ ipo_stats.avg_listing_return }}%</div>
-        <div style="font-size: 13px; color: var(--text-muted);">Avg Listing Return</div>
-      </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div class="bg-white p-8 rounded-[32px] border border-slate-200 shadow-sm relative overflow-hidden group">
+            <div class="absolute -right-4 -top-4 w-24 h-24 bg-slate-50 rounded-full opacity-50 group-hover:scale-110 transition-transform"></div>
+            <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1 relative z-10">Queue Status</span>
+            <div class="text-3xl font-black text-slate-900 relative z-10">{{ ipo_stats.total_upcoming }}</div>
+            <span class="text-[10px] font-bold text-slate-300 mt-1 block italic relative z-10">Upcoming Liquidity Events</span>
+        </div>
+        <div class="bg-white p-8 rounded-[32px] border border-slate-200 shadow-sm relative overflow-hidden group">
+            <div class="absolute -right-4 -top-4 w-24 h-24 bg-slate-50 rounded-full opacity-50 group-hover:scale-110 transition-transform"></div>
+            <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1 relative z-10">Active Nodes</span>
+            <div class="text-3xl font-black text-slate-900 relative z-10">{{ ipo_stats.total_listed }}</div>
+            <span class="text-[10px] font-bold text-slate-300 mt-1 block italic relative z-10">Recently Integrated Assets</span>
+        </div>
+        <div class="bg-white p-8 rounded-[32px] border border-slate-200 shadow-sm border-b-4 border-b-emerald-500 relative overflow-hidden group">
+            <div class="absolute -right-4 -top-4 w-24 h-24 bg-emerald-50 rounded-full opacity-30 group-hover:scale-110 transition-transform"></div>
+            <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1 relative z-10">Historical Alpha</span>
+            <div class="text-3xl font-black text-emerald-500 relative z-10">{{ ipo_stats.avg_listing_return }}%</div>
+            <span class="text-[10px] font-bold text-slate-300 mt-1 block italic relative z-10">Average Listing Delta</span>
+        </div>
     </div>
     {% endif %}
 
     <!-- Upcoming IPOs -->
-    <div class="section-header-hero" style="margin-bottom: 16px;">
-      <div class="section-title-hero"><span class="icon">📋</span> Upcoming IPOs</div>
-    </div>
-    <div class="widget-card-hero" style="margin-bottom: 32px;">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Company</th>
-            <th>Sector</th>
-            <th>Price Band</th>
-            <th>Lot Size</th>
-            <th>Open Date</th>
-            <th>Close Date</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for ipo in upcoming_ipos %}
-          <tr>
-            <td style="font-weight: 600;">{{ ipo.company }}</td>
-            <td>{{ ipo.sector }}</td>
-            <td>{{ ipo.price_band }}</td>
-            <td>{{ ipo.lot_size }}</td>
-            <td>{{ ipo.open_date }}</td>
-            <td>{{ ipo.close_date }}</td>
-            <td>
-              <span class="ipo-status {% if ipo.status == 'OPEN' %}ipo-open{% elif ipo.status == 'UPCOMING' %}ipo-upcoming{% else %}ipo-closed{% endif %}">
-                {{ ipo.status }}
-              </span>
-            </td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="7" style="text-align: center; padding: 30px; color: var(--text-muted);">
-              No upcoming IPOs at this time.
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+    <div class="mb-16">
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center text-slate-900">
+                <span class="material-symbols-outlined text-[18px]">history_edu</span>
+            </div>
+            <h2 class="text-xl font-black text-slate-900 tracking-tight uppercase tracking-widest">Upcoming Deployments</h2>
+        </div>
+        
+        <div class="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="bg-slate-50 border-bottom border-slate-100">
+                            <th class="px-8 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Enterprise</th>
+                            <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Industry Node</th>
+                            <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Price Spectrum</th>
+                            <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Allocation Lot</th>
+                            <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Open Epoch</th>
+                            <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Terminal Epoch</th>
+                            <th class="px-8 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest text-right">Operational Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-50">
+                        {% for ipo in upcoming_ipos %}
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="px-8 py-6">
+                                <span class="text-sm font-black text-slate-900">{{ ipo.company }}</span>
+                            </td>
+                            <td class="px-6 py-6">
+                                <span class="text-xs font-bold text-slate-500">{{ ipo.sector }}</span>
+                            </td>
+                            <td class="px-6 py-6">
+                                <span class="text-sm font-black text-slate-900">{{ ipo.price_band }}</span>
+                            </td>
+                            <td class="px-6 py-6">
+                                <span class="text-xs font-bold text-slate-500">{{ ipo.lot_size }}</span>
+                            </td>
+                            <td class="px-6 py-6">
+                                <span class="text-xs font-bold text-slate-500">{{ ipo.open_date }}</span>
+                            </td>
+                            <td class="px-6 py-6">
+                                <span class="text-xs font-bold text-slate-500">{{ ipo.close_date }}</span>
+                            </td>
+                            <td class="px-8 py-6 text-right">
+                                <span class="px-3 py-1 rounded-lg {% if ipo.status == 'OPEN' %}bg-emerald-50 text-emerald-600{% elif ipo.status == 'UPCOMING' %}bg-blue-50 text-blue-600{% else %}bg-slate-50 text-slate-400{% endif %} text-[9px] font-black uppercase tracking-widest">
+                                    {{ ipo.status }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="px-8 py-20 text-center">
+                                <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-200">
+                                    <span class="material-symbols-outlined text-[32px]">inventory_2</span>
+                                </div>
+                                <p class="text-slate-400 font-medium italic text-sm">No upcoming IPO strings detected in the current terminal cycle.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <!-- Recently Listed -->
-    <div class="section-header-hero" style="margin-bottom: 16px;">
-      <div class="section-title-hero"><span class="icon">🆕</span> Recently Listed</div>
+    <div>
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center text-slate-900">
+                <span class="material-symbols-outlined text-[18px]">new_releases</span>
+            </div>
+            <h2 class="text-xl font-black text-slate-900 tracking-tight uppercase tracking-widest">Integrated Assets</h2>
+        </div>
+        
+        <div class="bg-white rounded-[32px] border border-slate-200 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="bg-slate-50 border-bottom border-slate-100">
+                            <th class="px-8 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Asset Name</th>
+                            <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Domain</th>
+                            <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Genesis Price</th>
+                            <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Current Spot</th>
+                            <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Alpha Change</th>
+                            <th class="px-8 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest text-right">Integration Date</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-50">
+                        {% for ipo in recently_listed %}
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="px-8 py-6">
+                                <span class="text-sm font-black text-slate-900">{{ ipo.company }}</span>
+                            </td>
+                            <td class="px-6 py-6">
+                                <span class="text-xs font-bold text-slate-500">{{ ipo.sector }}</span>
+                            </td>
+                            <td class="px-6 py-6 font-bold text-slate-900 text-sm">₹{{ ipo.issue_price }}</td>
+                            <td class="px-6 py-6 font-black text-slate-900 text-sm">₹{{ ipo.current_price }}</td>
+                            <td class="px-6 py-6">
+                                <div class="flex items-center gap-1.5 {% if ipo.return_pct >= 0 %}text-emerald-500{% else %}text-rose-500{% endif %} font-black text-sm">
+                                    <span class="material-symbols-outlined text-[16px]">{% if ipo.return_pct >= 0 %}trending_up{% else %}trending_down{% endif %}</span>
+                                    {% if ipo.return_pct >= 0 %}+{% endif %}{{ ipo.return_pct }}%
+                                </div>
+                            </td>
+                            <td class="px-8 py-6 text-right">
+                                <span class="text-xs font-bold text-slate-400">{{ ipo.listing_date }}</span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="px-8 py-20 text-center">
+                                <p class="text-slate-400 font-medium italic text-sm">Historical archive empty for current cycle.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-    <div class="widget-card-hero">
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Company</th>
-            <th>Sector</th>
-            <th>Issue Price</th>
-            <th>Current Price</th>
-            <th>Return</th>
-            <th>Listed Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for ipo in recently_listed %}
-          <tr>
-            <td style="font-weight: 600;">{{ ipo.company }}</td>
-            <td>{{ ipo.sector }}</td>
-            <td>₹{{ ipo.issue_price }}</td>
-            <td style="font-weight: 700;">₹{{ ipo.current_price }}</td>
-            <td class="{% if ipo.return_pct >= 0 %}text-gain{% else %}text-loss{% endif %}">
-              {% if ipo.return_pct >= 0 %}+{% endif %}{{ ipo.return_pct }}%
-            </td>
-            <td>{{ ipo.listing_date }}</td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="6" style="text-align: center; padding: 30px; color: var(--text-muted);">
-              No recently listed IPOs.
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>
 </div>
 {% endblock %}

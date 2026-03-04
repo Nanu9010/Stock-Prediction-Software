@@ -1,77 +1,82 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Top Mutual Funds — StockPro{% endblock %}
+{% block title %}Capital Aggregators - Mutual Funds - StockPro{% endblock %}
 
 {% block page_content %}
-<div class="space-y-8">
+<div class="max-w-7xl mx-auto px-4 py-12">
     <!-- Page Header -->
-    <div class="flex items-center gap-3">
-        <span class="size-10 rounded-xl bg-accent-teal/10 flex items-center justify-center">
-            <span class="material-symbols-outlined text-accent-teal text-xl">insights</span>
-        </span>
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
         <div>
-            <h1 class="text-2xl font-extrabold text-text-main m-0">Top Mutual Funds</h1>
-            <p class="text-sm text-text-muted m-0">Curated selection of highest-performing mutual funds across categories.</p>
+            <h1 class="text-4xl font-black text-slate-900 tracking-tight mb-2">Capital Aggregators</h1>
+            <p class="text-slate-500 font-medium tracking-tight italic">Top-tier Mutual Fund vehicles indexed by alpha-generation potential.</p>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="px-4 py-2 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+                <span class="material-symbols-outlined text-[16px]">verified</span>
+                Institutional Choice
+            </div>
         </div>
     </div>
 
     <!-- Funds Table Card -->
-    <div class="bg-surface rounded-2xl shadow-soft overflow-hidden">
+    <div class="bg-white rounded-[40px] border border-slate-200 shadow-sm overflow-hidden mb-12">
         <div class="overflow-x-auto">
-            <table class="w-full">
+            <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="border-b border-gray-100">
-                        <th class="text-left px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Fund Name</th>
-                        <th class="text-left px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Category</th>
-                        <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">NAV</th>
-                        <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">AUM</th>
-                        <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">1Y Return</th>
-                        <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">3Y Return</th>
-                        <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">5Y Return</th>
-                        <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Risk</th>
-                        <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Rating</th>
+                    <tr class="bg-slate-50/50">
+                        <th class="px-8 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Fund Architecture</th>
+                        <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest text-center">Alpha Rating</th>
+                        <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest text-right">LTP Node (NAV)</th>
+                        <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest text-right">AUM Mass</th>
+                        <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest text-center">1Y Yield</th>
+                        <th class="px-8 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest text-center">Risk Node</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-50">
+                <tbody class="divide-y divide-slate-50">
                     {% for mf in mutual_funds %}
-                    <tr class="hover:bg-gray-50/50 transition-colors">
-                        <td class="px-6 py-4">
-                            <span class="font-bold text-text-main text-sm">{{ mf.name }}</span>
+                    <tr class="hover:bg-slate-50/50 transition-colors group">
+                        <td class="px-8 py-6">
+                            <div class="flex flex-col">
+                                <span class="text-sm font-black text-slate-900 group-hover:text-primary transition-colors leading-tight">{{ mf.name }}</span>
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ mf.category }}</span>
+                            </div>
                         </td>
-                        <td class="px-6 py-4">
-                            <span class="text-sm text-text-muted">{{ mf.category }}</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="text-sm font-bold text-text-main">₹{{ mf.nav }}</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="text-sm text-text-muted">{{ mf.aum }}</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="text-sm font-bold text-green-500">{{ mf.returns_1y }}%</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="text-sm font-bold text-green-500">{{ mf.returns_3y }}%</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="text-sm font-bold text-green-500">{{ mf.returns_5y }}%</span>
-                        </td>
-                        <td class="px-6 py-4 text-center text-xs">
-                          <span class="px-2.5 py-1 rounded bg-orange-50 text-orange-600 font-bold uppercase tracking-wider">{{ mf.risk }}</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
+                        <td class="px-6 py-6">
                             <div class="flex items-center justify-center gap-0.5">
                                 {% for i in "12345" %}
-                                    <span class="material-symbols-outlined text-sm {% if forloop.counter <= mf.rating %}text-accent-gold{% else %}text-gray-200{% endif %}">star</span>
+                                    <span class="material-symbols-outlined text-[14px] {% if forloop.counter <= mf.rating %}text-amber-400{% else %}text-slate-200{% endif %}">star</span>
                                 {% endfor %}
                             </div>
+                        </td>
+                        <td class="px-6 py-6 text-right font-black text-slate-900 text-sm italic">
+                            ₹{{ mf.nav }}
+                        </td>
+                        <td class="px-6 py-6 text-right font-bold text-slate-500 text-xs">
+                            {{ mf.aum }}
+                        </td>
+                        <td class="px-6 py-6 text-center">
+                            <div class="flex flex-col items-center">
+                                <span class="text-sm font-black text-emerald-500 leading-none">{{ mf.returns_1y }}%</span>
+                                <span class="text-[8px] font-black text-slate-300 uppercase mt-1">12-Month</span>
+                            </div>
+                        </td>
+                        <td class="px-8 py-6 text-center">
+                            <span class="px-2.5 py-1 rounded-lg bg-orange-50 text-orange-600 text-[10px] font-black uppercase tracking-widest">
+                                {{ mf.risk }}
+                            </span>
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="9" class="px-6 py-12 text-center">
-                            <span class="material-symbols-outlined text-5xl text-gray-300 mb-3 block">show_chart</span>
-                            <p class="text-text-muted text-sm m-0">No mutual fund data available right now</p>
+                        <td colspan="6" class="px-8 py-24 text-center">
+                            <div class="flex flex-col items-center">
+                                <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-4 text-slate-200">
+                                    <span class="material-symbols-outlined text-[40px]">account_balance_wallet</span>
+                                </div>
+                                <h3 class="text-slate-900 font-black text-lg">Aggregation Pending</h3>
+                                <p class="text-slate-400 text-sm font-medium italic">Mutual fund streams are currently recalibrating.</p>
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}

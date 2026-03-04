@@ -1,65 +1,106 @@
 {% extends 'admin_panel/base.html' %}
+{% load static %}
 
-{% block title %}Subscription Plans — Admin{% endblock %}
+{% block title %}Subscription Architecture - Admin Panel{% endblock %}
 
 {% block content %}
-<div class="page-header" style="display:flex;justify-content:space-between;align-items:center;">
-    <div>
-        <h1>Subscription Plans</h1>
-        <p class="text-secondary">{{ plans.count }} plan(s) configured</p>
+<div class="max-w-7xl mx-auto">
+    <!-- Page Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div>
+            <h1 class="text-3xl font-black text-slate-900 tracking-tight">Subscription Architecture</h1>
+            <p class="text-slate-500 font-medium">Managing {{ plans.count }} active service tiers and monetization models.</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <a href="{% url 'admin_panel:subscription_create' %}" class="px-6 py-3 bg-slate-900 text-white rounded-xl font-black text-sm hover:bg-slate-800 transition-all shadow-lg shadow-slate-200 flex items-center gap-2 no-underline">
+                <span class="material-symbols-outlined text-[20px]">add_circle</span>
+                New Tier
+            </a>
+        </div>
     </div>
-    <a href="{% url 'admin_panel:subscription_create' %}" class="btn btn-primary">+ New Plan</a>
-</div>
 
-<div class="data-table-wrapper">
-    <table class="data-table">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Monthly (₹)</th>
-                <th>Yearly (₹)</th>
-                <th>Featured</th>
-                <th>Status</th>
-                <th>Created</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for plan in plans %}
-            <tr>
-                <td>
-                    <strong>{{ plan.name }}</strong>
-                    <small style="display:block;color:#888;">{{ plan.slug }}</small>
-                </td>
-                <td>₹{{ plan.price_monthly }}</td>
-                <td>₹{{ plan.price_yearly }}</td>
-                <td>{% if plan.is_featured %}<span class="badge badge-success">⭐ Featured</span>{% else %}—{% endif %}</td>
-                <td>
-                    {% if plan.is_active %}
-                        <span class="badge badge-active">Active</span>
-                    {% else %}
-                        <span class="badge badge-inactive">Inactive</span>
-                    {% endif %}
-                </td>
-                <td>{{ plan.created_at|date:"d M Y" }}</td>
-                <td>
-                    <a href="{% url 'admin_panel:subscription_update' plan.pk %}" class="btn btn-sm btn-secondary">Edit</a>
-                    <form method="post" action="{% url 'admin_panel:subscription_delete' plan.pk %}" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-sm btn-danger"
-                            onclick="return confirm('Delete plan {{ plan.name }}?')">Delete</button>
-                    </form>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="7" class="text-center" style="padding:2rem;color:#888;">
-                    No subscription plans yet.
-                    <a href="{% url 'admin_panel:subscription_create' %}" class="btn btn-sm btn-primary" style="margin-left:12px;">Create First Plan</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <!-- Data Table -->
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-50/50 border-bottom border-slate-100">
+                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Plan Identity</th>
+                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Monthly Rate</th>
+                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Annual Yield</th>
+                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Placement</th>
+                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Visibility</th>
+                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Established</th>
+                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-50">
+                    {% for plan in plan_list %}
+                    <tr class="hover:bg-slate-50/50 transition-colors group">
+                        <td class="px-6 py-4">
+                            <div class="flex flex-col">
+                                <span class="text-sm font-black text-slate-900">{{ plan.name }}</span>
+                                <span class="text-[11px] text-slate-400 font-medium tracking-tight font-mono">{{ plan.slug }}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="text-sm font-black text-slate-900 tracking-tighter">₹{{ plan.price_monthly }}</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="text-sm font-black text-slate-900 tracking-tighter">₹{{ plan.price_yearly }}</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            {% if plan.is_featured %}
+                            <span class="px-2 py-1 rounded-lg bg-amber-50 text-amber-600 text-[10px] font-black uppercase tracking-wider flex items-center gap-1 w-fit">
+                                <span class="material-symbols-outlined text-[14px]">star</span>
+                                Featured
+                            </span>
+                            {% else %}
+                            <span class="text-slate-300 text-[10px] font-black uppercase tracking-widest">Standard</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4">
+                            {% if plan.is_active %}
+                            <span class="px-2 py-1 rounded-lg bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-wider">Active</span>
+                            {% else %}
+                            <span class="px-2 py-1 rounded-lg bg-slate-100 text-slate-400 text-[10px] font-black uppercase tracking-wider">Draft</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">{{ plan.created_at|date:"M d, Y" }}</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <a href="{% url 'admin_panel:subscription_update' plan.pk %}" class="p-2 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all" title="Modify Configuration">
+                                    <span class="material-symbols-outlined text-[20px]">edit_note</span>
+                                </a>
+                                <form method="post" action="{% url 'admin_panel:subscription_delete' plan.pk %}" class="inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all border-none bg-transparent cursor-pointer"
+                                            onclick="return confirm('CRITICAL: Delete plan {{ plan.name }}? This will affect all associated subscriptions.')" title="Destroy Identity">
+                                        <span class="material-symbols-outlined text-[20px]">delete_sweep</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="px-6 py-20 text-center">
+                            <div class="flex flex-col items-center">
+                                <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4 text-slate-300">
+                                    <span class="material-symbols-outlined text-[32px]">payments</span>
+                                </div>
+                                <h3 class="text-slate-900 font-bold">No Plans Defined</h3>
+                                <p class="text-slate-500 text-sm mb-6">Your system currently has no subscription tiers configured.</p>
+                                <a href="{% url 'admin_panel:subscription_create' %}" class="px-4 py-2 bg-primary text-white rounded-lg font-bold text-xs uppercase tracking-widest no-underline">Define First Plan</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 {% endblock %}

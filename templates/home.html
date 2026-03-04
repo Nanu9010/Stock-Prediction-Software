@@ -1,402 +1,144 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block page_css %}
-<link rel="stylesheet" href="{% static 'css/market_hero.css' %}">
-{% endblock page_css %}
-
-{% block page_content %}
-<div class="market-hero">
-  <div class="hero-container">
-
-    <!-- ═══ Hero Banner ═══ -->
-    <div class="hero-banner">
-      <div>
-        <div class="hero-title">📊 Market Hero</div>
-        <div class="hero-subtitle">Multi-Stockbroker Pro Research & Live Market Data</div>
-      </div>
-      <div class="hero-stats">
-        <div class="stat-item">
-          <div class="stat-value">{{ active_calls|default:"0" }}</div>
-          <div class="stat-label">Active Calls</div>
+{% block content %}
+<!-- Hero Section -->
+<section class="max-w-7xl mx-auto px-6 py-20 lg:py-32">
+    <div class="grid lg:grid-cols-2 gap-16 items-center">
+        <div class="flex flex-col gap-8">
+            <div class="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full w-fit">
+                <span class="material-symbols-outlined text-sm">auto_awesome</span>
+                <span class="text-xs font-bold uppercase tracking-wider">AI-Powered Insights</span>
+            </div>
+            <h1 class="text-5xl lg:text-7xl font-black leading-[1.1] tracking-tight text-primary dark:text-slate-100">
+                India's #1 Stock Research Platform
+            </h1>
+            <p class="text-lg lg:text-xl text-slate-600 dark:text-slate-400 leading-relaxed max-w-xl">
+                Harness the power of AI to predict market trends with institutional-grade accuracy. Start your journey towards smarter investing today.
+            </p>
+            <div class="flex flex-wrap gap-4">
+                <a href="{% url 'authentication:register' %}" class="flex items-center justify-center bg-primary text-white h-14 px-8 rounded-xl font-bold text-lg hover:shadow-xl hover:-translate-y-0.5 transition-all">
+                    Start Free Trial
+                </a>
+                <button class="bg-white border-2 border-primary/10 text-primary h-14 px-8 rounded-xl font-bold text-lg flex items-center gap-2 hover:bg-primary/5 transition-all">
+                    <span class="material-symbols-outlined">play_circle</span>
+                    Watch Demo
+                </button>
+            </div>
         </div>
-        <div class="stat-item">
-          <div class="stat-value">{{ total_calls|default:"0" }}</div>
-          <div class="stat-label">Total Calls</div>
+        <div class="relative group">
+            <div class="absolute -inset-4 bg-gradient-to-tr from-primary/20 to-transparent rounded-3xl blur-2xl opacity-50 group-hover:opacity-100 transition duration-1000"></div>
+            <div class="relative bg-white rounded-2xl shadow-2xl overflow-hidden border border-primary/5">
+                <img alt="Stock Market Dashboard" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQ4cYE-6BazzJEti10n1iV29Vy6cNHf-oikFTJ9uW5ADZO8QRaIv9103QVaH-ky1QOtgF9fweS-F0mHfJhOZYWYHWE2vxpP_OZ7KQgfpABGEp62ODk0yXxG7YPcBibtsPKqWybvWnjL8iYn6_06vVpympMJPkk2tGOH_oqfA10Pw4ga4gq5taRsFGWhiARoa3Xe0nolbAGdCFEWWrGdmcQcdgKUE7-AO9ZeUPybe3fiIpRjrEOoKO7jGKnE0R-w9_NtHCwfO8PZsHh" />
+            </div>
         </div>
-        <div class="stat-item">
-          <div class="stat-value">{{ success_rate }}%</div>
-          <div class="stat-label">Success Rate</div>
+    </div>
+</section>
+
+<!-- Stats Bar -->
+<section class="bg-white dark:bg-slate-800/50 border-y border-primary/5 py-12">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div class="flex flex-col gap-2">
+                <p class="text-slate-500 text-sm font-semibold uppercase tracking-widest">Active Users</p>
+                <div class="flex items-baseline gap-2">
+                    <h3 class="text-4xl font-black text-primary">{{ active_users|default:"500k+" }}</h3>
+                    <span class="text-secondary font-bold text-sm">+15% ↑</span>
+                </div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <p class="text-slate-500 text-sm font-semibold uppercase tracking-widest">Accuracy</p>
+                <div class="flex items-baseline gap-2">
+                    <h3 class="text-4xl font-black text-primary">{{ accuracy|default:"94" }}%</h3>
+                    <span class="text-secondary font-bold text-sm">+2.4% ↑</span>
+                </div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <p class="text-slate-500 text-sm font-semibold uppercase tracking-widest">Market Cap</p>
+                <div class="flex items-baseline gap-2">
+                    <h3 class="text-4xl font-black text-primary">₹850Cr</h3>
+                    <span class="text-slate-400 font-bold text-sm">Managed</span>
+                </div>
+            </div>
+            <div class="flex flex-col gap-2">
+                <p class="text-slate-500 text-sm font-semibold uppercase tracking-widest">Calls Generated</p>
+                <div class="flex items-baseline gap-2">
+                    <h3 class="text-4xl font-black text-primary">{{ total_calls|default:"12,000+" }}</h3>
+                    <span class="text-slate-400 font-bold text-sm">Tracked</span>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
+</section>
 
-    <!-- ═══ Market Indices Strip ═══ -->
-    <div class="index-strip">
-      {% for idx in market_indices %}
-      <div class="index-card">
-        <div class="index-name">{{ idx.name }}</div>
-        <div class="index-price">₹{{ idx.price|floatformat:2 }}</div>
-        <div class="index-change {% if idx.change >= 0 %}positive{% else %}negative{% endif %}">
-          {% if idx.change >= 0 %}▲{% else %}▼{% endif %}
-          {{ idx.change|floatformat:2 }} ({{ idx.change_pct|floatformat:2 }}%)
+<!-- Pricing Section -->
+<section class="max-w-7xl mx-auto px-6 py-24">
+    <div class="text-center mb-16">
+        <h2 class="text-3xl md:text-5xl font-black text-primary dark:text-slate-100 mb-4">Simple, Transparent Pricing</h2>
+        <p class="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">Choose the plan that fits your trading style. No hidden fees, cancel anytime.</p>
+    </div>
+    <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <!-- FREE Plan -->
+        <div class="p-10 rounded-3xl border border-primary/10 bg-white hover:shadow-2xl transition-all duration-300">
+            <div class="mb-8">
+                <h3 class="text-2xl font-bold text-primary mb-2">Basic</h3>
+                <p class="text-slate-500">Perfect for retail beginners</p>
+            </div>
+            <div class="mb-8">
+                <span class="text-5xl font-black text-primary">₹0</span>
+                <span class="text-slate-400">/mo</span>
+            </div>
+            <ul class="space-y-4 mb-10">
+                <li class="flex items-center gap-3 text-slate-700">
+                    <span class="material-symbols-outlined text-secondary">check_circle</span>
+                    5 Daily AI Predictions
+                </li>
+                <li class="flex items-center gap-3 text-slate-700">
+                    <span class="material-symbols-outlined text-secondary">check_circle</span>
+                    Basic Market Indicators
+                </li>
+                <li class="flex items-center gap-3 text-slate-700">
+                    <span class="material-symbols-outlined text-secondary">check_circle</span>
+                    Community Access
+                </li>
+                <li class="flex items-center gap-3 text-slate-400">
+                    <span class="material-symbols-outlined">block</span>
+                    Real-time Alerts
+                </li>
+            </ul>
+            <a href="{% url 'authentication:register' %}" class="block text-center w-full py-4 border-2 border-primary/10 rounded-xl font-bold text-primary hover:bg-primary hover:text-white transition-all">Get Started Free</a>
         </div>
-      </div>
-      {% empty %}
-      <div class="index-card">
-        <div class="index-name">NIFTY 50</div>
-        <div class="index-price">₹22,145.50</div>
-        <div class="index-change positive">▲ 85.30 (0.39%)</div>
-      </div>
-      <div class="index-card">
-        <div class="index-name">SENSEX</div>
-        <div class="index-price">₹72,980.20</div>
-        <div class="index-change positive">▲ 248.10 (0.34%)</div>
-      </div>
-      <div class="index-card">
-        <div class="index-name">BANK NIFTY</div>
-        <div class="index-price">₹47,125.80</div>
-        <div class="index-change negative">▼ 120.50 (-0.26%)</div>
-      </div>
-      <div class="index-card">
-        <div class="index-name">NIFTY IT</div>
-        <div class="index-price">₹37,450.40</div>
-        <div class="index-change positive">▲ 195.60 (0.52%)</div>
-      </div>
-      {% endfor %}
-    </div>
-
-    <!-- ═══ Market Sentiment ═══ -->
-    <div class="sentiment-bar">
-      <span class="sentiment-label">Market Sentiment</span>
-      <span class="sentiment-label text-gain">🐂 Buy {{ sentiment.buy_pct }}%</span>
-      <div class="sentiment-track">
-        <div class="sentiment-fill" style="width: {{ sentiment.buy_pct }}%"></div>
-      </div>
-      <span class="sentiment-label text-loss">🐻 Sell {{ sentiment.sell_pct }}%</span>
-      <span class="sentiment-text">({{ sentiment.total }} Active Calls)</span>
-    </div>
-
-    <!-- ═══ Today Top 10 Gainers / Losers Heatmap ═══ -->
-    <div class="section-header-hero">
-      <div class="section-title-hero">
-        <span class="icon">🔥</span> Today Top 10 Gainers & Losers
-        <span class="live-dot"></span>
-      </div>
-      <a href="{% url 'dashboard:markets' %}" class="view-all-link">View All →</a>
-    </div>
-
-    <div class="heatmap-section">
-      <!-- Gainers -->
-      <div class="heatmap-card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-          <span style="font-weight: 700; color: var(--accent-green); font-size: 15px;">📈 Top Gainers</span>
-          <span class="ipo-status ipo-open">Bullish</span>
+        <!-- PRO Plan -->
+        <div class="p-10 rounded-3xl bg-primary text-white shadow-2xl relative overflow-hidden group">
+            <div class="absolute top-0 right-0 bg-white/10 px-4 py-1 rounded-bl-xl text-xs font-bold tracking-widest uppercase">Popular</div>
+            <div class="mb-8">
+                <h3 class="text-2xl font-bold mb-2">Pro Trader</h3>
+                <p class="text-white/60">For serious wealth builders</p>
+            </div>
+            <div class="mb-8">
+                <span class="text-5xl font-black">₹1,499</span>
+                <span class="text-white/40">/mo</span>
+            </div>
+            <ul class="space-y-4 mb-10">
+                <li class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-secondary">check_circle</span>
+                    Unlimited AI Predictions
+                </li>
+                <li class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-secondary">check_circle</span>
+                    Real-time Smart Alerts
+                </li>
+                <li class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-secondary">check_circle</span>
+                    Institutional Grade Charts
+                </li>
+                <li class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-secondary">check_circle</span>
+                    Portfolio Auto-Optimizer
+                </li>
+            </ul>
+            <a href="{% url 'authentication:register' %}?plan=pro" class="block text-center w-full py-4 bg-white text-primary rounded-xl font-bold hover:bg-slate-100 transition-all shadow-xl">Upgrade to Pro</a>
         </div>
-        <div class="heatmap-grid">
-          {% for stock in today_gainers %}
-          <div class="stock-tile {% if stock.change_pct >= 2 %}gain-1{% elif stock.change_pct >= 1 %}gain-2{% else %}gain-3{% endif %}">
-            <span class="tile-symbol">{{ stock.symbol }}</span>
-            <span class="tile-change">+{{ stock.change_pct }}%</span>
-            <span class="tile-price">₹{{ stock.price }}</span>
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-
-      <!-- Losers -->
-      <div class="heatmap-card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-          <span style="font-weight: 700; color: var(--accent-red); font-size: 15px;">📉 Top Losers</span>
-          <span class="ipo-status" style="background: rgba(255,82,82,0.15); color: var(--accent-red);">Bearish</span>
-        </div>
-        <div class="heatmap-grid">
-          {% for stock in today_losers %}
-          <div class="stock-tile {% if stock.change_pct <= -2 %}loss-1{% elif stock.change_pct <= -1 %}loss-2{% else %}loss-3{% endif %}">
-            <span class="tile-symbol">{{ stock.symbol }}</span>
-            <span class="tile-change">{{ stock.change_pct }}%</span>
-            <span class="tile-price">₹{{ stock.price }}</span>
-          </div>
-          {% endfor %}
-        </div>
-      </div>
     </div>
-
-    <!-- ═══ Weekly Top Gainers ═══ -->
-    <div class="weekly-section">
-      <div class="section-header-hero">
-        <div class="section-title-hero">
-          <span class="icon">📊</span> Weekly Top Gainers
-        </div>
-      </div>
-      <div class="weekly-scroll">
-        {% for stock in weekly_gainers %}
-        <div class="weekly-card">
-          <div class="weekly-symbol">{{ stock.symbol }}</div>
-          <div class="weekly-price">₹{{ stock.price }}</div>
-          <div class="weekly-change text-gain">+{{ stock.change_pct }}%</div>
-        </div>
-        {% endfor %}
-      </div>
-    </div>
-
-    <!-- ═══ Weekly Top Losers ═══ -->
-    <div class="weekly-section">
-      <div class="section-header-hero">
-        <div class="section-title-hero">
-          <span class="icon">📉</span> Weekly Top Losers
-        </div>
-      </div>
-      <div class="weekly-scroll">
-        {% for stock in weekly_losers %}
-        <div class="weekly-card">
-          <div class="weekly-symbol">{{ stock.symbol }}</div>
-          <div class="weekly-price">₹{{ stock.price }}</div>
-          <div class="weekly-change text-loss">{{ stock.change_pct }}%</div>
-        </div>
-        {% endfor %}
-      </div>
-    </div>
-
-    <!-- ═══ Commodity / IPO / ETF Widgets Row ═══ -->
-    <div class="section-header-hero">
-      <div class="section-title-hero">
-        <span class="icon">💹</span> Market Snapshot
-      </div>
-    </div>
-
-    <div class="widgets-row">
-      <!-- Commodity Widget -->
-      <div class="widget-card-hero">
-        <div class="widget-header-hero header-commodity">🛢️ Commodities</div>
-        <ul class="widget-list-hero">
-          {% for item in commodities %}
-          <li class="widget-item-hero">
-            <div class="item-info">
-              <div class="item-name-hero">{{ item.icon }} {{ item.name }}</div>
-              <div class="item-sub-hero">{{ item.unit }}</div>
-            </div>
-            <div class="item-value-hero">
-              <div class="item-price">{{ item.price|floatformat:2 }}</div>
-              <div class="item-change-hero {% if item.change_pct >= 0 %}text-gain{% else %}text-loss{% endif %}">
-                {% if item.change_pct >= 0 %}+{% endif %}{{ item.change_pct }}%
-              </div>
-            </div>
-          </li>
-          {% endfor %}
-        </ul>
-      </div>
-
-      <!-- IPO Widget -->
-      <div class="widget-card-hero">
-        <div class="widget-header-hero header-ipo">🏢 Upcoming IPOs</div>
-        <ul class="widget-list-hero">
-          {% for ipo in upcoming_ipos|slice:":4" %}
-          <li class="widget-item-hero">
-            <div class="item-info">
-              <div class="item-name-hero">{{ ipo.company }}</div>
-              <div class="item-sub-hero">{{ ipo.sector }} · {{ ipo.price_band }}</div>
-            </div>
-            <div class="item-value-hero">
-              <span class="ipo-status {% if ipo.status == 'OPEN' %}ipo-open{% elif ipo.status == 'UPCOMING' %}ipo-upcoming{% else %}ipo-closed{% endif %}">
-                {{ ipo.status }}
-              </span>
-            </div>
-          </li>
-          {% endfor %}
-        </ul>
-      </div>
-
-      <!-- ETF Widget -->
-      <div class="widget-card-hero">
-        <div class="widget-header-hero header-etf">📦 Popular ETFs</div>
-        <ul class="widget-list-hero">
-          {% for etf in etfs|slice:":5" %}
-          <li class="widget-item-hero">
-            <div class="item-info">
-              <div class="item-name-hero">{{ etf.symbol }}</div>
-              <div class="item-sub-hero">{{ etf.category }}</div>
-            </div>
-            <div class="item-value-hero">
-              <div class="item-price">₹{{ etf.price }}</div>
-              <div class="item-change-hero {% if etf.change_pct >= 0 %}text-gain{% else %}text-loss{% endif %}">
-                {% if etf.change_pct >= 0 %}+{% endif %}{{ etf.change_pct }}%
-              </div>
-            </div>
-          </li>
-          {% endfor %}
-        </ul>
-      </div>
-    </div>
-
-    <!-- ═══ SIP / Mutual Funds / Bonds Row ═══ -->
-    <div class="widgets-row">
-      <!-- SIP Widget -->
-      <div class="widget-card-hero">
-        <div class="widget-header-hero header-sip">💰 Top SIP Funds</div>
-        <ul class="widget-list-hero">
-          {% for sip in sip_funds|slice:":4" %}
-          <li class="widget-item-hero">
-            <div class="item-info">
-              <div class="item-name-hero">{{ sip.name }}</div>
-              <div class="item-sub-hero">{{ sip.category }} · Min ₹{{ sip.min_sip }}</div>
-            </div>
-            <div class="item-value-hero">
-              <div class="item-change-hero text-gain">{{ sip.returns_1y }}% <span style="font-size:10px; color: var(--text-muted);">1Y</span></div>
-            </div>
-          </li>
-          {% endfor %}
-        </ul>
-      </div>
-
-      <!-- Mutual Funds Widget -->
-      <div class="widget-card-hero">
-        <div class="widget-header-hero header-mf">📈 Mutual Funds</div>
-        <ul class="widget-list-hero">
-          {% for mf in mutual_funds|slice:":4" %}
-          <li class="widget-item-hero">
-            <div class="item-info">
-              <div class="item-name-hero">{{ mf.name }}</div>
-              <div class="item-sub-hero">{{ mf.category }} · AUM {{ mf.aum }}</div>
-            </div>
-            <div class="item-value-hero">
-              <div class="item-change-hero text-gain">{{ mf.returns_1y }}% <span style="font-size:10px; color: var(--text-muted);">1Y</span></div>
-              <div class="star-rating">{% for i in "12345" %}{% if forloop.counter <= mf.rating %}★{% else %}☆{% endif %}{% endfor %}</div>
-            </div>
-          </li>
-          {% endfor %}
-        </ul>
-      </div>
-
-      <!-- Bonds Widget -->
-      <div class="widget-card-hero">
-        <div class="widget-header-hero header-bonds">🏛️ Bonds</div>
-        <ul class="widget-list-hero">
-          {% for bond in bonds|slice:":4" %}
-          <li class="widget-item-hero">
-            <div class="item-info">
-              <div class="item-name-hero">{{ bond.name }}</div>
-              <div class="item-sub-hero">{{ bond.type }} · {{ bond.rating }}</div>
-            </div>
-            <div class="item-value-hero">
-              <div class="item-price">{{ bond.yield_pct }}%</div>
-              <div class="item-sub-hero">Yield · {{ bond.maturity }}</div>
-            </div>
-          </li>
-          {% endfor %}
-        </ul>
-      </div>
-    </div>
-
-    <!-- ═══ Liquidity / Recently Listed Row ═══ -->
-    <div class="widgets-row">
-      <!-- Liquidity Widget -->
-      <div class="widget-card-hero">
-        <div class="widget-header-hero header-liquidity">💧 Money Market & Liquidity</div>
-        <ul class="widget-list-hero">
-          {% for rate in liquidity|slice:":5" %}
-          <li class="widget-item-hero">
-            <div class="item-info">
-              <div class="item-name-hero">{{ rate.name }}</div>
-              <div class="item-sub-hero">{{ rate.description }}</div>
-            </div>
-            <div class="item-value-hero">
-              <div class="item-price">{{ rate.rate }}%</div>
-              <div class="item-change-hero {% if rate.change > 0 %}text-gain{% elif rate.change < 0 %}text-loss{% else %}{% endif %}">
-                {% if rate.change > 0 %}+{% endif %}{% if rate.change != 0 %}{{ rate.change }}%{% else %}—{% endif %}
-              </div>
-            </div>
-          </li>
-          {% endfor %}
-        </ul>
-      </div>
-
-      <!-- Recently Listed IPOs -->
-      <div class="widget-card-hero">
-        <div class="widget-header-hero header-ipo">🆕 Recently Listed</div>
-        <ul class="widget-list-hero">
-          {% for ipo in recently_listed %}
-          <li class="widget-item-hero">
-            <div class="item-info">
-              <div class="item-name-hero">{{ ipo.company }}</div>
-              <div class="item-sub-hero">{{ ipo.sector }} · Issue ₹{{ ipo.issue_price }}</div>
-            </div>
-            <div class="item-value-hero">
-              <div class="item-price">₹{{ ipo.current_price }}</div>
-              <div class="item-change-hero {% if ipo.return_pct >= 0 %}text-gain{% else %}text-loss{% endif %}">
-                {% if ipo.return_pct >= 0 %}+{% endif %}{{ ipo.return_pct }}%
-              </div>
-            </div>
-          </li>
-          {% endfor %}
-        </ul>
-      </div>
-
-      <!-- Top Brokers Widget -->
-      <div class="widget-card-hero">
-        <div class="widget-header-hero" style="background: linear-gradient(135deg, #00695c, #00897b);">🏆 Top Performing Brokers</div>
-        <ul class="widget-list-hero">
-          {% for broker in top_brokers %}
-          <li class="widget-item-hero">
-            <div class="item-info">
-              <div class="item-name-hero">{{ broker.name }}</div>
-              <div class="item-sub-hero">{{ broker.total_calls }} calls published</div>
-            </div>
-            <div class="item-value-hero">
-              <div class="item-price text-gain">{{ broker.overall_accuracy|default:"N/A" }}%</div>
-              <div class="item-sub-hero">accuracy</div>
-            </div>
-          </li>
-          {% empty %}
-          <li class="widget-item-hero">
-            <div class="item-info">
-              <div class="item-name-hero">No brokers yet</div>
-              <div class="item-sub-hero">Add brokers from admin panel</div>
-            </div>
-          </li>
-          {% endfor %}
-        </ul>
-      </div>
-    </div>
-
-    <!-- ═══ Quick Navigation ═══ -->
-    <div class="section-header-hero" style="margin-top: 20px;">
-      <div class="section-title-hero">
-        <span class="icon">🚀</span> Explore More
-      </div>
-    </div>
-
-    <div class="index-strip" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
-      <a href="{% url 'dashboard:sip' %}" class="index-card" style="text-decoration: none; background: linear-gradient(135deg, rgba(0,105,92,0.3), rgba(0,137,123,0.1));">
-        <div class="index-name">💰 SIP</div>
-        <div style="color: var(--text-secondary); font-size: 12px;">Systematic Plans</div>
-      </a>
-      <a href="{% url 'dashboard:mutual_funds' %}" class="index-card" style="text-decoration: none; background: linear-gradient(135deg, rgba(40,53,147,0.3), rgba(57,73,171,0.1));">
-        <div class="index-name">📈 Mutual Funds</div>
-        <div style="color: var(--text-secondary); font-size: 12px;">Top Performers</div>
-      </a>
-      <a href="{% url 'dashboard:etf' %}" class="index-card" style="text-decoration: none; background: linear-gradient(135deg, rgba(106,27,154,0.3), rgba(123,31,162,0.1));">
-        <div class="index-name">📦 ETFs</div>
-        <div style="color: var(--text-secondary); font-size: 12px;">Exchange Traded</div>
-      </a>
-      <a href="{% url 'dashboard:bonds' %}" class="index-card" style="text-decoration: none; background: linear-gradient(135deg, rgba(78,52,46,0.3), rgba(93,64,55,0.1));">
-        <div class="index-name">🏛️ Bonds</div>
-        <div style="color: var(--text-secondary); font-size: 12px;">Fixed Income</div>
-      </a>
-      <a href="{% url 'dashboard:commodity' %}" class="index-card" style="text-decoration: none; background: linear-gradient(135deg, rgba(255,143,0,0.3), rgba(245,124,0,0.1));">
-        <div class="index-name">🛢️ Commodities</div>
-        <div style="color: var(--text-secondary); font-size: 12px;">Gold, Oil, More</div>
-      </a>
-      <a href="{% url 'dashboard:liquidity' %}" class="index-card" style="text-decoration: none; background: linear-gradient(135deg, rgba(55,71,79,0.3), rgba(69,90,100,0.1));">
-        <div class="index-name">💧 Liquidity</div>
-        <div style="color: var(--text-secondary); font-size: 12px;">Money Market</div>
-      </a>
-      <a href="{% url 'dashboard:trades_dashboard' %}" class="index-card" style="text-decoration: none; background: linear-gradient(135deg, rgba(68,138,255,0.3), rgba(68,138,255,0.1));">
-        <div class="index-name">📋 Trades</div>
-        <div style="color: var(--text-secondary); font-size: 12px;">All Categories</div>
-      </a>
-    </div>
-
-  </div>
-</div>
-{% endblock %}
+</section>
+{% endblock content %}

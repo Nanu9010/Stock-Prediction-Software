@@ -4,155 +4,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Stock Research Platform</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/base.css' %}">
-    <style>
-        .auth-container {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            padding: 2rem;
+    <title>Login - Stock Predict AI</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { primary: "#1a2b3d" },
+                    fontFamily: { sans: ["Inter", "sans-serif"] },
+                }
+            }
         }
-        .auth-card {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 450px;
-            width: 100%;
-            padding: 3rem;
-        }
-        .auth-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-        .auth-header h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 0.5rem;
-        }
-        .auth-header p {
-            color: var(--text-secondary);
-        }
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-            color: var(--text-primary);
-        }
-        .form-control {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-        }
-        .form-check {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-        }
-        .btn-primary {
-            width: 100%;
-            padding: 0.875rem;
-            font-size: 1rem;
-            font-weight: 600;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
-        }
-        .auth-footer {
-            text-align: center;
-            margin-top: 1.5rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--border-color);
-        }
-        .auth-footer a {
-            color: var(--primary-color);
-            text-decoration: none;
-            font-weight: 500;
-        }
-        .auth-footer a:hover {
-            text-decoration: underline;
-        }
-        .errorlist {
-            list-style: none;
-            padding: 0;
-            margin: 0.5rem 0 0 0;
-        }
-        .errorlist li {
-            color: var(--danger-color);
-            font-size: 0.875rem;
-        }
-    </style>
+    </script>
 </head>
-<body>
-    <div class="auth-container">
-        <div class="auth-card">
-            <div class="auth-header">
-                <h1>Welcome Back</h1>
-                <p>Login to your Stock Research Platform account</p>
+<body class="font-sans text-slate-900 bg-slate-50 antialiased h-screen flex overflow-hidden">
+    
+    <!-- Left Brand Panel -->
+    <div class="hidden lg:flex w-1/2 bg-primary text-white flex-col justify-between p-12 relative overflow-hidden">
+        <div class="absolute -inset-24 bg-gradient-to-tr from-blue-900/40 to-transparent rounded-full blur-3xl opacity-50"></div>
+        <div class="relative z-10">
+            <div class="flex items-center gap-2 mb-16">
+                <span class="material-symbols-outlined text-3xl text-blue-400">insights</span>
+                <span class="text-2xl font-extrabold tracking-tight">StockPredict AI</span>
             </div>
+            <h1 class="text-4xl xl:text-5xl font-black leading-tight mb-6">
+                Welcome back to your<br/>financial command center.
+            </h1>
+            <p class="text-lg text-slate-300 max-w-md">
+                Log in to access real-time market insights, AI predictions, and manage your portfolio.
+            </p>
+        </div>
+        <div class="relative z-10">
+            <div class="flex items-center gap-4 bg-white/10 p-6 rounded-2xl backdrop-blur-sm border border-white/5">
+                <div class="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center text-blue-400">
+                    <span class="material-symbols-outlined">trending_up</span>
+                </div>
+                <div>
+                    <h4 class="font-bold text-white">Market Outperforming</h4>
+                    <p class="text-sm text-slate-300">Our PRO calls hit 94% accuracy this week!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Form Section -->
+    <div class="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 overflow-y-auto">
+        <div class="w-full max-w-md">
+            
+            <div class="lg:hidden flex items-center justify-center gap-2 mb-12">
+                <span class="material-symbols-outlined text-4xl text-primary">insights</span>
+                <span class="text-2xl font-extrabold tracking-tight text-primary">StockPredict AI</span>
+            </div>
+
+            <h2 class="text-3xl font-black text-primary mb-2">Log in to your account</h2>
+            <p class="text-slate-500 mb-8">Don't have an account? <a href="{% url 'authentication:register' %}" class="text-primary font-bold hover:underline">Sign up for free</a></p>
 
             {% if messages %}
                 {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }}">
+                    <div class="mb-4 p-4 rounded-lg bg-red-50 text-red-600 border border-red-200 text-sm flex gap-2 items-start">
+                        <span class="material-symbols-outlined">error</span>
                         {{ message }}
                     </div>
                 {% endfor %}
             {% endif %}
 
-            <form method="POST" action="{% url 'authentication:login' %}">
+            {% if form.non_field_errors %}
+                <div class="mb-4 p-4 rounded-lg bg-red-50 text-red-600 border border-red-200 text-sm flex gap-2 items-start">
+                    <span class="material-symbols-outlined">error</span>
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <form method="POST" action="{% url 'authentication:login' %}" class="space-y-5">
                 {% csrf_token %}
                 
-                <div class="form-group">
-                    <label for="{{ form.email.id_for_label }}">Email Address</label>
-                    {{ form.email }}
-                    {{ form.email.errors }}
+                <div>
+                    <label for="{{ form.email.id_for_label }}" class="block text-sm font-bold text-slate-700 mb-2">Email Address</label>
+                    <input type="email" name="{{ form.email.html_name }}" id="{{ form.email.id_for_label }}" 
+                           class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder:text-slate-400" 
+                           placeholder="you@example.com" value="{{ form.email.value|default_if_none:'' }}">
+                    {% if form.email.errors %}
+                        <p class="mt-2 text-sm text-red-600">{{ form.email.errors.0 }}</p>
+                    {% endif %}
                 </div>
 
-                <div class="form-group">
-                    <label for="{{ form.password.id_for_label }}">Password</label>
-                    {{ form.password }}
-                    {{ form.password.errors }}
-                </div>
-
-                <div class="form-check">
-                    {{ form.remember_me }}
-                    <label for="{{ form.remember_me.id_for_label }}">Remember me</label>
-                </div>
-
-                {% if form.non_field_errors %}
-                    <div class="alert alert-danger">
-                        {{ form.non_field_errors }}
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label for="{{ form.password.id_for_label }}" class="block text-sm font-bold text-slate-700">Password</label>
+                        <a href="{% url 'authentication:password_reset_request' %}" class="text-sm font-semibold text-primary hover:underline">Forgot password?</a>
                     </div>
-                {% endif %}
+                    <input type="password" name="{{ form.password.html_name }}" id="{{ form.password.id_for_label }}" 
+                           class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" 
+                           placeholder="••••••••">
+                    {% if form.password.errors %}
+                        <p class="mt-2 text-sm text-red-600">{{ form.password.errors.0 }}</p>
+                    {% endif %}
+                </div>
 
-                <button type="submit" class="btn btn-primary btn-block">Login</button>
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" name="{{ form.remember_me.html_name }}" id="{{ form.remember_me.id_for_label }}" class="w-4 h-4 text-primary rounded border-slate-300 focus:ring-primary">
+                    <label for="{{ form.remember_me.id_for_label }}" class="text-sm font-medium text-slate-600">Remember me for 30 days</label>
+                </div>
+
+                <button type="submit" class="w-full py-4 bg-primary text-white rounded-xl font-bold text-lg hover:bg-primary/90 hover:shadow-lg transition-all flex items-center justify-center gap-2">
+                    Log in
+                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </button>
             </form>
-
-            <div class="auth-links">
-                <a href="{% url 'authentication:password_reset_request' %}">Forgot Password?</a>
-                <a href="{% url 'authentication:register' %}">Don't have an account? Register</a>
-            </div>
+            
         </div>
     </div>
 </body>

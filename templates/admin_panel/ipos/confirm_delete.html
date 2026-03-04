@@ -1,0 +1,33 @@
+{% extends 'admin_panel/base.html' %}
+
+{% block title %}Delete IPO - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div style="display: flex; align-items: center; gap: var(--spacing-4);">
+        <a href="{% url 'admin_panel:ipos_list' %}" class="btn btn-sm btn-outline-secondary">
+            <span>←</span> Back
+        </a>
+        <h1 class="page-title">Delete IPO</h1>
+    </div>
+</div>
+
+<div class="card" style="max-width: 600px; margin: 0 auto; text-align: center; padding: var(--spacing-8) 0;">
+    <div style="font-size: 3rem; margin-bottom: var(--spacing-4);">⚠️</div>
+    
+    <h2 style="font-size: 1.5rem; color: var(--color-white); margin-bottom: var(--spacing-2);">
+        Are you sure you want to delete "{{ object.company_name }}"?
+    </h2>
+    <p style="color: var(--text-secondary); margin-bottom: var(--spacing-8);">
+        This action cannot be undone. All data associated with this IPO will be permanently removed.
+    </p>
+    
+    <form method="post">
+        {% csrf_token %}
+        <div style="display: flex; justify-content: center; gap: var(--spacing-4);">
+            <a href="{% url 'admin_panel:ipos_list' %}" class="btn btn-outline-secondary">Cancel</a>
+            <button type="submit" class="btn btn-danger">Yes, Delete IPO</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

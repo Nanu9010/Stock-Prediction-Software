@@ -37,16 +37,27 @@ def create_research_call(data, created_by):
         research_call=call,
         version_number=1,
         changed_by=created_by,
-        change_summary='Initial version'
+        changes_json={
+            'status': call.status,
+            'entry_price': str(call.entry_price),
+            'target_1': str(call.target_1),
+            'stop_loss': str(call.stop_loss),
+        },
+        change_reason='Initial version',
     )
     
     # Audit log
     AuditLog.objects.create(
         user=created_by,
-        action='CREATE_RESEARCH_CALL',
-        entity_type='ResearchCall',
-        entity_id=call.id,
-        new_values={'symbol': call.symbol, 'action': call.action}
+        action='CREATE',
+        model_name='ResearchCall',
+        object_id=call.id,
+        object_repr=str(call),
+        changes_json={
+            'symbol': call.symbol,
+            'action': call.action,
+            'status': call.status,
+        },
     )
     
     return call
@@ -69,7 +80,6 @@ def approve_research_call(call, approved_by):
     
     call.status = 'APPROVED'
     call.approved_by = approved_by
-    call.approved_at = timezone.now()
     call.save()
     
     # Create event
@@ -83,9 +93,11 @@ def approve_research_call(call, approved_by):
     # Audit log
     AuditLog.objects.create(
         user=approved_by,
-        action='APPROVE_RESEARCH_CALL',
-        entity_type='ResearchCall',
-        entity_id=call.id
+        action='APPROVE',
+        model_name='ResearchCall',
+        object_id=call.id,
+        object_repr=str(call),
+        changes_json={'status': 'APPROVED'},
     )
     
     return call
@@ -121,9 +133,11 @@ def publish_research_call(call, published_by):
     # Audit log
     AuditLog.objects.create(
         user=published_by,
-        action='PUBLISH_RESEARCH_CALL',
-        entity_type='ResearchCall',
-        entity_id=call.id
+        action='PUBLISH',
+        model_name='ResearchCall',
+        object_id=call.id,
+        object_repr=str(call),
+        changes_json={'status': 'ACTIVE'},
     )
     
     # Future: Send notifications to subscribers
@@ -159,10 +173,11 @@ def close_research_call(call, reason, closed_by):
     # Audit log
     AuditLog.objects.create(
         user=closed_by,
-        action='CLOSE_RESEARCH_CALL',
-        entity_type='ResearchCall',
-        entity_id=call.id,
-        new_values={'reason': reason}
+        action='UPDATE',
+        model_name='ResearchCall',
+        object_id=call.id,
+        object_repr=str(call),
+        changes_json={'status': 'CLOSED', 'reason': reason},
     )
     
     return call

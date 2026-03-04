@@ -1,348 +1,256 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load widget_tweaks %}
 
-{% block title %}Profile - Stock Research Platform{% endblock %}
+{% block title %}Account Strategy - {{ user.get_full_name }} - Stock Research Platform{% endblock %}
 
 {% block page_content %}
-<div class="container">
-    <div class="page-header">
-        <h1>My Profile</h1>
-    </div>
-
-    <div class="profile-container">
-        <div class="profile-card">
-            <div class="profile-header">
-                <div class="profile-avatar">
+<div class="max-w-6xl mx-auto px-4 py-12">
+    <!-- Profile Hero -->
+    <div class="bg-white rounded-[40px] border border-slate-200 shadow-sm overflow-hidden mb-8">
+        <div class="h-32 bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 relative">
+            <div class="absolute -bottom-12 left-12 p-1 bg-white rounded-full shadow-xl">
+                <div class="w-24 h-24 rounded-full bg-slate-900 flex items-center justify-center text-white text-3xl font-black">
                     {{ user.first_name.0 }}{{ user.last_name.0 }}
                 </div>
-                <div class="profile-info">
-                    <h2>{{ user.get_full_name }}</h2>
-                    <p>{{ user.email }}</p>
-                    <span class="badge badge-{{ user.role|lower }}">{{ user.get_role_display }}</span>
-                </div>
             </div>
-
-            <div class="profile-details">
-                <h3>Account Information</h3>
-                <div class="detail-grid">
-                    <div class="detail-item">
-                        <label>First Name</label>
-                        <span>{{ user.first_name }}</span>
-                    </div>
-                    <div class="detail-item">
-                        <label>Last Name</label>
-                        <span>{{ user.last_name }}</span>
-                    </div>
-                    <div class="detail-item">
-                        <label>Email</label>
-                        <span>{{ user.email }}</span>
-                    </div>
-                    <div class="detail-item">
-                        <label>Role</label>
-                        <span>{{ user.get_role_display }}</span>
-                    </div>
-                    <div class="detail-item">
-                        <label>Account Status</label>
-                        <span class="{% if user.is_active %}text-success{% else %}text-danger{% endif %}">
-                            {% if user.is_active %}Active{% else %}Inactive{% endif %}
-                        </span>
-                    </div>
-                    <div class="detail-item">
-                        <label>Member Since</label>
-                        <span>{{ user.created_at|date:"M d, Y" }}</span>
-                    </div>
-                    {% if user.last_login_at %}
-                    <div class="detail-item">
-                        <label>Last Login</label>
-                        <span>{{ user.last_login_at|date:"M d, Y H:i" }}</span>
-                    </div>
+        </div>
+        <div class="pt-16 pb-8 px-12 flex flex-col md:flex-row justify-between items-end gap-6">
+            <div>
+                <h1 class="text-3xl font-black text-slate-900 tracking-tight mb-1">{{ user.get_full_name }}</h1>
+                <p class="text-slate-500 font-medium flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]">mail</span>
+                    {{ user.email }}
+                </p>
+                <div class="flex items-center gap-2 mt-4">
+                    {% if user.role == 'PRO' or current_subscription.is_active %}
+                    <span class="px-2.5 py-1 rounded-lg bg-amber-50 text-amber-600 text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[14px]">stars</span>
+                        PRO Member
+                    </span>
+                    {% else %}
+                    <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[14px]">person</span>
+                        Standard Account
+                    </span>
                     {% endif %}
+                    <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-wider">
+                        Active since {{ user.created_at|date:"M 'y" }}
+                    </span>
                 </div>
             </div>
-
-            <div class="profile-actions">
-                <button class="btn btn-primary" onclick="openEditModal()">
-                    Edit Profile
+            <div class="flex items-center gap-3">
+                <button onclick="openEditModal()" class="px-6 py-3 bg-white border border-slate-200 text-slate-900 rounded-2xl font-black text-sm hover:bg-slate-50 transition-all flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[20px]">edit_square</span>
+                    Adapt Identity
                 </button>
-                <button class="btn btn-outline" onclick="alert('Change password functionality coming soon!')">
-                    Change Password
-                </button>
-                <a href="{% url 'authentication:logout' %}" class="btn btn-outline">
-                    <span class="di-icon">🚪</span> Logout
+                <a href="{% url 'authentication:logout' %}" class="px-6 py-3 bg-rose-50 text-rose-600 rounded-2xl font-black text-sm hover:bg-rose-100 transition-all flex items-center gap-2 no-underline">
+                    <span class="material-symbols-outlined text-[20px]">logout</span>
+                    Exit Session
                 </a>
             </div>
         </div>
-
-        <!-- Subscription Details Card -->
-        <div class="profile-card mt-4">
-            <div class="profile-header" style="border-bottom: none; padding-bottom: 0; margin-bottom: 1rem;">
-                <div class="header-content">
-                    <h2>Subscription Details</h2>
-                    <p>Manage your plan and billing</p>
-                </div>
-                {% if current_subscription and current_subscription.is_active %}
-                    <span class="badge badge-success">Active</span>
-                {% else %}
-                    <span class="badge badge-secondary">Free Plan</span>
-                {% endif %}
-            </div>
-            
-            <div class="subscription-content">
-                {% if current_subscription and current_subscription.is_active %}
-                    <div class="current-plan">
-                        <div class="plan-info">
-                            <h3>{{ current_subscription.plan_type }} Plan</h3>
-                            <p class="text-muted">Billing Cycle: {{ current_subscription.get_billing_cycle_display }}</p>
-                        </div>
-                        <div class="plan-price">
-                            ₹{{ current_subscription.amount }}
-                        </div>
-                    </div>
-                    
-                    <div class="detail-grid mt-4">
-                        <div class="detail-item">
-                            <label>Start Date</label>
-                            <span>{{ current_subscription.start_date|date:"M d, Y" }}</span>
-                        </div>
-                        <div class="detail-item">
-                            <label>Renews On</label>
-                            <span>{{ current_subscription.end_date|date:"M d, Y" }}</span>
-                        </div>
-                        <div class="detail-item">
-                            <label>Status</label>
-                            <span class="text-success">Active</span>
-                        </div>
-                        <div class="detail-item">
-                            <label>Payment Method</label>
-                            <span>{{ current_subscription.payment.payment_method|default:"Razorpay" }}</span>
-                        </div>
-                    </div>
-                    
-                    <div class="subscription-actions mt-4">
-                        <button class="btn btn-outline-danger" onclick="alert('Cancel subscription functionality coming soon!')">Cancel Subscription</button>
-                        <button class="btn btn-primary" onclick="window.location.href='{% url 'payments:membership' %}'">Change Plan</button>
-                    </div>
-                {% else %}
-                    <div class="no-subscription text-center py-4">
-                        <div class="mb-3">
-                            <i class="bi bi-star" style="font-size: 3rem; color: #fbbf24;"></i>
-                        </div>
-                        <h3>Upgrade to PRO</h3>
-                        <p class="mb-4">Get access to premium research calls, real-time alerts, and expert analysis.</p>
-                        <a href="{% url 'payments:membership' %}" class="btn btn-primary btn-lg">View Plans & Upgrade</a>
-                    </div>
-                {% endif %}
-            </div>
-        </div>
     </div>
 
-    <!-- Edit Profile Modal -->
-    <div id="editProfileModal" class="modal-overlay">
-        <div class="modal-container">
-            <div class="modal-header">
-                <h2>Edit Profile</h2>
-                <button class="close-btn" onclick="closeEditModal()">&times;</button>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- Sidebar Navigation (Conceptual) -->
+        <div class="lg:col-span-4 space-y-8">
+            <!-- Account Health -->
+            <div class="bg-white p-8 rounded-[32px] border border-slate-200 shadow-sm">
+                <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]">security</span>
+                    Access & Health
+                </h3>
+                <div class="space-y-6">
+                    <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider">MFA Status</span>
+                            <span class="text-xs font-bold text-slate-700">Not Configured</span>
+                        </div>
+                        <span class="material-symbols-outlined text-amber-500">warning</span>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <button onclick="alert('Password refresh logic triggered')" class="w-full py-3 bg-slate-900 text-white rounded-xl font-black text-[11px] uppercase tracking-widest hover:bg-slate-800 transition-all">
+                            Refresh Password
+                        </button>
+                        <p class="text-[9px] text-slate-400 text-center font-bold italic uppercase">Last login: {{ user.last_login|default:"Today"|date:"M d, H:i" }}</p>
+                    </div>
+                </div>
             </div>
-            <form method="post" class="edit-form">
-                {% csrf_token %}
-                <div class="form-group">
-                    <label>First Name</label>
-                    {{ form.first_name }}
+
+            <!-- Promotion Hook -->
+            {% if not current_subscription.is_active %}
+            <div class="bg-indigo-600 p-8 rounded-[32px] text-white shadow-xl shadow-indigo-100 relative overflow-hidden group">
+                <div class="relative z-10">
+                    <h3 class="text-xl font-black mb-2 leading-tight">Unlock Market Intelligence</h3>
+                    <p class="text-indigo-100 text-xs font-medium mb-6 opacity-80 leading-relaxed">Access real-time Institutional trade setups and premium baskets.</p>
+                    <a href="{% url 'payments:membership' %}" class="inline-flex items-center gap-2 px-6 py-3 bg-white text-indigo-600 rounded-xl font-black text-sm hover:bg-indigo-50 transition-all no-underline">
+                        Upgrade to PRO
+                        <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+                    </a>
                 </div>
-                <div class="form-group">
-                    <label>Last Name</label>
-                    {{ form.last_name }}
+                <!-- Abstract Design Elements -->
+                <div class="absolute -right-8 -bottom-8 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
+                <div class="absolute -left-4 -top-4 w-16 h-16 bg-white/5 rounded-full blur-xl"></div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Main Content -->
+        <div class="lg:col-span-8 space-y-8">
+            <!-- Strategic Details -->
+            <div class="bg-white p-8 rounded-[32px] border border-slate-200 shadow-sm">
+                <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-8 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]">assignment_ind</span>
+                    Technical Profile
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="p-5 bg-slate-50 rounded-2xl border border-slate-100">
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 leading-none">First Identifier</label>
+                        <span class="text-lg font-black text-slate-900">{{ user.first_name }}</span>
+                    </div>
+                    <div class="p-5 bg-slate-50 rounded-2xl border border-slate-100">
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 leading-none">Primary Surname</label>
+                        <span class="text-lg font-black text-slate-900">{{ user.last_name }}</span>
+                    </div>
+                    <div class="p-5 bg-slate-50 rounded-2xl border border-slate-100 md:col-span-2">
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 leading-none">Verified Protocol Node (Email)</label>
+                        <span class="text-lg font-black text-slate-900 flex items-center gap-2">
+                            {{ user.email }}
+                            <span class="material-symbols-outlined text-emerald-500 text-[18px]">verified</span>
+                        </span>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Mobile Number</label>
-                    {{ form.mobile }}
+            </div>
+
+            <!-- Subscription Logic -->
+            <div class="bg-white p-8 rounded-[32px] border border-slate-200 shadow-sm">
+                <div class="flex items-center justify-between mb-8">
+                    <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[18px]">workspace_premium</span>
+                        Subscription Lifecycle
+                    </h3>
+                    {% if current_subscription.is_active %}
+                    <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-wider">Active Stream</span>
+                    {% else %}
+                    <span class="px-2.5 py-1 rounded-lg bg-slate-50 text-slate-400 text-[10px] font-black uppercase tracking-wider">Inactive</span>
+                    {% endif %}
                 </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn btn-outline" onclick="closeEditModal()">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
+
+                {% if current_subscription.is_active %}
+                <div class="space-y-6">
+                    <div class="flex items-center justify-between p-6 bg-slate-900 rounded-[24px] text-white">
+                        <div>
+                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Current Tier</span>
+                            <h4 class="text-2xl font-black">{{ current_subscription.plan_type }} Plan</h4>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Renewal Cycle</span>
+                            <span class="text-lg font-black">{{ current_subscription.get_billing_cycle_display }}</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Provisioned Date</span>
+                            <span class="text-sm font-black text-slate-900">{{ current_subscription.start_date|date:"M d, Y" }}</span>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Expiry Node</span>
+                            <span class="text-sm font-black text-slate-900">{{ current_subscription.end_date|date:"M d, Y" }}</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3 pt-4">
+                        <button onclick="alert('Portal redirecting...')" class="flex-1 py-4 bg-white border border-slate-200 text-slate-900 rounded-2xl font-black text-sm hover:bg-slate-50 transition-all flex items-center justify-center gap-2">
+                            <span class="material-symbols-outlined text-[20px]">receipt_long</span>
+                            Invoice History
+                        </button>
+                        <a href="{% url 'payments:membership' %}" class="flex-1 py-4 bg-slate-900 text-white rounded-2xl font-black text-sm hover:bg-slate-800 transition-all flex items-center justify-center gap-2 no-underline">
+                            <span class="material-symbols-outlined text-[20px]">upgrade</span>
+                            Tier Management
+                        </a>
+                    </div>
                 </div>
-            </form>
+                {% else %}
+                <div class="py-12 flex flex-col items-center text-center">
+                    <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4 text-slate-300">
+                        <span class="material-symbols-outlined text-[32px]">shield_person</span>
+                    </div>
+                    <h4 class="text-slate-900 font-bold mb-2">No Active Subscription</h4>
+                    <p class="text-slate-500 text-sm max-w-xs mx-auto mb-8 font-medium italic">You are currently operating on the restricted standard tier.</p>
+                    <a href="{% url 'payments:membership' %}" class="px-8 py-4 bg-indigo-600 text-white rounded-2xl font-black text-sm hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 no-underline">
+                        Explore PRO Intelligence
+                    </a>
+                </div>
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>
 
-<style>
-.profile-container {
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.profile-card {
-    background: white;
-    border-radius: 12px;
-    padding: 2rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.profile-header {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-    padding-bottom: 2rem;
-    border-bottom: 2px solid var(--border-color);
-    margin-bottom: 2rem;
-}
-
-.profile-avatar {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2.5rem;
-    font-weight: 700;
-}
-
-.profile-info h2 {
-    margin: 0 0 0.5rem 0;
-    font-size: 1.75rem;
-    font-weight: 700;
-}
-
-.profile-info p {
-    margin: 0 0 0.5rem 0;
-    color: var(--text-secondary);
-}
-
-.profile-details h3 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-bottom: 1.5rem;
-}
-
-.detail-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-}
-
-.detail-item {
-    display: flex;
-    flex-direction: column;
-}
-
-.detail-item label {
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-    margin-bottom: 0.25rem;
-}
-
-.detail-item span {
-    font-weight: 500;
-}
-
-.profile-actions {
-    display: flex;
-    gap: 1rem;
-}
-
-@media (max-width: 768px) {
-    .detail-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .profile-header {
-        flex-direction: column;
-        text-align: center;
-    }
-}
-
-/* Modal Styles */
-.modal-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
-    align-items: center;
-    justify-content: center;
-}
-
-.modal-container {
-    background: white;
-    border-radius: 12px;
-    padding: 2rem;
-    width: 100%;
-    max-width: 500px;
-    position: relative;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-}
-
-.modal-header h2 {
-    margin: 0;
-    font-size: 1.5rem;
-}
-
-.close-btn {
-    background: none;
-    border: none;
-    font-size: 2rem;
-    cursor: pointer;
-    color: #64748b;
-    padding: 0;
-    line-height: 1;
-}
-
-.form-group {
-    margin-bottom: 1.5rem;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    color: var(--text-secondary);
-    font-size: 0.875rem;
-}
-
-.form-control {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    font-size: 1rem;
-}
-
-.modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-    margin-top: 2rem;
-}
-</style>
+<!-- Edit Profile Modal -->
+<div id="editProfileModal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-lg rounded-[32px] shadow-2xl overflow-hidden scale-95 transition-all duration-300 modal-content">
+        <div class="px-8 py-6 border-b border-slate-100 flex items-center justify-between">
+            <h2 class="text-xl font-black text-slate-900 tracking-tight">Adapt Identity</h2>
+            <button onclick="closeEditModal()" class="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <form method="post" class="p-8">
+            {% csrf_token %}
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 leading-none">First Name</label>
+                    {% render_field form.first_name class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" %}
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 leading-none">Last Name</label>
+                    {% render_field form.last_name class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" %}
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 leading-none">Communication Protocol (Mobile)</label>
+                    {% render_field form.mobile class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" %}
+                </div>
+            </div>
+            <div class="mt-10 flex items-center gap-3">
+                <button type="button" onclick="closeEditModal()" class="flex-1 py-4 bg-white border border-slate-200 text-slate-700 rounded-2xl font-black text-sm hover:bg-slate-50 transition-all">
+                    Discard
+                </button>
+                <button type="submit" class="flex-1 py-4 bg-slate-900 text-white rounded-2xl font-black text-sm hover:bg-slate-800 transition-all shadow-lg shadow-slate-100">
+                    Commit Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 
 <script>
 function openEditModal() {
-    document.getElementById('editProfileModal').style.display = 'flex';
+    const modal = document.getElementById('editProfileModal');
+    modal.classList.remove('hidden');
+    setTimeout(() => {
+        modal.querySelector('.modal-content').classList.remove('scale-95');
+        modal.querySelector('.modal-content').classList.add('scale-100');
+    }, 10);
 }
 
 function closeEditModal() {
-    document.getElementById('editProfileModal').style.display = 'none';
+    const modal = document.getElementById('editProfileModal');
+    modal.querySelector('.modal-content').classList.remove('scale-100');
+    modal.querySelector('.modal-content').classList.add('scale-95');
+    setTimeout(() => {
+        modal.classList.add('hidden');
+    }, 300);
 }
 
 // Close outside click
 window.onclick = function(event) {
     const modal = document.getElementById('editProfileModal');
     if (event.target == modal) {
-        modal.style.display = "none";
+        closeEditModal();
     }
 }
 </script>

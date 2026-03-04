@@ -16,6 +16,13 @@ def role_required(*roles):
         def create_research_call(request):
             pass
     """
+    # Allow callers to pass either role_required('ADMIN', 'ANALYST')
+    # or role_required(['ADMIN', 'ANALYST']).
+    if len(roles) == 1 and isinstance(roles[0], (list, tuple, set)):
+        normalized_roles = tuple(roles[0])
+    else:
+        normalized_roles = tuple(roles)
+
     def decorator(view_func):
         @wraps(view_func)
         def _wrapped_view(request, *args, **kwargs):
@@ -23,11 +30,11 @@ def role_required(*roles):
                 messages.warning(request, 'Please login to access this page.')
                 return redirect('authentication:login')
             
-            if request.user.role not in roles:
+            if request.user.role not in normalized_roles:
                 messages.error(request, "You don't have permission to access this page.")
                 return HttpResponseForbidden(
                     "You don't have permission to access this page. "
-                    f"Required roles: {', '.join(roles)}"
+                    f"Required roles: {', '.join(normalized_roles)}"
                 )
             
             return view_func(request, *args, **kwargs)

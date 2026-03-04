@@ -1,70 +1,82 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Recently Listed — StockPro{% endblock %}
+{% block title %}Genesis Stream - Recently Listed - StockPro{% endblock %}
 
 {% block page_content %}
-<div class="space-y-8">
+<div class="max-w-7xl mx-auto px-4 py-12">
     <!-- Page Header -->
-    <div class="flex items-center gap-3">
-        <span class="size-10 rounded-xl bg-blue-50 flex items-center justify-center">
-            <span class="material-symbols-outlined text-blue-500 text-xl">new_releases</span>
-        </span>
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
         <div>
-            <h1 class="text-2xl font-extrabold text-text-main m-0">Recently Listed</h1>
-            <p class="text-sm text-text-muted m-0">Newly listed stocks and IPOs on the exchange</p>
+            <h1 class="text-4xl font-black text-slate-900 tracking-tight mb-2">Genesis Stream</h1>
+            <p class="text-slate-500 font-medium tracking-tight italic">Newly provisioned market entities and IPO lifecycle deployments.</p>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-black uppercase tracking-widest border border-blue-100">Synchronized</span>
         </div>
     </div>
 
     <!-- Cards Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {% for stock in recently_listed %}
-        <div class="bg-surface rounded-2xl shadow-soft p-6 hover:shadow-soft-hover transition-all group">
-            <div class="flex items-center justify-between mb-4">
-                <div class="flex items-center gap-3">
-                    <div class="size-10 rounded-xl bg-accent-teal/10 flex items-center justify-center">
-                        <span class="material-symbols-outlined text-accent-teal">apartment</span>
+        <div class="bg-white rounded-[40px] border border-slate-200 shadow-sm p-8 hover:shadow-xl hover:-translate-y-1 transition-all group relative overflow-hidden">
+            <div class="flex items-start justify-between mb-8 relative z-10">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-slate-200 transition-transform group-hover:scale-110">
+                        <span class="material-symbols-outlined text-[24px]">rocket_launch</span>
                     </div>
                     <div>
-                        <p class="font-bold text-text-main text-sm m-0">{{ stock.symbol|default:stock.name }}</p>
-                        <p class="text-xs text-text-muted m-0">{{ stock.exchange|default:"NSE" }}</p>
+                        <h3 class="text-sm font-black text-slate-900 leading-tight">{{ stock.symbol|default:stock.name }}</h3>
+                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]">{{ stock.exchange|default:"NSE" }}</span>
                     </div>
                 </div>
-                <span class="px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-bold">New</span>
+                <span class="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-widest border border-blue-100">New Epoch</span>
             </div>
 
-            <div class="space-y-3">
+            <div class="space-y-5 relative z-10">
                 {% if stock.listing_price or stock.ltp %}
-                <div class="flex justify-between items-center">
-                    <span class="text-xs text-text-muted">Listing Price</span>
-                    <span class="text-sm font-bold text-text-main">₹{{ stock.listing_price|default:stock.ltp|floatformat:2 }}</span>
+                <div class="flex justify-between items-end">
+                    <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Listing Node</span>
+                    <span class="text-lg font-black text-slate-900">₹{{ stock.listing_price|default:stock.ltp|floatformat:2 }}</span>
                 </div>
                 {% endif %}
-                {% if stock.issue_price %}
-                <div class="flex justify-between items-center">
-                    <span class="text-xs text-text-muted">Issue Price</span>
-                    <span class="text-sm font-bold text-text-main">₹{{ stock.issue_price|floatformat:2 }}</span>
+                
+                <div class="pt-4 border-t border-slate-50 space-y-3">
+                    {% if stock.issue_price %}
+                    <div class="flex justify-between items-center text-[11px] font-bold text-slate-500">
+                        <span>Issue Anchor</span>
+                        <span class="text-slate-900">₹{{ stock.issue_price|floatformat:2 }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if stock.listing_gain or stock.pct_change %}
+                    <div class="flex justify-between items-center">
+                        <span class="text-[11px] font-bold text-slate-500">Alpha Variance</span>
+                        <span class="px-2 py-0.5 rounded-md {% if stock.listing_gain > 0 or stock.pct_change > 0 %}bg-emerald-50 text-emerald-600{% else %}bg-rose-50 text-rose-600{% endif %} text-[10px] font-black">
+                            {{ stock.listing_gain|default:stock.pct_change|floatformat:2 }}%
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if stock.listing_date or stock.date %}
+                    <div class="flex justify-between items-center text-[10px] font-black text-slate-300 uppercase italic">
+                        <span>Provision Date</span>
+                        <span>{{ stock.listing_date|default:stock.date }}</span>
+                    </div>
+                    {% endif %}
                 </div>
-                {% endif %}
-                {% if stock.listing_gain or stock.pct_change %}
-                <div class="flex justify-between items-center">
-                    <span class="text-xs text-text-muted">Listing Gain</span>
-                    <span class="text-sm font-bold {% if stock.listing_gain > 0 or stock.pct_change > 0 %}text-green-500{% else %}text-red-500{% endif %}">
-                        {{ stock.listing_gain|default:stock.pct_change|floatformat:2 }}%
-                    </span>
-                </div>
-                {% endif %}
-                {% if stock.listing_date or stock.date %}
-                <div class="flex justify-between items-center">
-                    <span class="text-xs text-text-muted">Listed On</span>
-                    <span class="text-xs font-semibold text-text-muted">{{ stock.listing_date|default:stock.date }}</span>
-                </div>
-                {% endif %}
             </div>
+            
+            <!-- Abstract background element -->
+            <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-slate-50 rounded-full group-hover:scale-150 transition-transform duration-700 opacity-50"></div>
         </div>
         {% empty %}
-        <div class="col-span-full bg-surface rounded-2xl shadow-soft p-12 text-center">
-            <span class="material-symbols-outlined text-5xl text-gray-300 mb-3 block">inventory_2</span>
-            <p class="text-text-muted text-sm m-0">No recently listed stocks available right now</p>
+        <div class="col-span-full py-24 text-center bg-slate-50 rounded-[40px] border border-dashed border-slate-200">
+            <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100 text-slate-200 shadow-sm">
+                <span class="material-symbols-outlined text-[40px]">inventory_2</span>
+            </div>
+            <h3 class="text-slate-900 font-black text-lg">Stream Stagnation</h3>
+            <p class="text-slate-400 text-sm font-medium italic">No synthetic listings detected in the current market cycle.</p>
         </div>
         {% endfor %}
     </div>

@@ -20,14 +20,20 @@ def log_action(user, action, entity_type, entity_id, old_values=None, new_values
     Returns:
         AuditLog: Created audit log entry
     """
+    changes = {}
+    if old_values is not None:
+        changes['old_values'] = old_values
+    if new_values is not None:
+        changes['new_values'] = new_values
+    if notes:
+        changes['notes'] = notes
+
     return AuditLog.objects.create(
         user=user,
         action=action,
-        entity_type=entity_type,
-        entity_id=entity_id,
-        old_values=old_values or {},
-        new_values=new_values or {},
-        notes=notes or ''
+        model_name=entity_type,
+        object_id=entity_id,
+        changes_json=changes or None,
     )
 
 
@@ -44,9 +50,9 @@ def get_entity_history(entity_type, entity_id, limit=50):
         QuerySet: Audit log entries
     """
     return AuditLog.objects.filter(
-        entity_type=entity_type,
-        entity_id=entity_id
-    ).select_related('user').order_by('-timestamp')[:limit]
+        model_name=entity_type,
+        object_id=entity_id
+    ).select_related('user').order_by('-created_at')[:limit]
 
 
 def get_user_activity(user, limit=100):
@@ -62,4 +68,4 @@ def get_user_activity(user, limit=100):
     """
     return AuditLog.objects.filter(
         user=user
-    ).order_by('-timestamp')[:limit]
+    ).order_by('-created_at')[:limit]

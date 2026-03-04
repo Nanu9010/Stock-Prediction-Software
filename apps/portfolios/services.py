@@ -146,3 +146,14 @@ def calculate_portfolio_summary(portfolio):
         'losing_trades': losing_trades,
         'win_rate': round(win_rate, 2),
     }
+
+
+def get_portfolio_summary(user):
+    """
+    Backward-compatible helper used by tests and views.
+    """
+    portfolio, _ = Portfolio.objects.get_or_create(
+        user=user,
+        defaults={'name': 'My Portfolio'},
+    )
+    return calculate_portfolio_summary(portfolio)

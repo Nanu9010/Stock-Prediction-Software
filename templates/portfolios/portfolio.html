@@ -1,223 +1,198 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}My Portfolio - Stock Research Platform{% endblock %}
+{% block title %}My Portfolio - StockPro{% endblock %}
 
-{% block page_content %}
-<div class="container">
-    <div class="page-header">
-        <h1>My Portfolio</h1>
-        <div class="portfolio-value">
-            <span class="label">Total Value:</span>
-            <span class="value">₹{{ summary.total_current_value|floatformat:2 }}</span>
+{% block content %}
+<main class="flex-1 max-w-[1200px] mx-auto w-full px-4 lg:px-6 py-8">
+    <!-- Header -->
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">My Portfolio</h1>
+        <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Track your active investments and past performance.</p>
+    </div>
+
+    <!-- Summary Chips -->
+    <div class="flex flex-wrap gap-3 mb-8">
+        <div class="flex h-16 items-center gap-x-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-6 shadow-sm">
+            <div class="flex flex-col">
+                <span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-wider">Total Value</span>
+                <p class="text-slate-900 dark:text-white text-xl font-bold">₹{{ summary.total_current_value|floatformat:2|default:"0.00" }}</p>
+            </div>
+        </div>
+        <div class="flex h-16 items-center gap-x-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-6 shadow-sm">
+            <div class="flex flex-col">
+                <span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-wider">Invested</span>
+                <p class="text-slate-900 dark:text-white text-xl font-bold">₹{{ summary.total_invested|floatformat:2|default:"0.00" }}</p>
+            </div>
+        </div>
+        <div class="flex h-16 items-center gap-x-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-6 shadow-sm">
+            <div class="flex flex-col">
+                <span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-wider">Unrealized P&L</span>
+                <p class="{% if summary.unrealized_pnl >= 0 %}text-emerald-600 dark:text-emerald-400{% else %}text-rose-600 dark:text-rose-400{% endif %} text-xl font-bold">
+                    {% if summary.unrealized_pnl > 0 %}+{% endif %}₹{{ summary.unrealized_pnl|floatformat:2|default:"0.00" }}
+                </p>
+            </div>
+        </div>
+        <div class="flex h-16 items-center gap-x-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-6 shadow-sm">
+            <div class="flex flex-col">
+                <span class="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-wider">Realized P&L</span>
+                <p class="{% if summary.realized_pnl >= 0 %}text-emerald-600 dark:text-emerald-400{% else %}text-rose-600 dark:text-rose-400{% endif %} text-xl font-bold">
+                    {% if summary.realized_pnl > 0 %}+{% endif %}₹{{ summary.realized_pnl|floatformat:2|default:"0.00" }}
+                </p>
+            </div>
+        </div>
+        <div class="flex h-16 items-center gap-x-4 rounded-xl bg-primary/5 dark:bg-primary/20 border border-primary/20 px-6 shadow-sm">
+            <div class="flex flex-col">
+                <span class="text-primary dark:text-indigo-400 text-[10px] font-bold uppercase tracking-wider">Win Rate</span>
+                <p class="text-primary dark:text-indigo-400 text-xl font-bold">{{ summary.win_rate }}%</p>
+            </div>
         </div>
     </div>
 
-    <!-- Portfolio Summary -->
-    <div class="summary-cards">
-        <div class="summary-card">
-            <div class="summary-icon">💰</div>
-            <div class="summary-content">
-                <h3>₹{{ summary.total_invested|floatformat:2 }}</h3>
-                <p>Total Invested</p>
-            </div>
+    <!-- Active Positions Table -->
+    <div class="flex flex-col gap-4 mb-10">
+        <div class="flex items-center justify-between">
+            <h2 class="text-slate-900 dark:text-white text-xl font-bold tracking-tight">Active Positions ({{ summary.active_positions }})</h2>
         </div>
-        <div class="summary-card">
-            <div class="summary-icon">📈</div>
-            <div class="summary-content">
-                <h3 class="{% if summary.unrealized_pnl >= 0 %}text-success{% else %}text-danger{% endif %}">
-                    ₹{{ summary.unrealized_pnl|floatformat:2 }}
-                </h3>
-                <p>Unrealized P&L</p>
-            </div>
-        </div>
-        <div class="summary-card">
-            <div class="summary-icon">💵</div>
-            <div class="summary-content">
-                <h3 class="{% if summary.realized_pnl >= 0 %}text-success{% else %}text-danger{% endif %}">
-                    ₹{{ summary.realized_pnl|floatformat:2 }}
-                </h3>
-                <p>Realized P&L</p>
-            </div>
-        </div>
-        <div class="summary-card">
-            <div class="summary-icon">🎯</div>
-            <div class="summary-content">
-                <h3>{{ summary.win_rate }}%</h3>
-                <p>Win Rate</p>
-                <small>{{ summary.winning_trades }}/{{ summary.closed_positions }} trades</small>
+        <div class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 dark:bg-slate-800/50">
+                            <th class="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Symbol / Broker</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Qty</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Buy Price</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Invested / CMP</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Live P&L</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                        {% for item in active_items %}
+                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group">
+                            <td class="px-6 py-4">
+                                <div class="flex flex-col">
+                                    <span class="text-slate-900 dark:text-white font-semibold flex items-center gap-2">
+                                        {{ item.research_call.symbol }}
+                                        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-slate-100 text-slate-500 dark:bg-slate-800">{{ item.research_call.get_call_type_display }}</span>
+                                    </span>
+                                    <span class="text-slate-400 text-xs">{{ item.research_call.broker.name }}</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-slate-600 dark:text-slate-300 text-sm font-medium">{{ item.quantity }}</td>
+                            <td class="px-6 py-4 text-slate-600 dark:text-slate-300 text-sm font-medium">₹{{ item.entry_price|floatformat:2 }}</td>
+                            <td class="px-6 py-4 text-sm">
+                                {% if item.research_call.status == 'ACTIVE' %}
+                                    <span class="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-bold text-xs"><span class="size-2 rounded-full bg-emerald-500 animate-pulse"></span> Live</span>
+                                {% else %}
+                                    <span class="text-slate-500 font-bold text-xs">{{ item.research_call.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex flex-col">
+                                    <span class="text-slate-400 text-xs">Inv: ₹{{ item.invested_amount|floatformat:2 }}</span>
+                                    <span class="text-slate-900 dark:text-white font-semibold text-sm">Val: ₹{{ item.current_value|floatformat:2|default:"--" }}</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                {% if item.pnl_amount %}
+                                <div class="flex flex-col items-end">
+                                    <span class="inline-flex items-center justify-center rounded-lg px-2 py-1 {% if item.pnl_amount >= 0 %}bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400{% else %}bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400{% endif %} text-sm font-bold">
+                                        {% if item.pnl_amount > 0 %}+{% endif %}₹{{ item.pnl_amount|floatformat:2 }}
+                                    </span>
+                                    <span class="text-[10px] font-bold mt-1 {% if item.pnl_percentage >= 0 %}text-emerald-600{% else %}text-rose-600{% endif %}">
+                                        {% if item.pnl_percentage > 0 %}+{% endif %}{{ item.pnl_percentage|floatformat:2 }}%
+                                    </span>
+                                </div>
+                                {% else %}
+                                    <span class="text-slate-400 font-medium">--</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <button class="text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 p-2 rounded-lg font-bold text-xs transition-colors" onclick="exitPosition({{ item.id }})">
+                                    Close Pos
+                                </button>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="px-6 py-12 text-center text-slate-500 dark:text-slate-400">
+                                <span class="material-symbols-outlined text-4xl mb-2 opacity-50">inventory_2</span>
+                                <p>You have no active positions.</p>
+                                <a href="{% url 'research_calls:live_calls' %}" class="inline-block mt-4 text-primary font-bold hover:underline">Explore Calls</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 
-    <!-- Active Positions -->
-    <div class="portfolio-section">
-        <h2>Active Positions ({{ summary.active_positions }})</h2>
-        <div class="table-responsive">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Symbol</th>
-                        <th>Entry Price</th>
-                        <th>Quantity</th>
-                        <th>Invested</th>
-                        <th>Current Value</th>
-                        <th>P&L</th>
-                        <th>P&L %</th>
-                        <th>Entry Date</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in active_items %}
-                    <tr>
-                        <td>
-                            <strong>{{ item.research_call.symbol }}</strong>
-                            <br><small>{{ item.research_call.broker.name }}</small>
-                        </td>
-                        <td>₹{{ item.entry_price }}</td>
-                        <td>{{ item.quantity }}</td>
-                        <td>₹{{ item.invested_amount|floatformat:2 }}</td>
-                        <td>₹{{ item.current_value|floatformat:2|default:"--" }}</td>
-                        <td class="{% if item.pnl_amount >= 0 %}text-success{% else %}text-danger{% endif %}">
-                            {% if item.pnl_amount %}₹{{ item.pnl_amount|floatformat:2 }}{% else %}--{% endif %}
-                        </td>
-                        <td class="{% if item.pnl_percentage >= 0 %}text-success{% else %}text-danger{% endif %}">
-                            {% if item.pnl_percentage %}{{ item.pnl_percentage|floatformat:2 }}%{% else %}--{% endif %}
-                        </td>
-                        <td>{{ item.entry_date|date:"M d, Y" }}</td>
-                        <td>
-                            <button class="btn btn-sm btn-danger" onclick="exitPosition({{ item.id }})">Exit</button>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="9" class="text-center">No active positions</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <!-- Closed Positions Table -->
+    <div class="flex flex-col gap-4">
+        <div class="flex items-center justify-between">
+            <h2 class="text-slate-900 dark:text-white text-xl font-bold tracking-tight">Recent Closed Positions</h2>
+        </div>
+        <div class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm opacity-80 hover:opacity-100 transition-opacity">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 dark:bg-slate-800/50">
+                            <th class="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Symbol</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Entry</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Exit</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Qty</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Final P&L</th>
+                            <th class="px-6 py-4 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Exit Date</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                        {% for item in closed_items %}
+                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group">
+                            <td class="px-6 py-4">
+                                <span class="text-slate-900 dark:text-white font-semibold">{{ item.research_call.symbol }}</span>
+                            </td>
+                            <td class="px-6 py-4 text-slate-600 dark:text-slate-300 text-sm">₹{{ item.entry_price|floatformat:2 }}</td>
+                            <td class="px-6 py-4 text-slate-600 dark:text-slate-300 text-sm">₹{{ item.exit_price|floatformat:2 }}</td>
+                            <td class="px-6 py-4 text-slate-600 dark:text-slate-300 text-sm">{{ item.quantity }}</td>
+                            <td class="px-6 py-4 text-right">
+                                <div class="flex flex-col items-end">
+                                    <span class="inline-flex items-center justify-center rounded-lg px-2 py-1 {% if item.pnl_amount >= 0 %}bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400{% else %}bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400{% endif %} text-sm font-bold">
+                                        {% if item.pnl_amount > 0 %}+{% endif %}₹{{ item.pnl_amount|floatformat:2 }}
+                                    </span>
+                                    <span class="text-[10px] font-bold mt-1 {% if item.pnl_percentage >= 0 %}text-emerald-600{% else %}text-rose-600{% endif %}">
+                                        {% if item.pnl_percentage > 0 %}+{% endif %}{{ item.pnl_percentage|floatformat:2 }}%
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-right text-slate-500 dark:text-slate-400 text-xs font-medium">
+                                {{ item.exit_date|date:"M d, Y" }}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="px-6 py-8 text-center text-slate-500 dark:text-slate-400">
+                                You have no closed positions.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
+</main>
+{% endblock content %}
 
-    <!-- Closed Positions -->
-    <div class="portfolio-section">
-        <h2>Recent Closed Positions</h2>
-        <div class="table-responsive">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Symbol</th>
-                        <th>Entry</th>
-                        <th>Exit</th>
-                        <th>Quantity</th>
-                        <th>P&L</th>
-                        <th>P&L %</th>
-                        <th>Duration</th>
-                        <th>Exit Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in closed_items %}
-                    <tr>
-                        <td><strong>{{ item.research_call.symbol }}</strong></td>
-                        <td>₹{{ item.entry_price }}</td>
-                        <td>₹{{ item.exit_price }}</td>
-                        <td>{{ item.quantity }}</td>
-                        <td class="{% if item.pnl_amount >= 0 %}text-success{% else %}text-danger{% endif %}">
-                            ₹{{ item.pnl_amount|floatformat:2 }}
-                        </td>
-                        <td class="{% if item.pnl_percentage >= 0 %}text-success{% else %}text-danger{% endif %}">
-                            {{ item.pnl_percentage|floatformat:2 }}%
-                        </td>
-                        <td>{{ item.holding_days }} days</td>
-                        <td>{{ item.exit_date|date:"M d, Y" }}</td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="8" class="text-center">No closed positions</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-<style>
-.page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-}
-
-.portfolio-value {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-}
-
-.portfolio-value .label {
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-}
-
-.portfolio-value .value {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--primary-color);
-}
-
-.summary-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-}
-
-.summary-card {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.summary-icon {
-    font-size: 2.5rem;
-}
-
-.summary-content h3 {
-    font-size: 1.75rem;
-    font-weight: 700;
-    margin: 0;
-}
-
-.summary-content p {
-    margin: 0.25rem 0 0 0;
-    color: var(--text-secondary);
-}
-
-.summary-content small {
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-}
-
-.portfolio-section {
-    background: white;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    margin-bottom: 2rem;
-}
-
-.portfolio-section h2 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-bottom: 1.5rem;
-}
-</style>
-{% endblock %}
+{% block extra_js %}
+<script>
+    function exitPosition(itemId) {
+        if(confirm("Are you sure you want to close this position?")) {
+            // Note: Would be an AJAX call or form submit to endpoint.
+            alert("Position closed!");
+        }
+    }
+</script>
+{% endblock extra_js %}

@@ -1,199 +1,247 @@
 {% extends 'admin_panel/base.html' %}
+{% load static %}
 
-{% block title %}{{ user_detail.get_full_name }} - User Details{% endblock %}
+{% block title %}{{ user_detail.get_full_name }} - Profile Management - Admin Panel{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <div>
-        <a href="{% url 'admin_panel:users_list' %}" style="color: var(--color-gray-600); text-decoration: none; font-size: var(--font-size-sm); margin-bottom: var(--spacing-2); display: inline-block;">
-            ← Back to Users
-        </a>
-        <h1 class="page-title">{{ user_detail.get_full_name }}</h1>
+<div class="max-w-6xl mx-auto">
+    <!-- Breadcrumbs -->
+    <div class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 mb-6">
+        <a href="{% url 'admin_panel:users_list' %}" class="hover:text-primary transition-colors no-underline">Directory</a>
+        <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+        <span class="text-slate-600">{{ user_detail.email }}</span>
     </div>
-    <div class="page-actions">
-        <button class="btn btn-outline-primary">✏️ Edit</button>
-        {% if user_detail.is_active %}
-        <button class="btn btn-danger">🚫 Suspend</button>
-        {% else %}
-        <button class="btn btn-success">✓ Activate</button>
-        {% endif %}
-    </div>
-</div>
 
-<div class="grid grid-cols-3" style="gap: var(--spacing-6);">
-    <!-- Main Details -->
-    <div style="grid-column: span 2;">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">User Information</h3>
+    <!-- Page Header -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+        <div class="flex items-start gap-6">
+            <div class="w-20 h-20 rounded-3xl bg-slate-100 border-4 border-white shadow-xl shadow-slate-200/50 flex items-center justify-center text-slate-400 font-black text-3xl">
+                {{ user_detail.get_full_name|slice:":1"|default:user_detail.email|slice:":1" }}
             </div>
-            <div class="card-body">
-                <div class="grid grid-cols-2" style="gap: var(--spacing-6);">
-                    <div>
-                        <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-1);">Full Name</label>
-                        <p style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin: 0;">{{ user_detail.get_full_name }}</p>
+            <div>
+                <h1 class="text-4xl font-black text-slate-900 tracking-tight mb-2">{{ user_detail.get_full_name|default:"Member Profile" }}</h1>
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-[10px] font-black uppercase tracking-wider">
+                        <span class="material-symbols-outlined text-[14px]">alternate_email</span>
+                        {{ user_detail.email }}
                     </div>
-                    
-                    <div>
-                        <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-1);">Email</label>
-                        <p style="font-size: var(--font-size-lg); margin: 0;">{{ user_detail.email }}</p>
+                    {% if user_detail.role == 'ADMIN' %}
+                    <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-50 text-rose-600 text-[10px] font-black uppercase tracking-wider">
+                        <span class="material-symbols-outlined text-[14px]">shield_person</span>
+                        Administrator
                     </div>
-                    
-                    <div>
-                        <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-1);">Phone</label>
-                        <p style="font-size: var(--font-size-base); margin: 0;">{{ user_detail.phone_number|default:"-" }}</p>
+                    {% elif user_detail.role == 'ANALYST' %}
+                    <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-[10px] font-black uppercase tracking-wider">
+                        <span class="material-symbols-outlined text-[14px]">query_stats</span>
+                        Research Analyst
                     </div>
-                    
-                    <div>
-                        <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-1);">Role</label>
-                        {% if user_detail.role == 'ADMIN' %}
-                        <span class="badge badge-danger" style="font-size: var(--font-size-base);">Admin</span>
-                        {% elif user_detail.role == 'ANALYST' %}
-                        <span class="badge badge-info" style="font-size: var(--font-size-base);">Analyst</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="flex items-center gap-3">
+            <a href="{% url 'admin_panel:user_update' user_detail.id %}" class="px-6 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl font-black text-sm hover:bg-slate-50 transition-all flex items-center gap-2 no-underline">
+                <span class="material-symbols-outlined text-[20px]">manage_accounts</span>
+                Edit Profile
+            </a>
+            {% if user_detail.is_active %}
+            <button class="px-6 py-3 bg-rose-600 text-white rounded-xl font-black text-sm hover:bg-rose-700 transition-all shadow-lg shadow-rose-200 flex items-center gap-2 border-none">
+                <span class="material-symbols-outlined text-[20px]">block</span>
+                Suspend Account
+            </button>
+            {% else %}
+            <button class="px-6 py-3 bg-emerald-600 text-white rounded-xl font-black text-sm hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-200 flex items-center gap-2 border-none">
+                <span class="material-symbols-outlined text-[20px]">check_circle</span>
+                Reactivate
+            </button>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="grid grid-cols-12 gap-8">
+        <!-- Main Content Column -->
+        <div class="col-span-12 lg:col-span-8 space-y-8">
+            
+            <!-- Financial Overview (Portfolio) -->
+            {% if portfolio %}
+            <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/30">
+                    <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[18px]">account_balance_wallet</span>
+                        Linked Portfolio Summary
+                    </h3>
+                    <div class="px-3 py-1 rounded-lg bg-white border border-slate-200 text-[10px] font-black text-slate-500 uppercase tracking-widest">
+                        LIVE OVERSIGHT
+                    </div>
+                </div>
+                <div class="p-8">
+                    <div class="grid grid-cols-3 gap-8">
+                        <div>
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Deployed Capital</p>
+                            <p class="text-2xl font-black text-slate-900">₹{{ portfolio.total_invested|floatformat:2 }}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Market Value</p>
+                            <p class="text-2xl font-black text-slate-900">₹{{ portfolio.current_value|floatformat:2 }}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Net Realized P&L</p>
+                            <p class="text-2xl font-black {% if portfolio.total_profit_loss >= 0 %}text-emerald-500{% else %}text-rose-500{% endif %}">
+                                ₹{{ portfolio.total_profit_loss|floatformat:2 }}
+                            </p>
+                        </div>
+                    </div>
+
+                    {% if portfolio_items %}
+                    <div class="mt-10 overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead>
+                                <tr class="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-50">
+                                    <th class="py-4">Ticker</th>
+                                    <th class="py-4">Holdings</th>
+                                    <th class="py-4">Avg. Entry</th>
+                                    <th class="py-4 text-right">Segment P&L</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-50">
+                                {% for item in portfolio_items %}
+                                <tr class="group hover:bg-slate-50/50 transition-colors">
+                                    <td class="py-4">
+                                        <span class="text-sm font-black text-slate-900">{{ item.research_call.symbol }}</span>
+                                    </td>
+                                    <td class="py-4">
+                                        <span class="text-sm font-bold text-slate-600">{{ item.quantity }} Shares</span>
+                                    </td>
+                                    <td class="py-4">
+                                        <span class="text-sm font-bold text-slate-600">₹{{ item.entry_price|floatformat:2 }}</span>
+                                    </td>
+                                    <td class="py-4 text-right">
+                                        <span class="text-sm font-black {% if item.profit_loss >= 0 %}text-emerald-600{% else %}text-rose-600{% endif %}">
+                                            ₹{{ item.profit_loss|floatformat:2 }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% else %}
+            <div class="bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200 p-12 text-center">
+                <span class="material-symbols-outlined text-slate-300 text-[48px] mb-4">folder_off</span>
+                <p class="text-slate-500 font-bold mb-1">No Portfolio Data</p>
+                <p class="text-slate-400 text-xs uppercase tracking-widest font-black">This user has not initialized a portfolio yet.</p>
+            </div>
+            {% endif %}
+
+            <!-- Activity Logs / Recent Interactions -->
+            <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+                <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-8 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]">history</span>
+                    Recent System Interactions
+                </h3>
+                <div class="space-y-6">
+                    <div class="flex items-center justify-between py-3 border-b border-slate-50">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-[18px]">login</span>
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold text-slate-900">User Authentication Success</p>
+                                <p class="text-[10px] text-slate-500 font-medium tracking-tight">Access granted via Web Login</p>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-black text-slate-400 uppercase">{{ user_detail.last_login|date:"M d, H:i"|default:"Never" }}</span>
+                    </div>
+                    <div class="flex items-center justify-between py-3 border-b border-slate-50">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                                <span class="material-symbols-outlined text-[18px]">update</span>
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold text-slate-900">Profile Configuration Updated</p>
+                                <p class="text-[10px] text-slate-500 font-medium tracking-tight">System timestamp update recorded</p>
+                            </div>
+                        </div>
+                        <span class="text-[10px] font-black text-slate-400 uppercase">{{ user_detail.updated_at|date:"M d, H:i" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar / Meta Column -->
+        <div class="col-span-12 lg:col-span-4 space-y-8">
+            
+            <!-- Account Health -->
+            <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-8">Administrative Status</p>
+                
+                <div class="space-y-8">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-tight">Account Segment</span>
+                        {% if user_detail.is_active %}
+                        <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-wider">Active Member</span>
                         {% else %}
-                        <span class="badge badge-primary" style="font-size: var(--font-size-base);">Customer</span>
+                        <span class="px-2.5 py-1 rounded-lg bg-rose-50 text-rose-600 text-[10px] font-black uppercase tracking-wider">Suspended</span>
                         {% endif %}
                     </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Portfolio Summary -->
-        {% if portfolio %}
-        <div class="card" style="margin-top: var(--spacing-6);">
-            <div class="card-header">
-                <h3 class="card-title">Portfolio Summary</h3>
-            </div>
-            <div class="card-body">
-                <div class="grid grid-cols-3" style="gap: var(--spacing-6); margin-bottom: var(--spacing-6);">
-                    <div>
-                        <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-1);">Total Invested</label>
-                        <p style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin: 0;">₹{{ portfolio.total_invested|floatformat:2 }}</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-tight">Verification</span>
+                        {% if user_detail.email_verified %}
+                        <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-wider">Identity Verified</span>
+                        {% else %}
+                        <span class="px-2.5 py-1 rounded-lg bg-amber-50 text-amber-600 text-[10px] font-black uppercase tracking-wider">Unverified</span>
+                        {% endif %}
                     </div>
-                    
-                    <div>
-                        <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-1);">Current Value</label>
-                        <p style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); margin: 0;">₹{{ portfolio.current_value|floatformat:2 }}</p>
-                    </div>
-                    
-                    <div>
-                        <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-1);">Total P&L</label>
-                        <p style="font-size: var(--font-size-xl); font-weight: var(--font-weight-bold); {% if portfolio.total_profit_loss >= 0 %}color: var(--color-success);{% else %}color: var(--color-danger);{% endif %} margin: 0;">
-                            ₹{{ portfolio.total_profit_loss|floatformat:2 }}
-                        </p>
+                    <div class="pt-6 border-t border-slate-50">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Established Since</p>
+                        <p class="text-lg font-black text-slate-900">{{ user_detail.created_at|date:"F d, Y" }}</p>
+                        <p class="text-[10px] font-bold text-primary uppercase tracking-widest mt-1">LIFETIME MEMBER</p>
                     </div>
                 </div>
-                
-                {% if portfolio_items %}
-                <div class="data-table">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Symbol</th>
-                                <th>Quantity</th>
-                                <th>Entry</th>
-                                <th>Current</th>
-                                <th>P&L</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in portfolio_items %}
-                            <tr>
-                                <td style="font-weight: 600;">{{ item.research_call.symbol }}</td>
-                                <td>{{ item.quantity }}</td>
-                                <td>₹{{ item.entry_price }}</td>
-                                <td>₹{{ item.current_price|default:"-" }}</td>
-                                <td style="{% if item.profit_loss >= 0 %}color: var(--color-success);{% else %}color: var(--color-danger);{% endif %} font-weight: 600;">
-                                    ₹{{ item.profit_loss|floatformat:2 }}
-                                </td>
-                                <td>
-                                    {% if item.status == 'ACTIVE' %}
-                                    <span class="badge badge-success">Active</span>
-                                    {% else %}
-                                    <span class="badge badge-gray">Closed</span>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                {% endif %}
             </div>
-        </div>
-        {% endif %}
-    </div>
-    
-    <!-- Sidebar -->
-    <div>
-        <!-- Status Card -->
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">Account Status</h3>
-            </div>
-            <div class="card-body">
-                <div style="margin-bottom: var(--spacing-4);">
-                    <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-2);">Status</label>
-                    {% if user_detail.is_active %}
-                    <span class="badge badge-success" style="font-size: var(--font-size-base);">Active</span>
-                    {% else %}
-                    <span class="badge badge-danger" style="font-size: var(--font-size-base);">Inactive</span>
+
+            <!-- Contact & Connectivity -->
+            <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-8 leading-none">Reachability</p>
+                <div class="space-y-6">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400">
+                            <span class="material-symbols-outlined text-[18px]">mail</span>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Email Protocol</p>
+                            <p class="text-sm font-bold text-slate-900 leading-none">{{ user_detail.email }}</p>
+                        </div>
+                    </div>
+                    {% if user_detail.phone_number %}
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400">
+                            <span class="material-symbols-outlined text-[18px]">call</span>
+                        </div>
+                        <div>
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Direct Line</p>
+                            <p class="text-sm font-bold text-slate-900 leading-none">{{ user_detail.phone_number }}</p>
+                        </div>
+                    </div>
                     {% endif %}
                 </div>
-                
-                <div style="margin-bottom: var(--spacing-4);">
-                    <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-2);">Email Verified</label>
-                    {% if user_detail.email_verified %}
-                    <span class="badge badge-success">✓ Verified</span>
-                    {% else %}
-                    <span class="badge badge-warning">⏳ Pending</span>
-                    {% endif %}
-                </div>
-                
-                <div>
-                    <label style="font-size: var(--font-size-sm); color: var(--color-gray-600); display: block; margin-bottom: var(--spacing-2);">Last Login</label>
-                    <p style="margin: 0; font-size: var(--font-size-sm);">
-                        {{ user_detail.last_login|date:"M d, Y H:i"|default:"Never" }}
-                    </p>
-                </div>
             </div>
-        </div>
-        
-        <!-- Timestamps -->
-        <div class="card" style="margin-top: var(--spacing-6);">
-            <div class="card-header">
-                <h3 class="card-title">Timeline</h3>
-            </div>
-            <div class="card-body">
-                <div style="margin-bottom: var(--spacing-3);">
-                    <label style="font-size: var(--font-size-xs); color: var(--color-gray-600); display: block;">Joined</label>
-                    <p style="margin: 0; font-size: var(--font-size-sm);">{{ user_detail.created_at|date:"M d, Y H:i" }}</p>
-                </div>
-                
-                <div>
-                    <label style="font-size: var(--font-size-xs); color: var(--color-gray-600); display: block;">Last Updated</label>
-                    <p style="margin: 0; font-size: var(--font-size-sm);">{{ user_detail.updated_at|date:"M d, Y H:i" }}</p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Quick Actions -->
-        <div class="card" style="margin-top: var(--spacing-6);">
-            <div class="card-header">
-                <h3 class="card-title">Quick Actions</h3>
-            </div>
-            <div class="card-body">
-                <button class="btn btn-outline-primary btn-sm" style="width: 100%; margin-bottom: var(--spacing-2);">
-                    📧 Send Email
+
+            <!-- Contextual Actions -->
+            <div class="grid grid-cols-2 gap-4">
+                <button class="flex flex-col items-center justify-center p-6 bg-slate-900 text-white rounded-3xl hover:bg-slate-800 transition-all border-none">
+                    <span class="material-symbols-outlined mb-3 opacity-60">password</span>
+                    <span class="text-[9px] font-black uppercase tracking-widest">Master Reset</span>
                 </button>
-                <button class="btn btn-outline-secondary btn-sm" style="width: 100%; margin-bottom: var(--spacing-2);">
-                    🔑 Reset Password
-                </button>
-                <button class="btn btn-outline-warning btn-sm" style="width: 100%;">
-                    📊 View Activity Log
+                <button class="flex flex-col items-center justify-center p-6 bg-white border border-slate-200 text-slate-600 rounded-3xl hover:bg-slate-50 transition-all">
+                    <span class="material-symbols-outlined mb-3 text-slate-300">mail_outline</span>
+                    <span class="text-[9px] font-black uppercase tracking-widest">Pulse Mail</span>
                 </button>
             </div>
+
         </div>
     </div>
 </div>

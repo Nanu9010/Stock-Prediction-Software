@@ -10,23 +10,7 @@ logger = logging.getLogger(__name__)
 
 CACHE_TTL = 300  # 5 minutes
 
-# Commodity symbol mapping (yfinance futures symbols)
-COMMODITIES = {
-    'Gold': {'symbol': 'GC=F', 'unit': '$/oz', 'icon': '🥇'},
-    'Silver': {'symbol': 'SI=F', 'unit': '$/oz', 'icon': '🥈'},
-    'Crude Oil (WTI)': {'symbol': 'CL=F', 'unit': '$/bbl', 'icon': '🛢️'},
-    'Crude Oil (Brent)': {'symbol': 'BZ=F', 'unit': '$/bbl', 'icon': '🛢️'},
-    'Natural Gas': {'symbol': 'NG=F', 'unit': '$/MMBtu', 'icon': '🔥'},
-    'Copper': {'symbol': 'HG=F', 'unit': '$/lb', 'icon': '🟤'},
-}
-
-# Indian commodity prices (MCX-equivalent via yfinance)
-INDIAN_COMMODITIES = {
-    'Gold (10g)': {'symbol': 'GC=F', 'unit': '₹', 'multiplier': 0.322, 'icon': '🥇'},
-    'Silver (1kg)': {'symbol': 'SI=F', 'unit': '₹', 'multiplier': 26.5, 'icon': '🥈'},
-    'Crude Oil': {'symbol': 'CL=F', 'unit': '$/bbl', 'multiplier': 1, 'icon': '🛢️'},
-    'Natural Gas': {'symbol': 'NG=F', 'unit': '₹/MMBtu', 'multiplier': 83, 'icon': '🔥'},
-}
+from apps.market_data.models import Commodity
 
 
 def get_commodity_prices():
@@ -37,9 +21,12 @@ def get_commodity_prices():
         return cached
 
     results = []
-    for name, info in COMMODITIES.items():
+    commodities = Commodity.objects.filter(is_active=True, is_global=True)
+    
+    results = []
+    for item in commodities:
         try:
-            ticker = yf.Ticker(info['symbol'])
+            ticker = yf.Ticker(item.symbol)
             hist = ticker.history(period='2d')
             if hist.empty:
                 continue
@@ -50,16 +37,16 @@ def get_commodity_prices():
             change_pct = (change / prev * 100) if prev else 0
 
             results.append({
-                'name': name,
-                'symbol': info['symbol'],
+                'name': item.name,
+                'symbol': item.symbol,
                 'price': round(current, 2),
                 'change': round(change, 2),
                 'change_pct': round(change_pct, 2),
-                'unit': info['unit'],
-                'icon': info['icon'],
+                'unit': item.unit,
+                'icon': item.icon,
             })
         except Exception as e:
-            logger.debug(f"Skipping commodity {name}: {e}")
+            logger.debug(f"Skipping commodity {item.name}: {e}")
 
     if not results:
         results = _fallback_commodities()
@@ -78,10 +65,12 @@ def get_indian_commodity_prices():
     # Get USD/INR rate
     inr_rate = _get_usd_inr_rate()
 
+    indic_commodities = Commodity.objects.filter(is_active=True, is_global=False)
+
     results = []
-    for name, info in INDIAN_COMMODITIES.items():
+    for item in indic_commodities:
         try:
-            ticker = yf.Ticker(info['symbol'])
+            ticker = yf.Ticker(item.symbol)
             hist = ticker.history(period='2d')
             if hist.empty:
                 continue
@@ -89,22 +78,23 @@ def get_indian_commodity_prices():
             current_usd = float(hist['Close'].iloc[-1])
             prev_usd = float(hist['Close'].iloc[0]) if len(hist) > 1 else current_usd
 
-            current_inr = current_usd * info['multiplier'] * inr_rate
-            prev_inr = prev_usd * info['multiplier'] * inr_rate
+            multiplier = float(item.mcx_multiplier)
+            current_inr = current_usd * multiplier * inr_rate
+            prev_inr = prev_usd * multiplier * inr_rate
 
             change = current_inr - prev_inr
             change_pct = (change / prev_inr * 100) if prev_inr else 0
 
             results.append({
-                'name': name,
+                'name': item.name,
                 'price': round(current_inr, 2),
                 'change': round(change, 2),
                 'change_pct': round(change_pct, 2),
-                'unit': info['unit'],
-                'icon': info['icon'],
+                'unit': item.unit,
+                'icon': item.icon,
             })
         except Exception as e:
-            logger.debug(f"Skipping Indian commodity {name}: {e}")
+            logger.debug(f"Skipping Indian commodity {item.name}: {e}")
 
     if not results:
         results = _fallback_indian_commodities()
@@ -124,19 +114,8 @@ def _get_usd_inr_rate():
 
 
 def _fallback_commodities():
-    return [
-        {'name': 'Gold', 'symbol': 'GC=F', 'price': 2035.80, 'change': 12.50, 'change_pct': 0.62, 'unit': '$/oz', 'icon': '🥇'},
-        {'name': 'Silver', 'symbol': 'SI=F', 'price': 22.85, 'change': -0.15, 'change_pct': -0.65, 'unit': '$/oz', 'icon': '🥈'},
-        {'name': 'Crude Oil (WTI)', 'symbol': 'CL=F', 'price': 78.20, 'change': 1.30, 'change_pct': 1.69, 'unit': '$/bbl', 'icon': '🛢️'},
-        {'name': 'Natural Gas', 'symbol': 'NG=F', 'price': 2.45, 'change': -0.08, 'change_pct': -3.16, 'unit': '$/MMBtu', 'icon': '🔥'},
-        {'name': 'Copper', 'symbol': 'HG=F', 'price': 3.82, 'change': 0.05, 'change_pct': 1.33, 'unit': '$/lb', 'icon': '🟤'},
-    ]
+    return []
 
 
 def _fallback_indian_commodities():
-    return [
-        {'name': 'Gold (10g)', 'price': 62450, 'change': 280, 'change_pct': 0.45, 'unit': '₹', 'icon': '🥇'},
-        {'name': 'Silver (1kg)', 'price': 74200, 'change': -89, 'change_pct': -0.12, 'unit': '₹', 'icon': '🥈'},
-        {'name': 'Crude Oil', 'price': 82.40, 'change': 0.98, 'change_pct': 1.20, 'unit': '$/bbl', 'icon': '🛢️'},
-        {'name': 'Natural Gas', 'price': 203.40, 'change': -5.20, 'change_pct': -2.49, 'unit': '₹/MMBtu', 'icon': '🔥'},
-    ]
+    return []

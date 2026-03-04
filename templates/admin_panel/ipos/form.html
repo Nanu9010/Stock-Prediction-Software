@@ -1,0 +1,157 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}{% if object %}Modify Launch Parameter{% else %}Define Market Entry{% endif %} - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Breadcrumbs -->
+    <div class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 mb-6">
+        <a href="{% url 'admin_panel:ipos_list' %}" class="hover:text-primary transition-colors no-underline">Investment Pipeline</a>
+        <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+        <span class="text-slate-600">{% if object %}Parameter Adaptation{% else %}New Launch{% endif %}</span>
+    </div>
+
+    <!-- Page Header -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+        <div>
+            <h1 class="text-4xl font-black text-slate-900 tracking-tight mb-2">
+                {% if object %}Adapt IPO Parameters{% else %}Define Market Entry{% endif %}
+            </h1>
+            <p class="text-slate-500 font-medium tracking-tight">
+                {% if object %}Optimizing entry parameters for <span class="text-primary font-black">{{ object.company_name }}</span>.{% else %}Establishing a new equity launch in the system pipeline.{% endif %}
+            </p>
+        </div>
+        <div class="flex items-center gap-3">
+            <a href="{% url 'admin_panel:ipos_list' %}" class="px-6 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl font-black text-sm hover:bg-slate-50 transition-all no-underline">
+                Cancel
+            </a>
+        </div>
+    </div>
+
+    <form method="post" class="space-y-8">
+        {% csrf_token %}
+        
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+            <!-- Strategic Parameters -->
+            <div class="md:col-span-8 space-y-8">
+                <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+                    <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-8 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[18px]">business</span>
+                        Entity Intelligence
+                    </h3>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 leading-none">Legal Company Name</label>
+                            {% render_field form.company_name class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-slate-900 font-bold placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="Enter full legal name..." %}
+                            {% if form.company_name.errors %}<p class="mt-1 text-[10px] font-bold text-rose-500">{{ form.company_name.errors.0 }}</p>{% endif %}
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 leading-none">Listing Ticker</label>
+                                {% render_field form.symbol class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-slate-900 font-bold placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="e.g., RELIANCE" %}
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 leading-none">Sector Segment</label>
+                                {% render_field form.sector class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-slate-900 font-bold placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="e.g., Technology" %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+                    <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-8 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[18px]">analytics</span>
+                        Emission Architecture
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 leading-none">Price Architecture (Band)</label>
+                            {% render_field form.price_band class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="e.g., 500 - 520" %}
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 leading-none">Issue Magnitude (Cr)</label>
+                            {% render_field form.issue_size class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="e.g., 1500" %}
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 leading-none">Allocation Block (Lot)</label>
+                            {% render_field form.lot_size class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" %}
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 leading-none">Sentiment Premium (GMP)</label>
+                            {% render_field form.gmp class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="+20%" %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scheduling Node -->
+                <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+                    <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-8 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[18px]">calendar_month</span>
+                        Timeline Orchestration
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 leading-none">Subscription Opening</label>
+                            {% render_field form.open_date type="date" class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" %}
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 leading-none">Subscription Closure</label>
+                            {% render_field form.close_date type="date" class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Operational Status -->
+            <div class="md:col-span-4 space-y-8">
+                <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm sticky top-24">
+                    <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-8 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[18px]">verified_user</span>
+                        Market Pulse
+                    </h3>
+                    
+                    <div class="space-y-6">
+                        <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-primary">dynamic_feed</span>
+                                <span class="text-xs font-bold text-slate-700">Market Listed</span>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                {% render_field form.is_listed class="sr-only peer" %}
+                                <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                            </label>
+                        </div>
+
+                        <div class="space-y-4 pt-4 border-t border-slate-100">
+                            <div>
+                                <label class="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 leading-none">Listing Date</label>
+                                {% render_field form.listing_date type="date" class="w-full px-3 py-2 bg-slate-50 border border-slate-100 rounded-lg text-xs font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" %}
+                            </div>
+                            <div>
+                                <label class="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 leading-none">Issue Price (₹)</label>
+                                {% render_field form.issue_price class="w-full px-3 py-2 bg-slate-50 border border-slate-100 rounded-lg text-xs font-black focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" %}
+                            </div>
+                            <div>
+                                <label class="block text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 leading-none">Actual Listing (₹)</label>
+                                {% render_field form.listing_price class="w-full px-3 py-2 bg-slate-50 border border-slate-100 rounded-lg text-xs font-black focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all" %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-10 pt-8 border-t border-slate-100">
+                        <button type="submit" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-sm hover:bg-slate-800 transition-all shadow-xl shadow-slate-200 flex items-center justify-center gap-2 border-none cursor-pointer">
+                            <span class="material-symbols-outlined">rocket_launch</span>
+                            Finalize Launch
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

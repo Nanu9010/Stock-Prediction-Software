@@ -9,6 +9,7 @@ app_name = 'admin_panel'
 urlpatterns = [
     # Dashboard
     path('', views.AdminDashboardView.as_view(), name='dashboard'),
+    path('api/stats/', views.AdminDashboardStatsAPIView.as_view(), name='api_dashboard_stats'),
     
     # Research Calls
     path('calls/', views.CallListView.as_view(), name='calls_list'),
@@ -48,4 +49,22 @@ urlpatterns = [
     # Payments (read-only)
     path('payments/', views.PaymentListView.as_view(), name='payments_list'),
     path('payments/<int:pk>/', views.PaymentDetailView.as_view(), name='payment_detail'),
+    
+    # IPOs
+    path('ipos/', views.IPOListView.as_view(), name='ipos_list'),
+    path('ipos/create/', views.IPOCreateView.as_view(), name='ipo_create'),
+    path('ipos/<int:pk>/edit/', views.IPOUpdateView.as_view(), name='ipo_update'),
+    path('ipos/<int:pk>/delete/', views.IPODeleteView.as_view(), name='ipo_delete'),
+    
+    # Commodities
+    path('commodities/', views.CommodityListView.as_view(), name='commodities_list'),
+    path('commodities/create/', views.CommodityCreateView.as_view(), name='commodity_create'),
+    path('commodities/<int:pk>/edit/', views.CommodityUpdateView.as_view(), name='commodity_update'),
+    path('commodities/<int:pk>/delete/', views.CommodityDeleteView.as_view(), name='commodity_delete'),
+    
+    # ETFs
+    path('etfs/', views.ETFListView.as_view(), name='etfs_list'),
+    path('etfs/create/', views.ETFCreateView.as_view(), name='etf_create'),
+    path('etfs/<int:pk>/edit/', views.ETFUpdateView.as_view(), name='etf_update'),
+    path('etfs/<int:pk>/delete/', views.ETFDeleteView.as_view(), name='etf_delete'),
 ]

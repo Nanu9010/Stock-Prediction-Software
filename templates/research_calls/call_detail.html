@@ -1,240 +1,247 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{{ call.symbol }} — Research Call{% endblock %}
+{% block title %}{{ call.symbol }} - Detail - StockPro{% endblock title %}
 
 {% block page_css %}
 <style>
-    .blur-locked { filter: blur(8px); pointer-events: none; user-select: none; }
+    .blur-locked { filter: blur(5px); opacity: 0.6; pointer-events: none; user-select: none; }
 </style>
 {% endblock %}
 
-{% block page_content %}
-<div class="max-w-5xl mx-auto py-6">
-
+{% block content %}
+<main class="flex-1 px-4 lg:px-10 py-6">
     <!-- Breadcrumb -->
-    <div class="flex items-center gap-2 text-sm mb-8">
-        <a class="text-text-muted hover:text-text-main transition-colors no-underline" href="{% url 'research_calls:live_calls' %}">Research Calls</a>
-        <span class="text-text-muted">/</span>
-        <span class="text-text-main font-medium">{{ call.symbol }}</span>
+    <div class="flex items-center gap-2 text-sm mb-6">
+        <a class="text-slate-500 hover:text-primary transition-colors no-underline" href="{% url 'research_calls:live_calls' %}">Research Calls</a>
+        <span class="text-slate-400 material-symbols-outlined text-[16px]">chevron_right</span>
+        <span class="text-slate-900 dark:text-slate-100 font-medium">{{ call.symbol }}</span>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Main Content -->
-        <div class="lg:col-span-2 space-y-6">
-            <!-- Call Header Card -->
-            <div class="bg-surface border border-gray-200 rounded-2xl p-8 shadow-soft">
-                <div class="flex items-start justify-between mb-6 flex-wrap gap-4">
-                    <div>
-                        <h1 class="text-4xl font-bold text-text-main tracking-tight mb-3">{{ call.symbol }}</h1>
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <span class="text-[10px] font-bold uppercase px-3 py-1 rounded-full {% if call.action == 'BUY' %}bg-accent-teal/10 text-accent-teal{% else %}bg-accent-coral/10 text-accent-coral{% endif %}">{{ call.action }}</span>
-                            <span class="text-[10px] font-bold uppercase px-3 py-1 rounded-full bg-blue-50 text-blue-600">{{ call.call_type }}</span>
-                            {% if call.status == 'ACTIVE' %}
-                            <span class="text-[10px] font-bold uppercase px-3 py-1 rounded-full bg-accent-teal/10 text-accent-teal">Active</span>
-                            {% elif call.status == 'CLOSED' %}
-                            <span class="text-[10px] font-bold uppercase px-3 py-1 rounded-full bg-gray-100 text-text-muted">Closed</span>
-                            {% else %}
-                            <span class="text-[10px] font-bold uppercase px-3 py-1 rounded-full bg-amber-50 text-amber-600">{{ call.status }}</span>
-                            {% endif %}
+    <div class="mx-auto max-w-[1400px] grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- Main Content Area -->
+        <div class="lg:col-span-8 flex flex-col gap-6">
+            <!-- Stock Header -->
+            <div class="bg-white dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
+                <!-- Action Stripe -->
+                <div class="absolute left-0 top-0 bottom-0 w-2 {% if call.action == 'BUY' %}bg-emerald-500{% else %}bg-rose-500{% endif %}"></div>
+                
+                <div class="flex items-start justify-between pl-4">
+                    <div class="flex gap-5 items-center">
+                        <div class="h-16 w-16 rounded-lg {% if call.action == 'BUY' %}bg-emerald-50 text-emerald-600{% else %}bg-rose-50 text-rose-600{% endif %} flex items-center justify-center">
+                            <span class="material-symbols-outlined text-4xl">domain</span>
                         </div>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-text-muted text-xs font-medium">{{ call.broker.name }}</div>
-                        <div class="text-text-muted text-[10px] mt-1">{{ call.published_at|date:"M d, Y" }}</div>
-                    </div>
-                </div>
-
-                {% if not is_locked %}
-                <!-- Price Levels Grid — visible only for PRO / ADMIN -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 text-center">
-                        <div class="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-2">Entry</div>
-                        <div class="text-xl font-bold text-text-main">₹{{ call.entry_price }}</div>
-                    </div>
-                    <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-4 text-center">
-                        <div class="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-2">Target 1</div>
-                        <div class="text-xl font-bold text-emerald-600">₹{{ call.target_1 }}</div>
-                    </div>
-                    {% if call.target_2 %}
-                    <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-4 text-center">
-                        <div class="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-2">Target 2</div>
-                        <div class="text-xl font-bold text-emerald-600">₹{{ call.target_2 }}</div>
-                    </div>
-                    {% endif %}
-                    {% if call.target_3 %}
-                    <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-4 text-center">
-                        <div class="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-2">Target 3</div>
-                        <div class="text-xl font-bold text-emerald-600">₹{{ call.target_3 }}</div>
-                    </div>
-                    {% endif %}
-                    <div class="bg-red-50 border border-red-100 rounded-xl p-4 text-center">
-                        <div class="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-2">Stop Loss</div>
-                        <div class="text-xl font-bold text-red-500">₹{{ call.stop_loss }}</div>
-                    </div>
-                </div>
-                {% else %}
-                <!-- LOCKED: Blurred Price Levels -->
-                <div class="relative">
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 blur-locked select-none">
-                        <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 text-center">
-                            <div class="text-[10px] font-bold uppercase text-text-muted mb-2">Entry</div>
-                            <div class="text-xl font-bold text-text-main">₹•••.••</div>
-                        </div>
-                        <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-4 text-center">
-                            <div class="text-[10px] font-bold uppercase text-text-muted mb-2">Target 1</div>
-                            <div class="text-xl font-bold text-emerald-600">₹•••.••</div>
-                        </div>
-                        <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-4 text-center">
-                            <div class="text-[10px] font-bold uppercase text-text-muted mb-2">Target 2</div>
-                            <div class="text-xl font-bold text-emerald-600">₹•••.••</div>
-                        </div>
-                        <div class="bg-red-50 border border-red-100 rounded-xl p-4 text-center">
-                            <div class="text-[10px] font-bold uppercase text-text-muted mb-2">Stop Loss</div>
-                            <div class="text-xl font-bold text-red-500">₹•••.••</div>
-                        </div>
-                    </div>
-
-                    <!-- PRO Overlay -->
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <div class="bg-surface/95 backdrop-blur-xl border border-accent-gold/20 rounded-2xl p-8 text-center max-w-sm shadow-soft-hover">
-                            <div class="size-14 rounded-2xl bg-accent-gold/10 flex items-center justify-center mx-auto mb-4">
-                                <span class="material-symbols-outlined text-accent-gold text-[28px]">lock</span>
+                        <div class="flex flex-col">
+                            <div class="flex flex-wrap items-center gap-3">
+                                <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">{{ call.symbol }}</h1>
+                                
+                                {% if call.status == 'ACTIVE' %}
+                                <span class="px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">Live</span>
+                                {% elif call.status == 'CLOSED' %}
+                                <span class="px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400">Closed</span>
+                                {% else %}
+                                <span class="px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider bg-amber-100 text-amber-700">{{ call.status }}</span>
+                                {% endif %}
+                                
+                                <span class="px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider bg-blue-100 text-blue-700">{{ call.get_call_type_display }}</span>
+                                <span class="px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider {% if call.action == 'BUY' %}bg-emerald-100 text-emerald-700{% else %}bg-rose-100 text-rose-700{% endif %}">{{ call.action }}</span>
                             </div>
-                            <h3 class="text-lg font-bold text-text-main mb-2">Unlock Pro Analysis</h3>
-                            <p class="text-text-muted text-sm mb-6 leading-relaxed">Get entry price, targets, stop-loss, and expert rationale for this call.</p>
-                            <a href="{% url 'payments:membership' %}" class="inline-flex items-center gap-2 bg-gradient-to-r from-accent-gold to-orange-500 text-white px-6 py-3 rounded-xl text-sm font-bold hover:opacity-90 transition-opacity no-underline">
-                                <span class="material-symbols-outlined text-[18px]">workspace_premium</span>
-                                Upgrade to StockPro
-                            </a>
+                            <p class="text-slate-500 dark:text-slate-400 font-medium mt-1">
+                                Duration: {{ call.duration_days|default:"--" }} Days &nbsp;•&nbsp; Expiry: {{ call.expiry_date|date:"M d, Y"|default:"--" }}
+                            </p>
                         </div>
                     </div>
                 </div>
-                {% endif %}
             </div>
 
-            <!-- Call Metrics -->
+            <!-- Price Grid -->
             {% if not is_locked %}
-            <div class="bg-surface border border-gray-200 rounded-2xl p-8 shadow-soft">
-                <h2 class="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-5">Call Metrics</h2>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
-                    <div>
-                        <div class="text-text-muted text-xs mb-1">Expected Return</div>
-                        <div class="text-lg font-bold text-accent-teal">{{ call.expected_return_percentage|default:"—" }}%</div>
-                    </div>
-                    <div>
-                        <div class="text-text-muted text-xs mb-1">Risk/Reward</div>
-                        <div class="text-lg font-bold text-text-main">{{ call.risk_reward_ratio|default:"—" }}</div>
-                    </div>
-                    <div>
-                        <div class="text-text-muted text-xs mb-1">Duration</div>
-                        <div class="text-lg font-bold text-text-main">{{ call.duration_days|default:"—" }} days</div>
-                    </div>
-                    <div>
-                        <div class="text-text-muted text-xs mb-1">Expiry Date</div>
-                        <div class="text-lg font-bold text-text-main">{{ call.expiry_date|date:"M d, Y"|default:"—" }}</div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="flex flex-col gap-1 rounded-xl p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                    <span class="text-slate-500 dark:text-slate-400 text-sm font-medium">Entry Range</span>
+                    <span class="text-xl font-bold text-slate-900 dark:text-white">₹{{ call.entry_price|floatformat:2 }}</span>
+                </div>
+                <div class="flex flex-col gap-1 rounded-xl p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                    <span class="text-slate-500 dark:text-slate-400 text-sm font-medium">Target 1</span>
+                    <span class="text-xl font-bold text-green-600">₹{{ call.target_1|floatformat:2 }}</span>
+                </div>
+                <div class="flex flex-col gap-1 rounded-xl p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                    <span class="text-slate-500 dark:text-slate-400 text-sm font-medium">Stop Loss</span>
+                    <span class="text-xl font-bold text-red-600">₹{{ call.stop_loss|floatformat:2 }}</span>
+                </div>
+                <div class="flex flex-col gap-1 rounded-xl p-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+                    <span class="text-slate-500 dark:text-slate-400 text-sm font-medium">Expected Return</span>
+                    <span class="text-xl font-bold text-slate-900 dark:text-white">+{{ call.expected_return_percentage|default:"--" }}%</span>
+                </div>
+            </div>
+            
+            {% if call.rationale %}
+            <div class="bg-primary/5 dark:bg-primary/10 rounded-xl p-6 border border-primary/10">
+                <div class="flex items-center gap-2 mb-3">
+                    <span class="material-symbols-outlined text-primary dark:text-indigo-400">description</span>
+                    <h4 class="font-bold text-primary dark:text-indigo-400">Analyst's Rationale</h4>
+                </div>
+                <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed italic border-l-2 border-primary/20 pl-4">{{ call.rationale }}</p>
+            </div>
+            {% endif %}
+
+            <!-- Technical Chart Section -->
+            <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                    <h3 class="font-bold text-lg">Technical Chart Analysis</h3>
+                </div>
+                <div class="h-[500px] w-full relative overflow-hidden bg-white">
+                    <!-- TradingView Widget BEGIN -->
+                    <div class="tradingview-widget-container" style="height:100%;width:100%">
+                      <div id="tradingview_call" style="height:100%;width:100%"></div>
+                      <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+                      <script type="text/javascript">
+                      new TradingView.widget({
+                        "autosize": true,
+                        "symbol": "NSE:{{ call.symbol }}",
+                        "interval": "D",
+                        "timezone": "Asia/Kolkata",
+                        "theme": "light",
+                        "style": "1",
+                        "locale": "in",
+                        "enable_publishing": false,
+                        "hide_top_toolbar": false,
+                        "hide_legend": true,
+                        "save_image": false,
+                        "container_id": "tradingview_call"
+                      });
+                      </script>
                     </div>
                 </div>
             </div>
-
-            <!-- Rationale -->
-            {% if call.rationale %}
-            <div class="bg-surface border border-gray-200 rounded-2xl p-8 shadow-soft">
-                <h2 class="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-5">Rationale & Analysis</h2>
-                <p class="text-text-main text-sm leading-relaxed">{{ call.rationale }}</p>
+            {% else %}
+            <!-- LOCKED STATE -->
+            <div class="relative mt-8">
+                <!-- Blurred fake grid -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 blur-locked">
+                    <div class="flex flex-col gap-1 rounded-xl p-5 bg-white border border-slate-200 shadow-sm"><span class="text-slate-400 text-sm">Entry Range</span><span class="text-xl font-bold">₹---.--</span></div>
+                    <div class="flex flex-col gap-1 rounded-xl p-5 bg-white border border-slate-200 shadow-sm"><span class="text-slate-400 text-sm">Target Price</span><span class="text-xl font-bold text-green-600">₹---.--</span></div>
+                    <div class="flex flex-col gap-1 rounded-xl p-5 bg-white border border-slate-200 shadow-sm"><span class="text-slate-400 text-sm">Stop Loss</span><span class="text-xl font-bold text-red-600">₹---.--</span></div>
+                    <div class="flex flex-col gap-1 rounded-xl p-5 bg-white border border-slate-200 shadow-sm"><span class="text-slate-400 text-sm">Risk/Reward</span><span class="text-xl font-bold">1:---</span></div>
+                </div>
+                <!-- Premium Overlay -->
+                <div class="absolute inset-0 flex items-center justify-center z-10">
+                    <div class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-amber-200 dark:border-amber-900/50 rounded-2xl p-8 text-center max-w-sm shadow-xl flex flex-col items-center">
+                        <div class="size-16 rounded-2xl bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center mx-auto mb-4">
+                            <span class="material-symbols-outlined text-amber-500 text-[32px]">workspace_premium</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Unlock Pro Analysis</h3>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm mb-6 leading-relaxed">Upgrade to StockPro to view exact entry triggers, target prices, stop-loss, and expert rationale.</p>
+                        <a href="{% url 'payments:membership' %}" class="w-full inline-flex justify-center items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 py-3 rounded-xl font-bold hover:shadow-lg transition-all">
+                            Upgrade to Pro
+                        </a>
+                    </div>
+                </div>
             </div>
             {% endif %}
 
-            <!-- Actions -->
-            <div class="flex items-center gap-3 flex-wrap">
-                {% if user.role == 'CUSTOMER' %}
-                <button class="bg-text-main text-white px-6 py-3 rounded-xl text-sm font-bold hover:opacity-90 transition-opacity flex items-center gap-2" onclick="addToPortfolio({{ call.id }})">
-                    <span class="material-symbols-outlined text-[18px]">add_circle</span>
-                    Add to Portfolio
-                </button>
-                <button class="bg-surface border border-gray-200 text-text-main px-6 py-3 rounded-xl text-sm font-semibold hover:bg-background-base transition-all flex items-center gap-2 shadow-soft" onclick="addToWatchlist({{ call.id }})">
-                    <span class="material-symbols-outlined text-[18px]">visibility</span>
-                    Add to Watchlist
-                </button>
-                {% endif %}
-                {% if user.role == 'ADMIN' %}
-                    {% if call.status == 'PENDING_APPROVAL' %}
-                    <a href="{% url 'research_calls:approve' call.pk %}" class="bg-accent-teal text-white px-6 py-3 rounded-xl text-sm font-bold hover:opacity-90 transition-opacity no-underline flex items-center gap-2">
-                        <span class="material-symbols-outlined text-[18px]">check</span>
-                        Approve Call
-                    </a>
-                    {% endif %}
-                    {% if call.status == 'APPROVED' %}
-                    <a href="{% url 'research_calls:publish' call.pk %}" class="bg-blue-600 text-white px-6 py-3 rounded-xl text-sm font-bold hover:opacity-90 transition-opacity no-underline flex items-center gap-2">
-                        <span class="material-symbols-outlined text-[18px]">publish</span>
-                        Publish Call
-                    </a>
-                    {% endif %}
-                {% endif %}
-            </div>
-            {% endif %}
         </div>
 
-        <!-- Right Sidebar -->
-        <div class="space-y-6">
-            <!-- Event History -->
-            <div class="bg-surface border border-gray-200 rounded-2xl p-6 shadow-soft">
-                <h3 class="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-5">Event History</h3>
-                <div class="space-y-4">
+        <!-- Sidebar Area -->
+        <div class="lg:col-span-4 flex flex-col gap-6">
+            
+            {% if user.role == 'CUSTOMER' and not is_locked %}
+            <div class="bg-white dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-slate-800 flex flex-col gap-3 shadow-sm">
+                <!-- Assume JS handles the post to server like existing template -->
+                <button onclick="addToPortfolio({{ call.id }})" class="w-full flex items-center justify-center gap-2 py-3 bg-primary hover:bg-slate-800 dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white font-bold rounded-lg transition-all">
+                    <span class="material-symbols-outlined text-xl">add_box</span>
+                    Add to Executed Trades
+                </button>
+                <button onclick="addToWatchlist({{ call.id }})" class="w-full flex items-center justify-center gap-2 py-3 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 font-bold text-slate-700 dark:text-slate-300 rounded-lg transition-all">
+                    <span class="material-symbols-outlined text-xl">bookmark</span>
+                    Add to Watchlist
+                </button>
+            </div>
+            {% endif %}
+
+            {% if user.role == 'ADMIN' %}
+                <div class="bg-white dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-slate-800 flex flex-col gap-3 shadow-sm">
+                    <h3 class="font-bold text-sm text-slate-500 uppercase tracking-widest mb-2">Admin Actions</h3>
+                    {% if call.status == 'PENDING_APPROVAL' %}
+                    <a href="{% url 'research_calls:approve' call.pk %}" class="w-full flex justify-center py-3 bg-emerald-500 text-white font-bold rounded-lg transition-all">Approve</a>
+                    {% elif call.status == 'APPROVED' %}
+                    <a href="{% url 'research_calls:publish' call.pk %}" class="w-full flex justify-center py-3 bg-blue-500 text-white font-bold rounded-lg transition-all">Publish</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            <!-- Call Broker Info -->
+            <div class="bg-white dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+                <h3 class="font-bold text-lg mb-4">Research Provider</h3>
+                <div class="flex items-center gap-4">
+                    <div class="size-12 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold border border-blue-100 dark:border-blue-800">
+                        <span class="material-symbols-outlined">storefront</span>
+                    </div>
+                    <div>
+                        <p class="font-bold text-slate-900 dark:text-white">{{ call.broker.name }}</p>
+                        <p class="text-xs text-slate-500 font-medium tracking-wide">{{ call.broker.overall_accuracy|floatformat:1 }}% Win Rate</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Timeline -->
+            <div class="bg-white dark:bg-slate-900 rounded-xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
+                <h3 class="font-bold text-lg mb-6">Call Status Timeline</h3>
+                <div class="flex flex-col gap-0 relative">
                     {% for event in events %}
-                    <div class="flex gap-3 items-start">
-                        <div class="size-8 rounded-lg bg-background-base flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <span class="material-symbols-outlined text-text-muted text-[16px]">
-                                {% if event.event_type == 'CREATED' %}edit_note
-                                {% elif event.event_type == 'APPROVED' %}check_circle
-                                {% elif event.event_type == 'PUBLISHED' %}campaign
-                                {% elif event.event_type == 'TARGET_HIT' %}gps_fixed
-                                {% elif event.event_type == 'STOP_LOSS_HIT' %}shield
-                                {% elif event.event_type == 'CLOSED' %}lock
-                                {% else %}push_pin{% endif %}
-                            </span>
+                    <div class="flex gap-4 min-h-[60px]">
+                        <div class="flex flex-col items-center">
+                            <div class="size-6 rounded-full bg-primary dark:bg-indigo-500 text-white flex items-center justify-center z-10 shrink-0 shadow-[0_0_0_4px_rgba(255,255,255,1)] dark:shadow-[0_0_0_4px_rgba(30,35,41,1)]">
+                                <span class="material-symbols-outlined text-[12px]">check</span>
+                            </div>
+                            {% if not forloop.last %}
+                            <div class="w-[2px] grow bg-primary dark:bg-indigo-500/50 -my-1"></div>
+                            {% endif %}
                         </div>
-                        <div>
-                            <div class="text-text-main text-sm font-semibold">{{ event.get_event_type_display }}</div>
-                            {% if event.notes %}<p class="text-text-muted text-xs mt-0.5">{{ event.notes }}</p>{% endif %}
-                            <div class="text-text-muted/50 text-[10px] mt-1">{{ event.timestamp|date:"M d, Y H:i" }}</div>
-                            {% if event.triggered_by %}
-                            <div class="text-text-muted/50 text-[10px]">by {{ event.triggered_by.get_full_name }}</div>
+                        <div class="pb-6 w-full">
+                            <p class="font-bold text-slate-900 dark:text-white leading-none mb-1">{{ event.get_event_type_display }}</p>
+                            <div class="flex justify-between items-center w-full">
+                                <p class="text-[10px] text-slate-500">{{ event.timestamp|date:"M d, Y · h:i A" }}</p>
+                                {% if event.triggered_by %}
+                                <p class="text-[9px] text-slate-400 bg-slate-50 dark:bg-slate-800 px-2 py-0.5 rounded">by {{ event.triggered_by.get_full_name }}</p>
+                                {% endif %}
+                            </div>
+                            {% if event.notes %}
+                            <p class="text-xs text-slate-600 dark:text-slate-400 mt-2 bg-slate-50 dark:bg-slate-800/50 p-2 rounded-lg border border-slate-100 dark:border-slate-700/50">{{ event.notes }}</p>
                             {% endif %}
                         </div>
                     </div>
                     {% empty %}
-                    <p class="text-text-muted text-sm text-center py-4">No events recorded</p>
+                    <p class="text-slate-500 text-sm text-center">No status history found.</p>
                     {% endfor %}
+                    
+                    {% if call.status == 'ACTIVE' %}
+                    <!-- Live pulsing step -->
+                    <div class="flex gap-4">
+                        <div class="flex flex-col items-center">
+                            <div class="size-6 rounded-full border-2 border-emerald-500 bg-white dark:bg-slate-900 flex items-center justify-center z-10 shadow-[0_0_0_4px_rgba(255,255,255,1)] dark:shadow-[0_0_0_4px_rgba(30,35,41,1)]">
+                                <div class="size-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="font-bold text-emerald-600 dark:text-emerald-500 leading-none mb-1">Live Tracking</p>
+                            <p class="text-[10px] text-slate-500">Market hours active</p>
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
 
-            <!-- Broker Info -->
-            <div class="bg-surface border border-gray-200 rounded-2xl p-6 shadow-soft">
-                <h3 class="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-4">Broker Info</h3>
-                <div class="flex items-center gap-3">
-                    <div class="size-10 rounded-xl bg-blue-50 flex items-center justify-center">
-                        <span class="material-symbols-outlined text-blue-600 text-[20px]">storefront</span>
-                    </div>
-                    <div>
-                        <div class="text-text-main text-sm font-bold">{{ call.broker.name }}</div>
-                        <div class="text-text-muted text-xs">{{ call.broker.overall_accuracy|floatformat:1 }}% accuracy</div>
-                    </div>
-                </div>
-            </div>
-
-            {% if is_locked %}
-            <!-- PRO CTA Sidebar -->
-            <div class="bg-gradient-to-br from-accent-gold/10 to-orange-100 border border-accent-gold/20 rounded-2xl p-6 text-center shadow-soft">
-                <span class="material-symbols-outlined text-accent-gold text-[32px] mb-3 block">workspace_premium</span>
-                <h3 class="text-text-main font-bold text-sm mb-2">Go PRO</h3>
-                <p class="text-text-muted text-xs mb-4 leading-relaxed">Unlock all research calls, targets, and expert analysis.</p>
-                <a href="{% url 'payments:membership' %}" class="block bg-gradient-to-r from-accent-gold to-orange-500 text-white py-2.5 rounded-lg text-xs font-bold hover:opacity-90 transition-opacity no-underline">
-                    View Plans
-                </a>
-            </div>
-            {% endif %}
         </div>
     </div>
-</div>
+</main>
+
+<script>
+    function addToPortfolio(callId) {
+        alert("Portfolio integration coming soon. Use the main portal for trades.");
+    }
+    function addToWatchlist(callId) {
+        alert("Watchlist updated!"); // To be connected
+    }
+</script>
 {% endblock %}

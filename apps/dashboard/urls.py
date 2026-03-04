@@ -23,4 +23,5 @@ urlpatterns = [
     path('gainers-losers/', views.gainers_losers_view, name='gainers_losers'),
     path('recently-listed/', views.recently_listed_view, name='recently_listed'),
     path('top-brokers/', views.top_brokers_view, name='top_brokers'),
+    path('technical-analysis/', views.technical_analysis_view, name='technical_analysis'),
 ]

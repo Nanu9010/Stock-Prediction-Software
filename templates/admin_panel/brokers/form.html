@@ -1,277 +1,191 @@
 {% extends 'admin_panel/base.html' %}
+{% load static %}
 
 {% block title %}
-    {% if form.instance.pk %}Edit Broker{% else %}New Broker{% endif %}
+    {% if form.instance.pk %}Edit Broker Profile - {{ form.instance.name }}{% else %}Register New Broker{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stitch-input-wrap {
+        border-bottom: 2px solid #e2e8f0;
+        transition: all 0.2s;
+        background: transparent;
+    }
+    .stitch-input-wrap:focus-within {
+        border-bottom-color: #1a2b3d;
+    }
+    .stitch-input {
+        border: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        width: 100%;
+        padding: 0.75rem 0 !important;
+        font-size: 1rem;
+        font-weight: 500;
+        color: #1e293b;
+    }
+    .stitch-label {
+        display: block;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #94a3b8;
+        margin-bottom: 0.25rem;
+    }
+    .stitch-textarea {
+        border: 2px solid #e2e8f0 !important;
+        border-radius: 12px !important;
+        padding: 1.25rem !important;
+        min-height: 150px;
+    }
+    .stitch-textarea:focus {
+        border-color: #1a2b3d !important;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="modern-form-container">
-    <div class="form-header">
-        <h1 class="form-title">{% if form.instance.pk %}Edit Broker{% else %}Create Broker{% endif %}</h1>
-        <p class="form-subtitle">Manage broker information and verification</p>
+<div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-10">
+        <div class="flex items-center gap-3">
+            <a href="{% url 'admin_panel:brokers_list' %}" class="p-2 bg-white border border-slate-200 rounded-lg text-slate-400 hover:text-slate-600 transition-colors no-underline">
+                <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+            </a>
+            <div>
+                <h2 class="text-2xl font-bold text-slate-900">{% if form.instance.pk %}Update Broker Profile{% else %}Add Broker Entry{% endif %}</h2>
+                <p class="text-slate-500 text-sm">Configure broker details and verification credentials.</p>
+            </div>
+        </div>
+        <div class="flex gap-3">
+            <a href="{% url 'admin_panel:brokers_list' %}" class="px-5 py-2.5 text-sm font-bold text-slate-500 hover:text-slate-700 transition-colors no-underline">Discard</a>
+            <button type="submit" form="brokerForm" class="bg-primary text-white px-6 py-2.5 text-sm font-bold rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">{% if form.instance.pk %}save{% else %}person_add{% endif %}</span>
+                {% if form.instance.pk %}Update Profile{% else %}Register Broker{% endif %}
+            </button>
+        </div>
     </div>
 
-    <form method="post" class="modern-form" novalidate>
+    <!-- Main Form -->
+    <form method="post" id="brokerForm" class="space-y-12">
         {% csrf_token %}
-        
+
         {% if form.non_field_errors %}
-        <div class="alert-error">
-            {% for error in form.non_field_errors %}
-                {{ error }}
-            {% endfor %}
+        <div class="bg-rose-50 border border-rose-100 rounded-xl p-4 text-rose-600 text-sm flex items-start gap-3">
+            <span class="material-symbols-outlined text-rose-500">error</span>
+            <div>
+                {% for error in form.non_field_errors %}
+                    {{ error }}<br>
+                {% endfor %}
+            </div>
         </div>
         {% endif %}
-        
-        <!-- Basic Information -->
-        <div class="form-section">
-            <div class="section-label">Basic Information</div>
-            <div class="form-grid">
-                <div class="form-field span-2">
-                    <label>Broker Name<span class="required">*</span></label>
-                    {{ form.name }}
-                    {% if form.name.errors %}<span class="field-error">{{ form.name.errors.0 }}</span>{% endif %}
+
+        <!-- Section: Basic Information -->
+        <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm text-clip overflow-hidden">
+            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-8 flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">badge</span>
+                Institutional Identity
+            </h3>
+            <div class="grid grid-cols-12 gap-x-8 gap-y-10">
+                <div class="col-span-12">
+                    <label class="stitch-label">Full Entity Name</label>
+                    <div class="stitch-input-wrap">
+                        {{ form.name }}
+                    </div>
+                    {% if form.name.errors %}<span class="text-rose-500 text-[10px] font-bold mt-1 block">{{ form.name.errors.0 }}</span>{% endif %}
                 </div>
                 
-                <div class="form-field">
-                    <label>Website URL</label>
-                    {{ form.website_url }}
-                    {% if form.website_url.errors %}<span class="field-error">{{ form.website_url.errors.0 }}</span>{% endif %}
+                <div class="col-span-12 md:col-span-6">
+                    <label class="stitch-label">Official Website URL</label>
+                    <div class="stitch-input-wrap">
+                        {{ form.website_url }}
+                    </div>
+                    {% if form.website_url.errors %}<span class="text-rose-500 text-[10px] font-bold mt-1 block">{{ form.website_url.errors.0 }}</span>{% endif %}
                 </div>
                 
-                <div class="form-field">
-                    <label>SEBI Registration No.</label>
-                    {{ form.sebi_registration_no }}
-                    {% if form.sebi_registration_no.errors %}<span class="field-error">{{ form.sebi_registration_no.errors.0 }}</span>{% endif %}
+                <div class="col-span-12 md:col-span-6">
+                    <label class="stitch-label">SEBI Registration No.</label>
+                    <div class="stitch-input-wrap">
+                        {{ form.sebi_registration_no }}
+                    </div>
+                    {% if form.sebi_registration_no.errors %}<span class="text-rose-500 text-[10px] font-bold mt-1 block">{{ form.sebi_registration_no.errors.0 }}</span>{% endif %}
                 </div>
             </div>
         </div>
 
-        <!-- Description -->
-        <div class="form-section">
-            <div class="section-label">Description</div>
-            <div class="form-field">
-                <label>About the Broker</label>
+        <!-- Section: Description -->
+        <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
+            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-8 flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">description</span>
+                Professional Overview
+            </h3>
+            <div>
+                <label class="stitch-label mb-3">About the Broker / Profile Bio</label>
                 {{ form.description }}
-                {% if form.description.errors %}<span class="field-error">{{ form.description.errors.0 }}</span>{% endif %}
+                {% if form.description.errors %}<span class="text-rose-500 text-[10px] font-bold mt-1 block">{{ form.description.errors.0 }}</span>{% endif %}
             </div>
         </div>
 
-        <!-- Status -->
-        <div class="form-section">
-            <div class="section-label">Status</div>
-            <div class="form-grid">
-                <div class="form-field">
-                    <label class="checkbox-label">
+        <!-- Section: Status & Verification -->
+        <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-8 flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">verified_user</span>
+                Administrative Control
+            </h3>
+            <div class="grid grid-cols-2 gap-8">
+                <label class="flex items-center gap-4 p-4 rounded-xl border border-slate-100 bg-slate-50/50 cursor-pointer hover:bg-slate-50 transition-all">
+                    <div class="relative flex items-center">
                         {{ form.is_active }}
-                        <span>Active</span>
-                    </label>
-                    {% if form.is_active.errors %}<span class="field-error">{{ form.is_active.errors.0 }}</span>{% endif %}
-                </div>
+                    </div>
+                    <div>
+                        <span class="block text-sm font-bold text-slate-900">Active Status</span>
+                        <span class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Visible across the platform</span>
+                    </div>
+                </label>
                 
-                <div class="form-field">
-                    <label class="checkbox-label">
+                <label class="flex items-center gap-4 p-4 rounded-xl border border-slate-100 bg-slate-50/50 cursor-pointer hover:bg-slate-50 transition-all">
+                    <div class="relative flex items-center">
                         {{ form.is_verified }}
-                        <span>Verified</span>
-                    </label>
-                    {% if form.is_verified.errors %}<span class="field-error">{{ form.is_verified.errors.0 }}</span>{% endif %}
-                </div>
+                    </div>
+                    <div>
+                        <span class="block text-sm font-bold text-slate-900">Verified Partner</span>
+                        <span class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Verified SEBI credentials</span>
+                    </div>
+                </label>
             </div>
         </div>
 
         <!-- Actions -->
-        <div class="form-actions">
-            <a href="{% url 'admin_panel:brokers_list' %}" class="btn-secondary">Cancel</a>
-            <button type="submit" class="btn-primary">
-                {% if form.instance.pk %}Update Broker{% else %}Create Broker{% endif %}
+        <div class="flex items-center justify-end gap-4 pb-12">
+            <a href="{% url 'admin_panel:brokers_list' %}" class="px-8 py-3 text-sm font-bold text-slate-500 hover:text-slate-700 transition-colors no-underline">Cancel</a>
+            <button type="submit" class="bg-primary text-white px-10 py-3.5 text-sm font-black rounded-xl hover:opacity-90 shadow-lg shadow-primary/10 transition-all flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">{% if form.instance.pk %}check_circle{% else %}how_to_reg{% endif %}</span>
+                {% if form.instance.pk %}SAVE CHANGES{% else %}REGISTER BROKER{% endif %}
             </button>
         </div>
     </form>
 </div>
 
-<style>
-.modern-form-container {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 0;
-}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Apply Stitch styles to Django-rendered inputs
+    const inputs = document.querySelectorAll('input:not([type="radio"]):not([type="checkbox"]), select, textarea');
+    inputs.forEach(input => {
+        if (input.tagName === 'TEXTAREA') {
+            input.classList.add('stitch-textarea', 'w-full', 'focus:ring-0', 'transition-all');
+        } else {
+            input.classList.add('stitch-input', 'focus:ring-0');
+        }
+    });
 
-.form-header {
-    margin-bottom: 32px;
-}
-
-.form-title {
-    font-size: 28px;
-    font-weight: 700;
-    color: #1a1a1a;
-    margin: 0 0 8px 0;
-}
-
-.form-subtitle {
-    font-size: 15px;
-    color: #6b7280;
-    margin: 0;
-}
-
-.modern-form {
-    background: white;
-    border-radius: 12px;
-    padding: 32px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-}
-
-.alert-error {
-    background: #fee2e2;
-    border-left: 4px solid #ef4444;
-    padding: 16px;
-    border-radius: 8px;
-    color: #991b1b;
-    margin-bottom: 24px;
-    font-size: 14px;
-}
-
-.form-section {
-    margin-bottom: 32px;
-}
-
-.section-label {
-    font-size: 13px;
-    font-weight: 600;
-    color: #374151;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 16px;
-    padding-bottom: 8px;
-    border-bottom: 2px solid #f3f4f6;
-}
-
-.form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
-}
-
-.form-field {
-    display: flex;
-    flex-direction: column;
-}
-
-.form-field.span-2 {
-    grid-column: span 2;
-}
-
-.form-field label {
-    font-size: 14px;
-    font-weight: 500;
-    color: #374151;
-    margin-bottom: 8px;
-}
-
-.checkbox-label {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-}
-
-.checkbox-label input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-}
-
-.required {
-    color: #ef4444;
-    font-size: 14px;
-}
-
-.form-field input[type="text"],
-.form-field input[type="url"],
-.form-field select,
-.form-field textarea {
-    padding: 10px 14px;
-    border: 1.5px solid #e5e7eb;
-    border-radius: 8px;
-    font-size: 14px;
-    color: #1f2937;
-    transition: all 0.2s;
-    background: white;
-}
-
-.form-field input:focus,
-.form-field select:focus,
-.form-field textarea:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.form-field textarea {
-    min-height: 120px;
-    resize: vertical;
-    font-family: inherit;
-}
-
-.field-error {
-    font-size: 13px;
-    color: #ef4444;
-    margin-top: 6px;
-}
-
-.form-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-    margin-top: 32px;
-    padding-top: 24px;
-    border-top: 1px solid #f3f4f6;
-}
-
-.btn-primary,
-.btn-secondary {
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-    transition: all 0.2s;
-    text-decoration: none;
-    display: inline-block;
-}
-
-.btn-primary {
-    background: #3b82f6;
-    color: white;
-}
-
-.btn-primary:hover {
-    background: #2563eb;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
-
-.btn-secondary {
-    background: #f3f4f6;
-    color: #374151;
-}
-
-.btn-secondary:hover {
-    background: #e5e7eb;
-}
-
-@media (max-width: 768px) {
-    .modern-form {
-        padding: 24px;
-    }
-    
-    .form-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .form-field.span-2 {
-        grid-column: span 1;
-    }
-}
-</style>
+    // Style checkboxes
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(cb => {
+        cb.classList.add('w-5', 'h-5', 'rounded-md', 'border-slate-300', 'text-primary', 'focus:ring-primary/20', 'transition-all', 'cursor-pointer');
+    });
+});
+</script>
 {% endblock %}

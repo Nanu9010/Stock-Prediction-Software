@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static widget_tweaks %}
+{% load static %}
 
 {% block title %}{% if form.instance.pk %}Edit Call{% else %}Create Call{% endif %} - Stock Research Platform{% endblock %}
 
@@ -25,37 +25,37 @@
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="{{ form.symbol.id_for_label }}">{{ form.symbol.label }} *</label>
-                        {% render_field form.symbol class="form-control" placeholder="e.g., RELIANCE" %}
+                        {{ form.symbol }}
                         <div class="text-danger">{{ form.symbol.errors }}</div>
                     </div>
                     
                     <div class="form-group">
                         <label for="{{ form.broker.id_for_label }}">{{ form.broker.label }} *</label>
-                        {% render_field form.broker class="form-control" %}
+                        {{ form.broker }}
                         <div class="text-danger">{{ form.broker.errors }}</div>
                     </div>
                     
                     <div class="form-group">
                         <label for="{{ form.action.id_for_label }}">{{ form.action.label }} *</label>
-                        {% render_field form.action class="form-control" id="action" %}
+                        {{ form.action }}
                         <div class="text-danger">{{ form.action.errors }}</div>
                     </div>
                     
                     <div class="form-group">
                         <label for="{{ form.call_type.id_for_label }}">{{ form.call_type.label }} *</label>
-                        {% render_field form.call_type class="form-control" %}
+                        {{ form.call_type }}
                         <div class="text-danger">{{ form.call_type.errors }}</div>
                     </div>
 
                     <div class="form-group">
                         <label for="{{ form.instrument_type.id_for_label }}">{{ form.instrument_type.label }}</label>
-                        {% render_field form.instrument_type class="form-control" %}
+                        {{ form.instrument_type }}
                         <div class="text-danger">{{ form.instrument_type.errors }}</div>
                     </div>
 
                     <div class="form-group">
                         <label for="{{ form.exchange.id_for_label }}">{{ form.exchange.label }}</label>
-                        {% render_field form.exchange class="form-control" %}
+                        {{ form.exchange }}
                         <div class="text-danger">{{ form.exchange.errors }}</div>
                     </div>
                 </div>
@@ -66,37 +66,37 @@
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="{{ form.entry_price.id_for_label }}">{{ form.entry_price.label }} *</label>
-                        {% render_field form.entry_price class="form-control" id="entry_price" step="0.01" %}
+                        {{ form.entry_price }}
                         <div class="text-danger">{{ form.entry_price.errors }}</div>
                     </div>
                     
                     <div class="form-group">
                         <label for="{{ form.target_1.id_for_label }}">{{ form.target_1.label }} *</label>
-                        {% render_field form.target_1 class="form-control" id="target_1" step="0.01" %}
+                        {{ form.target_1 }}
                         <div class="text-danger">{{ form.target_1.errors }}</div>
                     </div>
                     
                     <div class="form-group">
                         <label for="{{ form.target_2.id_for_label }}">{{ form.target_2.label }}</label>
-                        {% render_field form.target_2 class="form-control" step="0.01" %}
+                        {{ form.target_2 }}
                         <div class="text-danger">{{ form.target_2.errors }}</div>
                     </div>
                     
                     <div class="form-group">
                         <label for="{{ form.target_3.id_for_label }}">{{ form.target_3.label }}</label>
-                        {% render_field form.target_3 class="form-control" step="0.01" %}
+                        {{ form.target_3 }}
                         <div class="text-danger">{{ form.target_3.errors }}</div>
                     </div>
                     
                     <div class="form-group">
                         <label for="{{ form.stop_loss.id_for_label }}">{{ form.stop_loss.label }} *</label>
-                        {% render_field form.stop_loss class="form-control" id="stop_loss" step="0.01" %}
+                        {{ form.stop_loss }}
                         <div class="text-danger">{{ form.stop_loss.errors }}</div>
                     </div>
                     
                     <div class="form-group">
                         <label for="{{ form.timeframe_days.id_for_label }}">Duration (Days)</label>
-                        {% render_field form.timeframe_days class="form-control" min="1" %}
+                        {{ form.timeframe_days }}
                         <div class="text-danger">{{ form.timeframe_days.errors }}</div>
                     </div>
                 </div>
@@ -106,13 +106,13 @@
                 <h2>Additional Information</h2>
                 <div class="form-group">
                     <label for="{{ form.rationale.id_for_label }}">{{ form.rationale.label }}</label>
-                    {% render_field form.rationale class="form-control" rows="5" placeholder="Explain the reasoning behind this call..." %}
+                    {{ form.rationale }}
                     <div class="text-danger">{{ form.rationale.errors }}</div>
                 </div>
                 
                  <div class="form-group">
                     <label for="{{ form.expires_at.id_for_label }}">{{ form.expires_at.label }}</label>
-                     {% render_field form.expires_at class="form-control" %}
+                     {{ form.expires_at }}
                     <div class="text-danger">{{ form.expires_at.errors }}</div>
                 </div>
             </div>
@@ -221,13 +221,19 @@ textarea.form-control {
 // Form validation
 document.querySelector('.call-form').addEventListener('submit', function(e) {
     // Basic frontend validation for price logic
-    // We get values from the inputs which have IDs set by widget_tweaks or manually added above
-    // I added IDs to key fields above: action, entry_price, target_1, stop_loss
-    
-    const action = document.getElementById('action').value;
-    const entryPrice = parseFloat(document.getElementById('entry_price').value);
-    const target1 = parseFloat(document.getElementById('target_1').value);
-    const stopLoss = parseFloat(document.getElementById('stop_loss').value);
+    const actionEl = document.getElementById('id_action');
+    const entryEl = document.getElementById('id_entry_price');
+    const targetEl = document.getElementById('id_target_1');
+    const stopEl = document.getElementById('id_stop_loss');
+
+    if (!actionEl || !entryEl || !targetEl || !stopEl) {
+        return true;
+    }
+
+    const action = actionEl.value;
+    const entryPrice = parseFloat(entryEl.value);
+    const target1 = parseFloat(targetEl.value);
+    const stopLoss = parseFloat(stopEl.value);
     
     // Ensure values are numbers before checking
     if (isNaN(entryPrice) || isNaN(target1) || isNaN(stopLoss)) {

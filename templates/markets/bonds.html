@@ -1,72 +1,80 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Bonds & Fixed Income — StockPro{% endblock %}
+{% block title %}Fixed Yield Protocol - Bonds - StockPro{% endblock %}
 
 {% block page_content %}
-<div class="space-y-8">
+<div class="max-w-7xl mx-auto px-4 py-12">
     <!-- Page Header -->
-    <div class="flex items-center gap-3">
-        <span class="size-10 rounded-xl bg-accent-teal/10 flex items-center justify-center">
-            <span class="material-symbols-outlined text-accent-teal text-xl">account_balance</span>
-        </span>
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
         <div>
-            <h1 class="text-2xl font-extrabold text-text-main m-0">Bonds & Fixed Income</h1>
-            <p class="text-sm text-text-muted m-0">Government and corporate bond yields, tax-free options.</p>
+            <h1 class="text-4xl font-black text-slate-900 tracking-tight mb-2">Fixed Yield Protocol</h1>
+            <p class="text-slate-500 font-medium tracking-tight italic">Low-volatility sovereign and corporate debt instruments with predictable returns.</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <span class="px-3 py-1 bg-slate-100 rounded-lg text-slate-500 text-[10px] font-black uppercase tracking-widest border border-slate-200">Stable Node</span>
         </div>
     </div>
 
     <!-- Bonds Table Card -->
-    <div class="bg-surface rounded-2xl shadow-soft overflow-hidden">
+    <div class="bg-white rounded-[40px] border border-slate-200 shadow-sm overflow-hidden min-h-[400px]">
         <div class="overflow-x-auto">
-            <table class="w-full">
+            <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="border-b border-gray-100">
-                        <th class="text-left px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Bond Name</th>
-                        <th class="text-left px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Type</th>
-                        <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Yield</th>
-                        <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Maturity</th>
-                        <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Rating</th>
-                        <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Trend</th>
+                    <tr class="bg-slate-50/50">
+                        <th class="px-8 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Bond Architecture</th>
+                        <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Classification</th>
+                        <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest text-center">Net Yield</th>
+                        <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Maturity Node</th>
+                        <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest text-center">Trust Rating</th>
+                        <th class="px-8 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest text-center">Velocity Trend</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-50">
+                <tbody class="divide-y divide-slate-50">
                     {% for bond in bonds %}
-                    <tr class="hover:bg-gray-50/50 transition-colors">
-                        <td class="px-6 py-4">
-                            <span class="font-bold text-text-main text-sm">{{ bond.name }}</span>
+                    <tr class="hover:bg-slate-50/50 transition-colors group">
+                        <td class="px-8 py-6">
+                            <span class="text-sm font-black text-slate-900 group-hover:text-primary transition-colors">{{ bond.name }}</span>
                         </td>
-                        <td class="px-6 py-4">
-                            <span class="text-sm text-text-muted">{{ bond.type }}</span>
+                        <td class="px-6 py-6 font-bold text-slate-500 text-xs">
+                            {{ bond.type }}
                         </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="text-sm font-bold text-green-500">{{ bond.yield_pct }}%</span>
+                        <td class="px-6 py-6 text-center">
+                            <span class="text-sm font-black text-emerald-500 italic">{{ bond.yield_pct }}%</span>
                         </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="text-sm text-text-muted">{{ bond.maturity }}</span>
+                        <td class="px-6 py-6 font-bold text-slate-900 text-xs">
+                            {{ bond.maturity }}
                         </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="px-2.5 py-1 rounded bg-blue-50 text-blue-600 text-xs font-bold uppercase tracking-wider">{{ bond.rating }}</span>
+                        <td class="px-6 py-6 text-center">
+                            <span class="px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-600 text-[10px] font-black tracking-widest uppercase">
+                                {{ bond.rating }}
+                            </span>
                         </td>
-                        <td class="px-6 py-4 text-center">
-                            <div class="flex items-center justify-center gap-1.5 text-xs font-bold">
+                        <td class="px-8 py-6 text-center">
+                            <div class="flex items-center justify-center gap-1.5 font-black text-[10px] uppercase tracking-widest">
                                 {% if bond.trend == 'up' %}
-                                    <span class="material-symbols-outlined text-green-500 text-base">trending_up</span>
-                                    <span class="text-green-600">Up</span>
+                                    <span class="material-symbols-outlined text-emerald-500 text-[18px]">trending_up</span>
+                                    <span class="text-emerald-600">Ascending</span>
                                 {% elif bond.trend == 'down' %}
-                                    <span class="material-symbols-outlined text-red-500 text-base">trending_down</span>
-                                    <span class="text-red-600">Down</span>
+                                    <span class="material-symbols-outlined text-rose-500 text-[18px]">trending_down</span>
+                                    <span class="text-rose-600">Descending</span>
                                 {% else %}
-                                    <span class="material-symbols-outlined text-gray-300 text-base">horizontal_rule</span>
-                                    <span class="text-gray-400">Stable</span>
+                                    <span class="material-symbols-outlined text-slate-300 text-[18px]">horizontal_rule</span>
+                                    <span class="text-slate-400">Stable</span>
                                 {% endif %}
                             </div>
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="6" class="px-6 py-12 text-center">
-                            <span class="material-symbols-outlined text-5xl text-gray-300 mb-3 block">history_edu</span>
-                            <p class="text-text-muted text-sm m-0">No bond data available right now</p>
+                        <td colspan="6" class="px-8 py-24 text-center">
+                            <div class="flex flex-col items-center">
+                                <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-4 text-slate-200">
+                                    <span class="material-symbols-outlined text-[40px]">history_edu</span>
+                                </div>
+                                <h3 class="text-slate-900 font-black text-lg">Yield Stream Offline</h3>
+                                <p class="text-slate-400 text-sm font-medium italic">Fixed income nodes are currently synchronizing with sovereign desks.</p>
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}

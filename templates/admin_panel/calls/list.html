@@ -1,147 +1,174 @@
 {% extends 'admin_panel/base.html' %}
+{% load static %}
 
 {% block title %}Research Calls - Admin Panel{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <h1 class="page-title">Research Calls Management</h1>
-    <div class="page-actions">
-        <a href="#" class="btn btn-outline-primary">
-            <span>📥</span>
-            Export
-        </a>
-        <a href="{% url 'admin_panel:call_create' %}" class="btn btn-primary">
-            <span>➕</span>
-            Add New Call
-        </a>
+<div class="mb-8">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h2 class="text-2xl font-bold text-slate-900">Research Calls Management</h2>
+            <p class="text-slate-500 text-sm">Monitor, approve, and manage all active research trade recommendations.</p>
+        </div>
+        <div class="flex gap-3">
+            <button class="bg-white border border-slate-200 text-slate-700 px-4 py-2 text-sm font-semibold rounded-lg hover:bg-slate-50 transition-colors flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">download</span>
+                Export
+            </button>
+            <a href="{% url 'admin_panel:call_create' %}" class="bg-primary text-white px-5 py-2 text-sm font-semibold rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2 no-underline">
+                <span class="material-symbols-outlined text-[18px]">add</span>
+                Add New Call
+            </a>
+        </div>
     </div>
-</div>
 
-<!-- Filters -->
-<div class="filters-bar">
-    <form method="get" style="display: flex; align-items: center; gap: var(--spacing-4); flex: 1;">
-        <div class="filter-group">
-            <label>Status</label>
-            <select name="status" class="form-select" onchange="this.form.submit()">
-                <option value="">All Status</option>
-                <option value="PENDING" {% if selected_status == 'PENDING' %}selected{% endif %}>Pending</option>
-                <option value="ACTIVE" {% if selected_status == 'ACTIVE' %}selected{% endif %}>Active</option>
-                <option value="CLOSED" {% if selected_status == 'CLOSED' %}selected{% endif %}>Closed</option>
-                <option value="DRAFT" {% if selected_status == 'DRAFT' %}selected{% endif %}>Draft</option>
-            </select>
-        </div>
-        
-        <div class="filter-group">
-            <label>Broker</label>
-            <select name="broker" class="form-select" onchange="this.form.submit()">
-                <option value="">All Brokers</option>
-                {% for broker in brokers %}
-                <option value="{{ broker.id }}" {% if selected_broker == broker.id|stringformat:"s" %}selected{% endif %}>
-                    {{ broker.name }}
-                </option>
-                {% endfor %}
-            </select>
-        </div>
-        
-        <div class="filter-group" style="flex: 1;">
-            <label>Search</label>
-            <input type="text" name="search" class="form-input" placeholder="Search symbol or broker..." value="{{ search_query }}">
-        </div>
-        
-        <button type="submit" class="btn btn-primary">Search</button>
-        {% if selected_status or selected_broker or search_query %}
-        <a href="{% url 'admin_panel:calls_list' %}" class="btn btn-outline-secondary">Clear</a>
-        {% endif %}
-    </form>
-</div>
+    <!-- Filters Bar -->
+    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm mb-8">
+        <form method="get" class="flex flex-wrap items-end gap-4">
+            <div class="flex-1 min-w-[200px]">
+                <label class="block text-[10px] uppercase tracking-widest font-bold text-slate-400 mb-2">Search Call</label>
+                <div class="relative">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
+                    <input type="text" name="search" value="{{ search_query }}" placeholder="Symbol or broker..." 
+                           class="w-full pl-10 pr-4 py-2 bg-slate-50 border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 transition-all">
+                </div>
+            </div>
+            
+            <div class="w-48">
+                <label class="block text-[10px] uppercase tracking-widest font-bold text-slate-400 mb-2">Status</label>
+                <select name="status" onchange="this.form.submit()" class="w-full py-2 bg-slate-50 border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 appearance-none">
+                    <option value="">All Statuses</option>
+                    <option value="PENDING_APPROVAL" {% if selected_status == 'PENDING_APPROVAL' %}selected{% endif %}>Pending</option>
+                    <option value="ACTIVE" {% if selected_status == 'ACTIVE' %}selected{% endif %}>Active</option>
+                    <option value="CLOSED" {% if selected_status == 'CLOSED' %}selected{% endif %}>Closed</option>
+                    <option value="DRAFT" {% if selected_status == 'DRAFT' %}selected{% endif %}>Draft</option>
+                </select>
+            </div>
 
-<!-- Calls Table -->
-<div class="card">
-    <div class="data-table">
-        <div class="table-wrapper">
-            <table>
-                <thead>
+            <div class="w-48">
+                <label class="block text-[10px] uppercase tracking-widest font-bold text-slate-400 mb-2">Broker</label>
+                <select name="broker" onchange="this.form.submit()" class="w-full py-2 bg-slate-50 border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 appearance-none">
+                    <option value="">All Brokers</option>
+                    {% for broker in brokers %}
+                    <option value="{{ broker.id }}" {% if selected_broker == broker.id|stringformat:"s" %}selected{% endif %}>{{ broker.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="flex gap-2">
+                <button type="submit" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold hover:opacity-90 transition-all">Apply</button>
+                {% if selected_status or selected_broker or search_query %}
+                <a href="{% url 'admin_panel:calls_list' %}" class="bg-slate-100 text-slate-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-200 transition-all no-underline">Clear</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <!-- Calls Table Card -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead class="bg-slate-50/50 border-b border-slate-100">
                     <tr>
-                        <th>ID</th>
-                        <th>Symbol</th>
-                        <th>Broker</th>
-                        <th>Action</th>
-                        <th>Entry Price</th>
-                        <th>Target</th>
-                        <th>Status</th>
-                        <th>Created</th>
-                        <th>Actions</th>
+                        <th class="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider">ID</th>
+                        <th class="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Symbol</th>
+                        <th class="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Broker</th>
+                        <th class="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Type</th>
+                        <th class="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider text-center">Action</th>
+                        <th class="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Entry</th>
+                        <th class="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Target</th>
+                        <th class="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="divide-y divide-slate-100">
                     {% for call in calls %}
-                    <tr>
-                        <td>#{{ call.id }}</td>
-                        <td>
-                            <a href="{% url 'admin_panel:call_detail' call.id %}" style="color: var(--color-primary); text-decoration: none; font-weight: 600;">
-                                {{ call.symbol }}
-                            </a>
+                    <tr class="hover:bg-slate-50/50 transition-colors group">
+                        <td class="px-6 py-4 text-xs font-bold text-slate-400">#{{ call.id }}</td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm font-bold text-slate-900">{{ call.symbol }}</span>
+                                <span class="text-[10px] text-slate-400 font-medium">{{ call.exchange }}</span>
+                            </div>
                         </td>
-                        <td>{{ call.broker.name }}</td>
-                        <td>
-                            <span class="badge {% if call.action == 'BUY' %}badge-success{% else %}badge-danger{% endif %}">
+                        <td class="px-6 py-4 text-xs font-medium text-slate-600">{{ call.broker.name }}</td>
+                        <td class="px-6 py-4 text-xs text-slate-500">{{ call.instrument_type }}</td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="px-2 py-1 rounded text-[10px] font-black uppercase tracking-tight {% if call.action == 'BUY' %}bg-emerald-100 text-emerald-700{% else %}bg-rose-100 text-rose-700{% endif %}">
                                 {{ call.action }}
                             </span>
                         </td>
-                        <td>₹{{ call.entry_price }}</td>
-                        <td>₹{{ call.target_price }}</td>
-                        <td>
+                        <td class="px-6 py-4 text-sm font-bold text-slate-900">₹{{ call.entry_price }}</td>
+                        <td class="px-6 py-4 text-sm font-bold text-slate-900">₹{{ call.target_price|default:call.target_1 }}</td>
+                        <td class="px-6 py-4">
                             {% if call.status == 'ACTIVE' %}
-                            <span class="badge badge-success">Active</span>
-                            {% elif call.status == 'PENDING' %}
-                            <span class="badge badge-warning">Pending</span>
+                            <span class="flex items-center gap-1.5 text-green-600 text-[10px] font-bold">
+                                <span class="size-1.5 bg-green-500 rounded-full"></span> ACTIVE
+                            </span>
+                            {% elif call.status == 'PENDING_APPROVAL' %}
+                            <span class="flex items-center gap-1.5 text-amber-600 text-[10px] font-bold">
+                                <span class="size-1.5 bg-amber-500 rounded-full"></span> PENDING
+                            </span>
                             {% elif call.status == 'CLOSED' %}
-                            <span class="badge badge-gray">Closed</span>
-                            {% elif call.status == 'DRAFT' %}
-                            <span class="badge badge-info">Draft</span>
+                            <span class="flex items-center gap-1.5 text-slate-400 text-[10px] font-bold">
+                                <span class="size-1.5 bg-slate-300 rounded-full"></span> CLOSED
+                            </span>
                             {% else %}
-                            <span class="badge">{{ call.status }}</span>
+                            <span class="text-slate-500 text-[10px] font-bold">{{ call.status }}</span>
                             {% endif %}
                         </td>
-                        <td>{{ call.created_at|date:"M d, Y" }}</td>
-                        <td>
-                            <div style="display: flex; gap: var(--spacing-2);">
-                                <a href="{% url 'admin_panel:call_detail' call.id %}" class="btn btn-sm btn-outline-primary" title="View">👁️</a>
-                                {% if call.status == 'PENDING' %}
-                                <button class="btn btn-sm btn-success" title="Approve">✓</button>
-                                <button class="btn btn-sm btn-danger" title="Reject">✗</button>
+                        <td class="px-6 py-4 text-right">
+                            <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <a href="{% url 'admin_panel:call_detail' call.id %}" class="p-1.5 text-slate-400 hover:text-primary transition-colors" title="View">
+                                    <span class="material-symbols-outlined text-[20px]">visibility</span>
+                                </a>
+                                <a href="{% url 'admin_panel:call_update' call.id %}" class="p-1.5 text-slate-400 hover:text-blue-500 transition-colors" title="Edit">
+                                    <span class="material-symbols-outlined text-[20px]">edit</span>
+                                </a>
+                                {% if call.status == 'PENDING_APPROVAL' %}
+                                <a href="{% url 'research_calls:approve' call.id %}" class="p-1.5 text-amber-500 hover:text-amber-600 transition-colors" title="Approve">
+                                    <span class="material-symbols-outlined text-[20px]">verified</span>
+                                </a>
                                 {% endif %}
                             </div>
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="10" style="text-align: center; padding: var(--spacing-8); color: var(--color-gray-600);">
-                            No research calls found
+                        <td colspan="9" class="px-6 py-12 text-center text-slate-400">
+                            <div class="flex flex-col items-center gap-2">
+                                <span class="material-symbols-outlined text-4xl">inventory_2</span>
+                                <p class="text-sm">No research calls found matching your criteria.</p>
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
-    </div>
-    
-    {% if is_paginated %}
-    <div class="card-footer">
-        <div class="pagination">
-            {% if page_obj.has_previous %}
-            <a href="?page=1{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_broker %}&broker={{ selected_broker }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="pagination-item">«</a>
-            <a href="?page={{ page_obj.previous_page_number }}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_broker %}&broker={{ selected_broker }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="pagination-item">‹</a>
-            {% endif %}
-            
-            <span class="pagination-item is-active">{{ page_obj.number }}</span>
-            
-            {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_broker %}&broker={{ selected_broker }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="pagination-item">›</a>
-            <a href="?page={{ page_obj.paginator.num_pages }}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_broker %}&broker={{ selected_broker }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="pagination-item">»</a>
-            {% endif %}
+        
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
+            <p class="text-xs text-slate-500">Showing page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</p>
+            <div class="flex gap-2">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_broker %}&broker={{ selected_broker }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" 
+                   class="p-2 border border-slate-200 rounded-lg hover:bg-white text-slate-600 transition-all no-underline">
+                    <span class="material-symbols-outlined text-sm">chevron_left</span>
+                </a>
+                {% endif %}
+                
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_broker %}&broker={{ selected_broker }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" 
+                   class="p-2 border border-slate-200 rounded-lg hover:bg-white text-slate-600 transition-all no-underline">
+                    <span class="material-symbols-outlined text-sm">chevron_right</span>
+                </a>
+                {% endif %}
+            </div>
         </div>
+        {% endif %}
     </div>
-    {% endif %}
 </div>
 {% endblock %}
+

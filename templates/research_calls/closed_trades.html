@@ -1,226 +1,131 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Closed Trades - Stock Research Platform{% endblock %}
-
-{% block page_css %}
-<style>
-.trades-page { padding: 32px 0; max-width: 1280px; margin: 0 auto; padding: 0 24px 48px; }
-
-.page-header { margin-bottom: 24px; }
-.page-header h1 { font-size: 32px; font-weight: 700; color: #111827; margin-bottom: 4px; }
-.subtitle { color: #6b7280; font-size: 16px; }
-
-/* Live/Closed Toggle */
-.status-toggle {
-    display: flex; gap: 0; margin-bottom: 24px; background: #f3f4f6;
-    border-radius: 12px; padding: 4px; width: fit-content;
-}
-.status-toggle a {
-    padding: 10px 28px; border-radius: 10px; font-weight: 600; font-size: 14px;
-    text-decoration: none; color: #6b7280; transition: all 0.2s;
-}
-.status-toggle a.active { background: #111827; color: white; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
-.status-toggle a:hover:not(.active) { color: #111827; }
-
-/* Performance Summary */
-.perf-summary {
-    display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;
-}
-.perf-stat {
-    background: white; padding: 16px 24px; border-radius: 12px;
-    border: 1px solid #e5e7eb; flex: 1; min-width: 140px; text-align: center;
-}
-.perf-stat .stat-value { font-size: 28px; font-weight: 800; color: #111827; }
-.perf-stat .stat-label { font-size: 12px; color: #9ca3af; text-transform: uppercase; margin-top: 4px; }
-.perf-stat.success .stat-value { color: #10b981; }
-.perf-stat.danger .stat-value { color: #ef4444; }
-
-/* Category Filters */
-.category-filters {
-    display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap;
-    padding: 12px; background: #f9fafb; border-radius: 12px;
-}
-.category-tab {
-    padding: 8px 18px; border-radius: 8px; background: white; border: 1.5px solid #e5e7eb;
-    color: #374151; font-weight: 500; font-size: 13px; text-decoration: none; transition: all 0.2s;
-}
-.category-tab:hover { border-color: #2563eb; color: #2563eb; }
-.category-tab.active { background: #2563eb; border-color: #2563eb; color: white; }
-
-/* Trades Grid */
-.trades-grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px;
-}
-
-/* Unified Trade Card — same as live_trades.html */
-.trade-card {
-    background: white; border-radius: 16px; overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #e5e7eb;
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-.trade-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
-
-.card-top {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 16px 20px 12px; border-bottom: 1px solid #f3f4f6;
-}
-.posted-date { font-size: 12px; color: #9ca3af; }
-.type-badge {
-    padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600;
-    text-transform: uppercase; background: #eff6ff; color: #2563eb;
-}
-
-.card-body { padding: 16px 20px; }
-
-.symbol-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-.symbol-name { font-size: 20px; font-weight: 700; color: #111827; }
-.action-pill {
-    padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 700;
-}
-.action-pill.buy { background: #d1fae5; color: #065f46; }
-.action-pill.sell { background: #fee2e2; color: #991b1b; }
-
-.price-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 14px; }
-.price-item { text-align: center; }
-.price-label { font-size: 11px; color: #9ca3af; text-transform: uppercase; margin-bottom: 2px; }
-.price-value { font-size: 15px; font-weight: 700; }
-.price-value.entry { color: #111827; }
-.price-value.target { color: #10b981; }
-.price-value.stoploss { color: #ef4444; }
-
-/* Closed-specific: net gain bar */
-.gain-bar {
-    padding: 10px 16px; border-radius: 8px;
-    display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;
-}
-.gain-bar.positive { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; }
-.gain-bar.negative { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; }
-.gain-bar .label { font-size: 12px; opacity: 0.9; }
-.gain-bar .value { font-size: 18px; font-weight: 800; }
-
-.exit-info {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px;
-    padding: 10px; background: #f9fafb; border-radius: 8px; font-size: 13px;
-}
-.exit-info .label { color: #9ca3af; }
-.exit-info .val { font-weight: 600; color: #111827; }
-
-.card-footer {
-    display: flex; gap: 8px; padding: 0 20px 16px;
-}
-.card-footer .btn {
-    flex: 1; padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 600;
-    text-align: center; text-decoration: none; transition: all 0.2s; border: none; cursor: pointer;
-}
-.btn-view { background: #f3f4f6; color: #374151; }
-.btn-view:hover { background: #e5e7eb; }
-
-.no-results {
-    grid-column: 1 / -1; text-align: center; padding: 60px;
-    background: white; border-radius: 16px; color: #6b7280;
-}
-
-@media (max-width: 768px) {
-    .trades-grid { grid-template-columns: 1fr; }
-    .perf-summary { flex-direction: column; }
-}
-</style>
-{% endblock page_css %}
+{% block title %}Research Archive - Closed Trades - StockPro{% endblock %}
 
 {% block page_content %}
-<div class="trades-page">
-    <div class="page-header">
-        <h1>Closed Trades</h1>
-        <p class="subtitle">{{ total_calls }} closed research calls with {{ accuracy|floatformat:1 }}% accuracy</p>
-    </div>
-
-    <!-- Live / Closed Toggle -->
-    <div class="status-toggle">
-        <a href="{% url 'research_calls:live_calls' %}">Live Trades</a>
-        <a href="{% url 'research_calls:closed_calls' %}" class="active">Closed Trades</a>
+<div class="max-w-7xl mx-auto px-4 py-12">
+    <!-- Page Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+        <div>
+            <h1 class="text-4xl font-black text-slate-900 tracking-tight mb-2">Research Archive</h1>
+            <p class="text-slate-500 font-medium tracking-tight italic">{{ total_calls }} liquidated positions with a {{ accuracy|floatformat:1 }}% verification rate.</p>
+        </div>
+        
+        <!-- Live / Closed Toggle -->
+        <div class="flex p-1 bg-slate-100 rounded-2xl w-fit border border-slate-200">
+            <a href="{% url 'research_calls:live_calls' %}" class="px-6 py-2 rounded-xl text-xs font-black text-slate-500 hover:text-slate-900 transition-colors">Live Node</a>
+            <a href="{% url 'research_calls:closed_calls' %}" class="px-6 py-2 rounded-xl text-xs font-black bg-white text-slate-900 shadow-sm border border-slate-200">Archive Node</a>
+        </div>
     </div>
 
     <!-- Performance Summary -->
-    <div class="perf-summary">
-        <div class="perf-stat">
-            <div class="stat-value">{{ total_calls }}</div>
-            <div class="stat-label">Total Closed</div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+        <div class="bg-white p-6 rounded-[32px] border border-slate-200 shadow-sm">
+            <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">Total Exhaustion</span>
+            <div class="text-3xl font-black text-slate-900">{{ total_calls }}</div>
+            <span class="text-[10px] font-bold text-slate-300 mt-1 block italic">Positions Cleared</span>
         </div>
-        <div class="perf-stat success">
-            <div class="stat-value">{{ successful_calls }}</div>
-            <div class="stat-label">Hits</div>
+        <div class="bg-white p-6 rounded-[32px] border border-slate-200 shadow-sm">
+            <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">Precision Rate</span>
+            <div class="text-3xl font-black text-emerald-500">{{ accuracy|floatformat:1 }}%</div>
+            <span class="text-[10px] font-bold text-slate-300 mt-1 block italic">Alpha Confirmation</span>
         </div>
-        <div class="perf-stat danger">
-            <div class="stat-value">{{ failed_calls }}</div>
-            <div class="stat-label">Misses</div>
+        <div class="bg-white p-6 rounded-[32px] border border-slate-200 shadow-sm">
+            <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">Positive Alpha</span>
+            <div class="text-3xl font-black text-slate-900">{{ successful_calls }}</div>
+            <span class="text-[10px] font-bold text-slate-300 mt-1 block italic">Hits Detected</span>
         </div>
-        <div class="perf-stat">
-            <div class="stat-value">{{ accuracy|floatformat:1 }}%</div>
-            <div class="stat-label">Accuracy</div>
+        <div class="bg-white p-6 rounded-[32px] border border-slate-200 shadow-sm border-l-4 border-l-rose-500">
+            <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">Negative Alpha</span>
+            <div class="text-3xl font-black text-slate-900">{{ failed_calls }}</div>
+            <span class="text-[10px] font-bold text-slate-300 mt-1 block italic">Variance Events</span>
         </div>
     </div>
 
     <!-- Category Filters -->
-    <div class="category-filters">
-        <a href="?category=all" class="category-tab {% if selected_category == 'all' %}active{% endif %}">All</a>
-        <a href="?category=short_term" class="category-tab {% if selected_category == 'short_term' %}active{% endif %}">Short Term</a>
-        <a href="?category=medium_term" class="category-tab {% if selected_category == 'medium_term' %}active{% endif %}">Medium Term</a>
-        <a href="?category=long_term" class="category-tab {% if selected_category == 'long_term' %}active{% endif %}">Long Term</a>
-        <a href="?category=futures" class="category-tab {% if selected_category == 'futures' %}active{% endif %}">Futures</a>
-        <a href="?category=options" class="category-tab {% if selected_category == 'options' %}active{% endif %}">Options</a>
-        <a href="?category=commodity" class="category-tab {% if selected_category == 'commodity' %}active{% endif %}">Commodity</a>
+    <div class="flex flex-wrap gap-2 mb-12 p-3 bg-slate-50 rounded-[24px] border border-slate-100">
+        <a href="?category=all" class="px-5 py-2 rounded-xl text-xs font-black transition-all {% if selected_category == 'all' %}bg-slate-900 text-white shadow-lg{% else %}bg-white text-slate-500 border border-slate-200 hover:border-slate-900{% endif %}">Aggregated</a>
+        <a href="?category=short_term" class="px-5 py-2 rounded-xl text-xs font-black transition-all {% if selected_category == 'short_term' %}bg-slate-900 text-white shadow-lg{% else %}bg-white text-slate-500 border border-slate-200 hover:border-slate-900{% endif %}">Short Cycle</a>
+        <a href="?category=medium_term" class="px-5 py-2 rounded-xl text-xs font-black transition-all {% if selected_category == 'medium_term' %}bg-slate-900 text-white shadow-lg{% else %}bg-white text-slate-500 border border-slate-200 hover:border-slate-900{% endif %}">Mid Cycle</a>
+        <a href="?category=long_term" class="px-5 py-2 rounded-xl text-xs font-black transition-all {% if selected_category == 'long_term' %}bg-slate-900 text-white shadow-lg{% else %}bg-white text-slate-500 border border-slate-200 hover:border-slate-900{% endif %}">Full Cycle</a>
+        <a href="?category=futures" class="px-5 py-2 rounded-xl text-xs font-black transition-all {% if selected_category == 'futures' %}bg-slate-900 text-white shadow-lg{% else %}bg-white text-slate-500 border border-slate-200 hover:border-slate-900{% endif %}">Derivative [F]</a>
+        <a href="?category=options" class="px-5 py-2 rounded-xl text-xs font-black transition-all {% if selected_category == 'options' %}bg-slate-900 text-white shadow-lg{% else %}bg-white text-slate-500 border border-slate-200 hover:border-slate-900{% endif %}">Derivative [O]</a>
+        <a href="?category=commodity" class="px-5 py-2 rounded-xl text-xs font-black transition-all {% if selected_category == 'commodity' %}bg-slate-900 text-white shadow-lg{% else %}bg-white text-slate-500 border border-slate-200 hover:border-slate-900{% endif %}">Hard Asset</a>
     </div>
 
     <!-- Trades Grid -->
-    <div class="trades-grid">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {% for call in calls %}
-        <div class="trade-card">
-            <div class="card-top">
-                <span class="posted-date">{{ call.created_at|date:"d M y · h:i A" }}</span>
-                <span class="type-badge">{{ call.get_call_type_display }}</span>
-            </div>
-            <div class="card-body">
-                <div class="symbol-row">
-                    <span class="symbol-name">{{ call.symbol }}</span>
-                    <span class="action-pill {% if call.action == 'BUY' %}buy{% else %}sell{% endif %}">{{ call.action }}</span>
+        <div class="bg-white rounded-[40px] border border-slate-200 shadow-sm overflow-hidden flex flex-col hover:shadow-xl hover:-translate-y-1 transition-all group">
+            <div class="p-8 pb-0">
+                <div class="flex items-center justify-between mb-8">
+                    <span class="text-[9px] font-black text-slate-300 uppercase tracking-widest italic leading-none">{{ call.created_at|date:"d M y · h:i A" }}</span>
+                    <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 text-[9px] font-black uppercase tracking-widest">
+                        {{ call.get_call_type_display }}
+                    </span>
                 </div>
-                <div class="price-grid">
-                    <div class="price-item">
-                        <div class="price-label">Entry</div>
-                        <div class="price-value entry">₹{{ call.entry_price|floatformat:2 }}</div>
+                
+                <div class="flex items-start justify-between mb-8">
+                    <div>
+                        <h3 class="text-2xl font-black text-slate-900 tracking-tight mb-1 group-hover:text-primary transition-colors">{{ call.symbol }}</h3>
+                        <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{{ call.exchange|default:"Equity Exchange" }}</span>
                     </div>
-                    <div class="price-item">
-                        <div class="price-label">Target</div>
-                        <div class="price-value target">₹{{ call.target_1|floatformat:2 }}</div>
+                    <span class="px-4 py-1 rounded-xl {% if call.action == 'BUY' %}bg-emerald-50 text-emerald-600{% else %}bg-rose-50 text-rose-600{% endif %} text-[11px] font-black tracking-widest">
+                        {{ call.action }}
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-3 gap-4 mb-8">
+                    <div>
+                        <span class="text-[8px] font-black text-slate-300 uppercase block mb-1">Anchor</span>
+                        <span class="text-[13px] font-black text-slate-900">₹{{ call.entry_price|floatformat:0 }}</span>
                     </div>
-                    <div class="price-item">
-                        <div class="price-label">Stop Loss</div>
-                        <div class="price-value stoploss">₹{{ call.stop_loss|floatformat:2 }}</div>
+                    <div>
+                        <span class="text-[8px] font-black text-slate-300 uppercase block mb-1">Objective</span>
+                        <span class="text-[13px] font-black text-emerald-500">₹{{ call.target_1|floatformat:0 }}</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-[8px] font-black text-slate-300 uppercase block mb-1">Guard</span>
+                        <span class="text-[13px] font-black text-rose-500">₹{{ call.stop_loss|floatformat:0 }}</span>
                     </div>
                 </div>
 
-                <!-- Exit Info -->
-                <div class="exit-info">
-                    <div><span class="label">Exit Price: </span><span class="val">₹{{ call.exit_price|default:call.target_1|floatformat:2 }}</span></div>
-                    <div><span class="label">Closed: </span><span class="val">{{ call.closed_at|date:"d M y" }}</span></div>
-                </div>
-
-                <!-- Net Gain/Loss -->
-                <div class="gain-bar {% if call.actual_return_percentage > 0 %}positive{% else %}negative{% endif %}">
-                    <span class="label">Net Return</span>
-                    <span class="value">{% if call.actual_return_percentage > 0 %}+{% endif %}{{ call.actual_return_percentage|floatformat:1 }}%</span>
+                <!-- Exit Timeline -->
+                <div class="p-4 bg-slate-50 rounded-2xl mb-6 flex items-center justify-between border border-slate-100">
+                    <div>
+                        <span class="text-[8px] font-black text-slate-400 uppercase block mb-0.5">Exit Node</span>
+                        <span class="text-xs font-black text-slate-900">₹{{ call.exit_price|default:call.target_1|floatformat:2 }}</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-[8px] font-black text-slate-400 uppercase block mb-0.5">Liquidation</span>
+                        <span class="text-xs font-black text-slate-900">{{ call.closed_at|date:"d M y" }}</span>
+                    </div>
                 </div>
             </div>
-            <div class="card-footer">
-                <a href="{% url 'research_calls:detail' call.id %}" class="btn btn-view">View Details</a>
+
+            <!-- ROI Footnote -->
+            <div class="mt-auto p-6 bg-slate-900 flex items-center justify-between">
+                <span class="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em]">Liquid Alpha</span>
+                <div class="flex items-center gap-2">
+                    <span class="text-xl font-black {% if call.actual_return_percentage > 0 %}text-emerald-400{% else %}text-rose-400{% endif %}">
+                        {% if call.actual_return_percentage > 0 %}+{% endif %}{{ call.actual_return_percentage|floatformat:1 }}%
+                    </span>
+                    <a href="{% url 'research_calls:detail' call.id %}" class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-white hover:bg-primary transition-colors">
+                        <span class="material-symbols-outlined text-[16px]">north_east</span>
+                    </a>
+                </div>
             </div>
         </div>
         {% empty %}
-        <div class="no-results">
-            <p>No closed trades found matching your filters.</p>
+        <div class="col-span-full py-32 text-center bg-white rounded-[40px] border border-dashed border-slate-200">
+            <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-200">
+                <span class="material-symbols-outlined text-[40px]">history</span>
+            </div>
+            <h3 class="text-slate-900 font-black text-xl mb-2">Archive Vacant</h3>
+            <p class="text-slate-400 text-sm font-medium italic max-w-xs mx-auto">No closed research strings matched the current acquisition filters.</p>
         </div>
         {% endfor %}
     </div>
 </div>
-{% endblock page_content %}
+{% endblock %}

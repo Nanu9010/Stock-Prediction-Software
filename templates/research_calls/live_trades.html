@@ -1,188 +1,150 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Live Trades - Stock Research Platform{% endblock %}
+{% block title %}Live Trades - StockPro{% endblock title %}
 
 {% block page_css %}
 <style>
-.trades-page { padding: 32px 0; max-width: 1280px; margin: 0 auto; padding: 0 24px 48px; }
-
-.page-header { margin-bottom: 24px; }
-.page-header h1 { font-size: 32px; font-weight: 700; color: #111827; margin-bottom: 4px; }
-.subtitle { color: #6b7280; font-size: 16px; }
-
-/* Live/Closed Toggle */
-.status-toggle {
-    display: flex; gap: 0; margin-bottom: 24px; background: #f3f4f6;
-    border-radius: 12px; padding: 4px; width: fit-content;
-}
-.status-toggle a {
-    padding: 10px 28px; border-radius: 10px; font-weight: 600; font-size: 14px;
-    text-decoration: none; color: #6b7280; transition: all 0.2s;
-}
-.status-toggle a.active { background: #111827; color: white; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
-.status-toggle a:hover:not(.active) { color: #111827; }
-
-/* Category Filters */
-.category-filters {
-    display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap;
-    padding: 12px; background: #f9fafb; border-radius: 12px;
-}
-.category-tab {
-    padding: 8px 18px; border-radius: 8px; background: white; border: 1.5px solid #e5e7eb;
-    color: #374151; font-weight: 500; font-size: 13px; text-decoration: none; transition: all 0.2s;
-}
-.category-tab:hover { border-color: #2563eb; color: #2563eb; }
-.category-tab.active { background: #2563eb; border-color: #2563eb; color: white; }
-
-/* Trades Grid */
-.trades-grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px;
-}
-
-/* Unified Trade Card */
-.trade-card {
-    background: white; border-radius: 16px; overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #e5e7eb;
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-.trade-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
-
-.card-top {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 16px 20px 12px; border-bottom: 1px solid #f3f4f6;
-}
-.posted-date { font-size: 12px; color: #9ca3af; }
-.type-badge {
-    padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600;
-    text-transform: uppercase; background: #eff6ff; color: #2563eb;
-}
-
-.card-body { padding: 16px 20px; }
-
-.symbol-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-.symbol-name { font-size: 20px; font-weight: 700; color: #111827; }
-.action-pill {
-    padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 700;
-}
-.action-pill.buy { background: #d1fae5; color: #065f46; }
-.action-pill.sell { background: #fee2e2; color: #991b1b; }
-
-.price-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 14px; }
-.price-item { text-align: center; }
-.price-label { font-size: 11px; color: #9ca3af; text-transform: uppercase; margin-bottom: 2px; }
-.price-value { font-size: 15px; font-weight: 700; }
-.price-value.entry { color: #111827; }
-.price-value.target { color: #10b981; }
-.price-value.stoploss { color: #ef4444; }
-
-.potential-bar {
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-    color: white; padding: 10px 16px; border-radius: 8px;
-    display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;
-}
-.potential-bar .label { font-size: 12px; opacity: 0.9; }
-.potential-bar .value { font-size: 18px; font-weight: 800; }
-
-/* Closed-specific: net gain */
-.gain-bar {
-    padding: 10px 16px; border-radius: 8px;
-    display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;
-}
-.gain-bar.positive { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; }
-.gain-bar.negative { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; }
-.gain-bar .label { font-size: 12px; opacity: 0.9; }
-.gain-bar .value { font-size: 18px; font-weight: 800; }
-
-.card-footer {
-    display: flex; gap: 8px; padding: 0 20px 16px;
-}
-.card-footer .btn {
-    flex: 1; padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 600;
-    text-align: center; text-decoration: none; transition: all 0.2s; border: none; cursor: pointer;
-}
-.btn-view { background: #f3f4f6; color: #374151; }
-.btn-view:hover { background: #e5e7eb; }
-.btn-pro { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; }
-.btn-pro:hover { opacity: 0.9; }
-
-.no-results {
-    grid-column: 1 / -1; text-align: center; padding: 60px;
-    background: white; border-radius: 16px; color: #6b7280;
-}
-
-@media (max-width: 768px) { .trades-grid { grid-template-columns: 1fr; } }
+    .blur-overlay {
+        backdrop-filter: blur(4px);
+        background-color: rgba(255, 255, 255, 0.4);
+    }
+    .dark .blur-overlay {
+        background-color: rgba(30, 35, 41, 0.6);
+    }
 </style>
-{% endblock page_css %}
+{% endblock %}
 
-{% block page_content %}
-<div class="trades-page">
-    <div class="page-header">
-        <h1>Research Trades</h1>
-        <p class="subtitle">{{ total_count }} active research calls across all categories</p>
-    </div>
-
-    <!-- Live / Closed Toggle -->
-    <div class="status-toggle">
-        <a href="{% url 'research_calls:live_calls' %}" class="active">Live Trades</a>
-        <a href="{% url 'research_calls:closed_calls' %}">Closed Trades</a>
+{% block content %}
+<main class="flex-1 flex flex-col gap-6">
+    <!-- Header & Toggle -->
+    <div class="px-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+            <div class="bg-primary/10 p-2 rounded-lg">
+                <span class="material-symbols-outlined text-primary">analytics</span>
+            </div>
+            <div class="flex flex-col">
+                <h1 class="text-slate-900 dark:text-slate-100 text-2xl font-bold tracking-tight">Research Calls</h1>
+                <p class="text-slate-500 dark:text-slate-400 text-sm font-medium">{{ total_count }} active calls available</p>
+            </div>
+        </div>
+        <div class="flex bg-white dark:bg-slate-900 p-1 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+            <a href="{% url 'research_calls:live_calls' %}" class="px-6 py-2 rounded-lg bg-primary text-white text-sm font-semibold shadow-sm text-center">Live Calls</a>
+            <a href="{% url 'research_calls:closed_calls' %}" class="px-6 py-2 rounded-lg text-slate-500 dark:text-slate-400 text-sm font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 text-center transition-colors">Expired (Closed)</a>
+        </div>
     </div>
 
     <!-- Category Filters -->
-    <div class="category-filters">
-        <a href="?category=all" class="category-tab {% if selected_category == 'all' %}active{% endif %}">All</a>
-        <a href="?category=short_term" class="category-tab {% if selected_category == 'short_term' %}active{% endif %}">Short Term</a>
-        <a href="?category=medium_term" class="category-tab {% if selected_category == 'medium_term' %}active{% endif %}">Medium Term</a>
-        <a href="?category=long_term" class="category-tab {% if selected_category == 'long_term' %}active{% endif %}">Long Term</a>
-        <a href="?category=futures" class="category-tab {% if selected_category == 'futures' %}active{% endif %}">Futures</a>
-        <a href="?category=options" class="category-tab {% if selected_category == 'options' %}active{% endif %}">Options</a>
-        <a href="?category=commodity" class="category-tab {% if selected_category == 'commodity' %}active{% endif %}">Commodity</a>
+    <div class="px-4 flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+        <a href="?category=all" class="flex h-10 shrink-0 items-center justify-center px-5 rounded-full text-sm font-medium {% if selected_category == 'all' or not selected_category %}bg-primary text-white shadow-sm{% else %}bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:border-primary{% endif %}">All</a>
+        
+        <a href="?category=short_term" class="flex h-10 shrink-0 items-center justify-center px-5 rounded-full text-sm font-medium {% if selected_category == 'short_term' %}bg-primary text-white shadow-sm{% else %}bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:border-primary{% endif %}">Short Term</a>
+        
+        <a href="?category=medium_term" class="flex h-10 shrink-0 items-center justify-center px-5 rounded-full text-sm font-medium {% if selected_category == 'medium_term' %}bg-primary text-white shadow-sm{% else %}bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:border-primary{% endif %}">Medium Term</a>
+        
+        <a href="?category=long_term" class="flex h-10 shrink-0 items-center justify-center px-5 rounded-full text-sm font-medium {% if selected_category == 'long_term' %}bg-primary text-white shadow-sm{% else %}bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:border-primary{% endif %}">Long Term</a>
+        
+        <a href="?category=futures" class="flex h-10 shrink-0 items-center justify-center px-5 rounded-full text-sm font-medium {% if selected_category == 'futures' %}bg-primary text-white shadow-sm{% else %}bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:border-primary{% endif %}">Futures</a>
+        
+        <a href="?category=options" class="flex h-10 shrink-0 items-center justify-center px-5 rounded-full text-sm font-medium {% if selected_category == 'options' %}bg-primary text-white shadow-sm{% else %}bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:border-primary{% endif %}">Options</a>
+        
+        <a href="?category=commodity" class="flex h-10 shrink-0 items-center justify-center px-5 rounded-full text-sm font-medium {% if selected_category == 'commodity' %}bg-primary text-white shadow-sm{% else %}bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:border-primary{% endif %}">Commodity</a>
     </div>
 
     <!-- Trades Grid -->
-    <div class="trades-grid">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
         {% for call in calls %}
-        <div class="trade-card">
-            <div class="card-top">
-                <span class="posted-date">{{ call.published_at|date:"d M y · h:i A" }}</span>
-                <span class="type-badge">{{ call.get_call_type_display }}</span>
-            </div>
-            <div class="card-body">
-                <div class="symbol-row">
-                    <span class="symbol-name">{{ call.symbol }}</span>
-                    <span class="action-pill {% if call.action == 'BUY' %}buy{% else %}sell{% endif %}">{{ call.action }}</span>
+            {% if call.is_pro_only and not user.subscription %}
+            <!-- Locked PRO Card -->
+            <div class="relative flex flex-col bg-white dark:bg-slate-900 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm group">
+                <div class="h-32 w-full bg-gradient-to-br from-amber-50 to-orange-100 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center p-4 relative">
+                    <span class="material-symbols-outlined text-4xl text-amber-500/40">workspace_premium</span>
+                    <div class="absolute top-3 left-3 bg-amber-100 text-amber-700 px-2 py-0.5 rounded text-[10px] font-bold tracking-wider">PRO</div>
+                    <div class="absolute top-3 right-3 bg-green-100 text-green-700 px-2 py-0.5 rounded text-[10px] font-bold tracking-wider">LIVE</div>
                 </div>
-                <div class="price-grid">
-                    <div class="price-item">
-                        <div class="price-label">Entry</div>
-                        <div class="price-value entry">₹{{ call.entry_price }}</div>
+                <div class="p-5 flex flex-col gap-3 relative grow">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-slate-900 dark:text-slate-100 font-bold text-lg line-clamp-1">{{ call.symbol }}</h3>
+                            <p class="text-xs text-slate-500 uppercase font-semibold">{{ call.get_call_type_display }} • {{ call.action }}</p>
+                        </div>
                     </div>
-                    <div class="price-item">
-                        <div class="price-label">Target</div>
-                        <div class="price-value target">₹{{ call.target_1 }}</div>
+                    <div class="grid grid-cols-3 gap-2 py-3 border-y border-slate-100 dark:border-slate-800">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-slate-400 font-bold uppercase">Entry</span>
+                            <span class="text-sm font-bold text-slate-700 dark:text-slate-300">₹{{ call.entry_price }}</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-slate-400 font-bold uppercase">Target</span>
+                            <span class="text-sm font-bold text-primary">₹{{ call.target_1 }}</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-slate-400 font-bold uppercase">Stop Loss</span>
+                            <span class="text-sm font-bold text-red-500">₹{{ call.stop_loss }}</span>
+                        </div>
                     </div>
-                    <div class="price-item">
-                        <div class="price-label">Stop Loss</div>
-                        <div class="price-value stoploss">₹{{ call.stop_loss }}</div>
+                    <a href="{% url 'payments:membership' %}" class="w-full text-center mt-auto py-2 bg-amber-500 text-white rounded-lg text-xs font-bold shadow-sm disabled">Upgrade to View</a>
+                    
+                    <div class="absolute inset-0 blur-overlay flex flex-col items-center justify-center p-6 text-center z-10">
+                        <span class="material-symbols-outlined text-amber-600 mb-2 text-3xl">lock</span>
+                        <p class="text-xs font-bold text-slate-900 dark:text-white">Premium Analysis</p>
+                        <p class="text-[10px] text-slate-600 dark:text-slate-300 mt-1 mb-4">Unlock technical targets and research notes</p>
+                        <a href="{% url 'payments:membership' %}" class="w-full py-2 bg-amber-500 text-white rounded-lg text-xs font-bold shadow-sm">Unlock Call</a>
                     </div>
                 </div>
-                <div class="potential-bar">
-                    <span class="label">Potential Return</span>
-                    <span class="value">{{ call.expected_return_percentage|floatformat:1 }}%</span>
+            </div>
+            {% else %}
+            <!-- Normal Active Card -->
+            <div class="flex flex-col bg-white dark:bg-slate-900 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow group">
+                <div class="h-32 w-full {% if call.action == 'BUY' %}bg-gradient-to-br from-green-50 to-emerald-100 dark:from-slate-800 dark:to-emerald-900/20{% else %}bg-gradient-to-br from-red-50 to-rose-100 dark:from-slate-800 dark:to-rose-900/20{% endif %} flex items-center justify-center p-4 relative">
+                    <span class="material-symbols-outlined text-4xl {% if call.action == 'BUY' %}text-emerald-500/40{% else %}text-rose-500/40{% endif %}">{% if call.action == 'BUY' %}trending_up{% else %}trending_down{% endif %}</span>
+                    <div class="absolute top-3 right-3 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 px-2 py-0.5 rounded text-[10px] font-bold tracking-wider">LIVE</div>
+                    {% if call.is_pro_only %}
+                    <div class="absolute top-3 left-3 bg-amber-100 text-amber-700 px-2 py-0.5 rounded text-[10px] font-bold tracking-wider">PRO</div>
+                    {% endif %}
+                </div>
+                <div class="p-5 flex flex-col gap-3 grow">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-slate-900 dark:text-slate-100 font-bold text-lg line-clamp-1">{{ call.symbol }}</h3>
+                            <p class="text-xs text-slate-500 uppercase font-semibold">{{ call.get_call_type_display }} • {{ call.action }}</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 py-3 border-y border-slate-100 dark:border-slate-800">
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-slate-400 font-bold uppercase">Entry</span>
+                            <span class="text-sm font-bold text-slate-700 dark:text-slate-300">₹{{ call.entry_price|floatformat:2 }}</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-slate-400 font-bold uppercase">Target</span>
+                            <span class="text-sm font-bold text-primary dark:text-indigo-400">₹{{ call.target_1|floatformat:2 }}</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-[10px] text-slate-400 font-bold uppercase">Stop Loss</span>
+                            <span class="text-sm font-bold text-red-500">₹{{ call.stop_loss|floatformat:2 }}</span>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-1 mb-2">
+                        <div class="flex justify-between items-center text-[10px] font-bold uppercase text-slate-400">
+                            <span>Expected Return</span>
+                            <span class="text-emerald-600">+{{ call.expected_return_percentage|floatformat:1 }}%</span>
+                        </div>
+                        <div class="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-primary to-indigo-500 w-full" style="width: {{ call.expected_return_percentage|default:'50'|stringformat:'s' }}%; max-width: 100%;"></div>
+                        </div>
+                    </div>
+                    <a href="{% url 'research_calls:call_detail' call.id %}" class="w-full mt-auto py-2 bg-primary/5 text-primary dark:bg-slate-800 dark:text-white dark:hover:bg-primary text-center rounded-lg text-xs font-bold hover:bg-primary hover:text-white transition-colors">View Details</a>
                 </div>
             </div>
-            <div class="card-footer">
-                <a href="{% url 'research_calls:detail' call.id %}" class="btn btn-view">View Details</a>
-                {% if not user.is_authenticated or not user.subscription %}
-                <a href="{% url 'payments:membership' %}" class="btn btn-pro">🔒 Go PRO</a>
-                {% endif %}
-            </div>
-        </div>
+            {% endif %}
         {% empty %}
-        <div class="no-results">
-            <p>No active trades found matching your filters.</p>
-        </div>
+            <div class="col-span-full py-20 flex flex-col items-center justify-center text-center bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+                <span class="material-symbols-outlined text-6xl text-slate-300 dark:text-slate-700 mb-4">search_off</span>
+                <h3 class="text-xl font-bold text-slate-700 dark:text-slate-300 mb-1">No Active Calls</h3>
+                <p class="text-slate-500">There are no live research calls matching your filters.</p>
+                <a href="{% url 'research_calls:live_calls' %}" class="mt-6 px-6 py-2 bg-primary text-white rounded-lg text-sm font-semibold hover:bg-primary/90">Clear Filters</a>
+            </div>
         {% endfor %}
     </div>
-</div>
-{% endblock page_content %}
+</main>
+{% endblock content %}

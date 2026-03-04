@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1a2b3d",
+                        "background-light": "#f6f7f7",
+                        "background-dark": "#15191d",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .blur-overlay {
+            backdrop-filter: blur(4px);
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100">
+<div class="relative flex h-auto min-screen w-full flex-col group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-6 py-3 lg:px-40">
+<div class="flex items-center gap-4 text-primary">
+<div class="size-8 flex items-center justify-center bg-primary rounded-lg text-white">
+<span class="material-symbols-outlined">analytics</span>
+</div>
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold leading-tight tracking-[-0.015em]">Research Calls</h2>
+</div>
+<div class="flex flex-1 justify-end gap-4 lg:gap-8 items-center">
+<label class="hidden md:flex flex-col min-w-40 h-10 max-w-64 w-full">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+<div class="text-slate-500 flex items-center justify-center pl-3">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 border-none bg-transparent focus:ring-0 text-sm font-normal placeholder:text-slate-500 px-3" placeholder="Search stocks..." value=""/>
+</div>
+</label>
+<div class="flex gap-2">
+<button class="flex items-center justify-center rounded-lg size-10 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="flex items-center justify-center rounded-lg size-10 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border border-slate-200 dark:border-slate-700" data-alt="User profile professional portrait" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuChi7rC_tzTOL6zvnGhAxsuhSk2HozhR3i8tmCM_0GvT8OIg5TTWfIFr2TgbA6fkm8sObGZYCWsJUlIuPmkOIbVhtL9819ylPIe_TTFwA6KMbT8DVHY8DyTz5xgu_eApkFJpoo8JPRN9mqDnYY6sskAVqRqnbWOdoXR6BGD355dB6boURBenjOQPnXgnWZAJIshB85HvMNleee1ySQcBN-xZfBorW6ZxrvNbZpnN86GhEV4JeVE4r9H6JB2uVuHHAf6efl_IwINW5As");'></div>
+</div>
+</header>
+<main class="flex-1 flex flex-col lg:px-40 py-6 gap-6">
+<div class="px-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex items-center gap-3">
+<div class="bg-primary/10 p-2 rounded-lg">
+<span class="material-symbols-outlined text-primary">verified_user</span>
+</div>
+<div class="flex flex-col">
+<h1 class="text-slate-900 dark:text-slate-100 text-base font-bold">Pro Researcher</h1>
+<p class="text-slate-500 dark:text-slate-400 text-xs font-medium">Institutional Grade Insights</p>
+</div>
+</div>
+<div class="flex bg-white dark:bg-slate-900 p-1 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<button class="px-6 py-2 rounded-lg bg-primary text-white text-sm font-semibold shadow-sm">Live Calls</button>
+<button class="px-6 py-2 rounded-lg text-slate-500 dark:text-slate-400 text-sm font-semibold hover:bg-slate-50 dark:hover:bg-slate-800">Expired (Closed)</button>
+</div>
+</div>
+<div class="px-4 flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+<button class="flex h-10 shrink-0 items-center justify-center px-5 rounded-full bg-primary text-white text-sm font-medium">All</button>
+<button class="flex h-10 shrink-0 items-center justify-center px-5 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 text-sm font-medium hover:border-primary">Equity</button>
+<button class="flex h-10 shrink-0 items-center justify-center px-5 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 text-sm font-medium hover:border-primary">Futures</button>
+<button class="flex h-10 shrink-0 items-center justify-center px-5 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 text-sm font-medium hover:border-primary">Options</button>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-4">
+<div class="flex flex-col bg-white dark:bg-slate-900 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+<div class="h-32 w-full bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center p-4 relative" data-alt="Stock performance trend visualization">
+<span class="material-symbols-outlined text-4xl text-primary/40">show_chart</span>
+<div class="absolute top-3 right-3 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 px-2 py-0.5 rounded text-[10px] font-bold tracking-wider">LIVE</div>
+</div>
+<div class="p-5 flex flex-col gap-3">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="text-slate-900 dark:text-slate-100 font-bold text-lg">RELIANCE</h3>
+<p class="text-xs text-slate-500 uppercase font-semibold">Equity • Intraday</p>
+</div>
+<span class="material-symbols-outlined text-slate-400">bookmark</span>
+</div>
+<div class="grid grid-cols-3 gap-2 py-3 border-y border-slate-100 dark:border-slate-800">
+<div class="flex flex-col">
+<span class="text-[10px] text-slate-400 font-bold uppercase">Entry</span>
+<span class="text-sm font-bold text-slate-700 dark:text-slate-300">₹2540.00</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] text-slate-400 font-bold uppercase">Target</span>
+<span class="text-sm font-bold text-primary">₹2600.00</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] text-slate-400 font-bold uppercase">Stop Loss</span>
+<span class="text-sm font-bold text-red-500">₹2510.00</span>
+</div>
+</div>
+<button class="w-full py-2 bg-primary/5 text-primary rounded-lg text-xs font-bold hover:bg-primary hover:text-white transition-colors">Trade Now</button>
+</div>
+</div>
+<div class="flex flex-col bg-white dark:bg-slate-900 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+<div class="h-32 w-full bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center p-4 relative" data-alt="Abstract financial pattern background">
+<span class="material-symbols-outlined text-4xl text-slate-300">candlestick_chart</span>
+<div class="absolute top-3 right-3 bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-400 px-2 py-0.5 rounded text-[10px] font-bold tracking-wider">CLOSED</div>
+</div>
+<div class="p-5 flex flex-col gap-3">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="text-slate-900 dark:text-slate-100 font-bold text-lg">HDFCBANK</h3>
+<p class="text-xs text-slate-500 uppercase font-semibold">Equity • Delivery</p>
+</div>
+<span class="material-symbols-outlined text-slate-400">bookmark</span>
+</div>
+<div class="grid grid-cols-3 gap-2 py-3 border-y border-slate-100 dark:border-slate-800 opacity-60">
+<div class="flex flex-col">
+<span class="text-[10px] text-slate-400 font-bold uppercase">Entry</span>
+<span class="text-sm font-bold text-slate-700 dark:text-slate-300">₹1650.00</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] text-slate-400 font-bold uppercase">Target</span>
+<span class="text-sm font-bold text-primary">₹1720.00</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] text-slate-400 font-bold uppercase">Stop Loss</span>
+<span class="text-sm font-bold text-red-500">₹1620.00</span>
+</div>
+</div>
+<div class="text-center text-[11px] font-bold text-green-600 dark:text-green-400 py-2">Target Achieved +4.24%</div>
+</div>
+</div>
+<div class="relative flex flex-col bg-white dark:bg-slate-900 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm group">
+<div class="h-32 w-full bg-gradient-to-br from-amber-50 to-orange-100 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center p-4 relative" data-alt="Golden financial achievement icon background">
+<span class="material-symbols-outlined text-4xl text-amber-500/40">workspace_premium</span>
+<div class="absolute top-3 left-3 bg-amber-100 text-amber-700 px-2 py-0.5 rounded text-[10px] font-bold tracking-wider">PRO</div>
+<div class="absolute top-3 right-3 bg-green-100 text-green-700 px-2 py-0.5 rounded text-[10px] font-bold tracking-wider">LIVE</div>
+</div>
+<div class="p-5 flex flex-col gap-3 relative">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="text-slate-900 dark:text-slate-100 font-bold text-lg">INFY (PRO)</h3>
+<p class="text-xs text-slate-500 uppercase font-semibold">Futures • Monthly</p>
+</div>
+</div>
+<div class="grid grid-cols-3 gap-2 py-3 border-y border-slate-100 dark:border-slate-800">
+<div class="flex flex-col">
+<span class="text-[10px] text-slate-400 font-bold uppercase">Entry</span>
+<span class="text-sm font-bold text-slate-700 dark:text-slate-300">₹1450.00</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] text-slate-400 font-bold uppercase">Target</span>
+<span class="text-sm font-bold text-primary">₹1520.00</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] text-slate-400 font-bold uppercase">Stop Loss</span>
+<span class="text-sm font-bold text-red-500">₹1420.00</span>
+</div>
+</div>
+<button class="w-full py-2 bg-amber-500 text-white rounded-lg text-xs font-bold">Upgrade to View</button>
+<div class="absolute inset-0 blur-overlay flex flex-col items-center justify-center p-6 text-center">
+<span class="material-symbols-outlined text-primary mb-2">lock</span>
+<p class="text-xs font-bold text-slate-900">Premium Analysis</p>
+<p class="text-[10px] text-slate-600 mt-1">Unlock technical levels and research notes</p>
+</div>
+</div>
+</div>
+<div class="flex flex-col bg-white dark:bg-slate-900 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+<div class="h-32 w-full bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center p-4 relative" data-alt="Stock market growth chart">
+<span class="material-symbols-outlined text-4xl text-primary/40">data_exploration</span>
+<div class="absolute top-3 right-3 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 px-2 py-0.5 rounded text-[10px] font-bold tracking-wider">LIVE</div>
+</div>
+<div class="p-5 flex flex-col gap-3">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="text-slate-900 dark:text-slate-100 font-bold text-lg">TATASTEEL</h3>
+<p class="text-xs text-slate-500 uppercase font-semibold">Options • Weekly</p>
+</div>
+<span class="material-symbols-outlined text-primary fill-1">bookmark</span>
+</div>
+<div class="grid grid-cols-3 gap-2 py-3 border-y border-slate-100 dark:border-slate-800">
+<div class="flex flex-col">
+<span class="text-[10px] text-slate-400 font-bold uppercase">Entry</span>
+<span class="text-sm font-bold text-slate-700 dark:text-slate-300">₹120.50</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] text-slate-400 font-bold uppercase">Target</span>
+<span class="text-sm font-bold text-primary">₹135.00</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] text-slate-400 font-bold uppercase">Stop Loss</span>
+<span class="text-sm font-bold text-red-500">₹115.00</span>
+</div>
+</div>
+<button class="w-full py-2 bg-primary text-white rounded-lg text-xs font-bold shadow-sm">Execute Call</button>
+</div>
+</div>
+<div class="flex flex-col bg-white dark:bg-slate-900 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
+<div class="h-32 w-full bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center p-4 relative" data-alt="Abstract gradient representation of market volatility">
+<span class="material-symbols-outlined text-4xl text-primary/30">insights</span>
+<div class="absolute top-3 right-3 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 px-2 py-0.5 rounded text-[10px] font-bold tracking-wider">LIVE</div>
+</div>
+<div class="p-5 flex flex-col gap-3">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="text-slate-900 dark:text-slate-100 font-bold text-lg">WIPRO</h3>
+<p class="text-xs text-slate-500 uppercase font-semibold">Equity • BTST</p>
+</div>
+<span class="material-symbols-outlined text-slate-400">bookmark</span>
+</div>
+<div class="grid grid-cols-3 gap-2 py-3 border-y border-slate-100 dark:border-slate-800">
+<div class="flex flex-col">
+<span class="text-[10px] text-slate-400 font-bold uppercase">Entry</span>
+<span class="text-sm font-bold text-slate-700 dark:text-slate-300">₹445.00</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] text-slate-400 font-bold uppercase">Target</span>
+<span class="text-sm font-bold text-primary">₹470.00</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] text-slate-400 font-bold uppercase">Stop Loss</span>
+<span class="text-sm font-bold text-red-500">₹432.00</span>
+</div>
+</div>
+<button class="w-full py-2 bg-primary/5 text-primary rounded-lg text-xs font-bold hover:bg-primary hover:text-white transition-colors">Trade Now</button>
+</div>
+</div>
+<div class="relative flex flex-col bg-white dark:bg-slate-900 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm group">
+<div class="h-32 w-full bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center p-4 relative" data-alt="Stock ticker tape abstract background">
+<span class="material-symbols-outlined text-4xl text-slate-400">monitoring</span>
+<div class="absolute top-3 left-3 bg-amber-100 text-amber-700 px-2 py-0.5 rounded text-[10px] font-bold tracking-wider">PRO</div>
+<div class="absolute top-3 right-3 bg-slate-200 text-slate-600 px-2 py-0.5 rounded text-[10px] font-bold tracking-wider">CLOSED</div>
+</div>
+<div class="p-5 flex flex-col gap-3 relative">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="text-slate-900 dark:text-slate-100 font-bold text-lg">MARUTI</h3>
+<p class="text-xs text-slate-500 uppercase font-semibold">Options • Expiry</p>
+</div>
+</div>
+<div class="grid grid-cols-3 gap-2 py-3 border-y border-slate-100 dark:border-slate-800 opacity-40">
+<div class="flex flex-col">
+<span class="text-[10px] text-slate-400 font-bold uppercase">Entry</span>
+<span class="text-sm font-bold text-slate-700 dark:text-slate-300">₹10200</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] text-slate-400 font-bold uppercase">Target</span>
+<span class="text-sm font-bold text-primary">₹10600</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[10px] text-slate-400 font-bold uppercase">Stop Loss</span>
+<span class="text-sm font-bold text-red-500">₹10100</span>
+</div>
+</div>
+<div class="text-center text-[11px] font-bold text-red-600 dark:text-red-400 py-2 uppercase">Stop Loss Hit</div>
+<div class="absolute inset-0 blur-overlay flex flex-col items-center justify-center p-6 text-center">
+<span class="material-symbols-outlined text-primary mb-2">lock</span>
+<p class="text-xs font-bold text-slate-900">Premium Analysis</p>
+<p class="text-[10px] text-slate-600 mt-1">Upgrade to see full rationale</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<footer class="lg:px-40 py-8 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
+<div class="px-4 flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="flex items-center gap-2 text-primary font-bold">
+<span class="material-symbols-outlined">analytics</span>
+                    Research Calls
+                </div>
+<p class="text-slate-500 text-xs text-center md:text-left">
+                    Disclaimer: Stock investments are subject to market risks. Read all scheme related documents carefully.
+                </p>
+<div class="flex gap-6">
+<a class="text-slate-400 hover:text-primary" href="#"><span class="material-symbols-outlined">share</span></a>
+<a class="text-slate-400 hover:text-primary" href="#"><span class="material-symbols-outlined">contact_support</span></a>
+<a class="text-slate-400 hover:text-primary" href="#"><span class="material-symbols-outlined">settings</span></a>
+</div>
+</div>
+</footer>
+</div>
+</div>
+</body></html>

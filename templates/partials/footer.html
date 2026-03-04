@@ -1,80 +1,54 @@
 {% load static %}
-{# ─── Modern Footer ─────────────────────────────────────────────────────────── #}
-<footer class="modern-footer">
-    <div class="footer-container">
-        <div class="footer-grid">
-            <!-- Company Info -->
-            <div class="footer-company">
-                <div class="footer-logo">StockPro</div>
-                <p class="footer-description">
-                    Your trusted platform for smart trading insights. Get expert research calls,
-                    track your portfolio, and make informed investment decisions.
+<!-- Footer -->
+<footer class="bg-primary py-16 text-white/60 border-t border-white/5">
+    <div class="mx-auto max-w-7xl px-6">
+        <div class="grid md:grid-cols-4 gap-12 mb-12">
+            <div class="col-span-1 md:col-span-1">
+                <div class="flex items-center gap-2 mb-6">
+                    <span class="material-symbols-outlined text-white text-2xl">insights</span>
+                    <h2 class="text-lg font-bold text-white m-0">StockPro</h2>
+                </div>
+                <p class="text-sm leading-relaxed">
+                    Revolutionizing personal finance through accessible artificial intelligence and deep market data.
                 </p>
-                <div class="footer-social">
-                    <a href="#" class="social-link">𝕏</a>
-                    <a href="#" class="social-link">in</a>
-                    <a href="#" class="social-link">f</a>
-                    <a href="#" class="social-link">📱</a>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-6">Product</h4>
+                <ul class="space-y-4 text-sm p-0 list-none">
+                    <li><a class="hover:text-white transition-colors no-underline text-white/60" href="/market/">Market Radar</a></li>
+                    <li><a class="hover:text-white transition-colors no-underline text-white/60" href="/calls/">AI Signals</a></li>
+                    <li><a class="hover:text-white transition-colors no-underline text-white/60" href="/portfolios/">Portfolio</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-6">Company</h4>
+                <ul class="space-y-4 text-sm p-0 list-none">
+                    <li><a class="hover:text-white transition-colors no-underline text-white/60" href="/about/">About Us</a></li>
+                    <li><a class="hover:text-white transition-colors no-underline text-white/60" href="/careers/">Careers</a></li>
+                    <li><a class="hover:text-white transition-colors no-underline text-white/60" href="/contact/">Contact</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold mb-6">Connect</h4>
+                <div class="flex gap-4">
+                    <a class="size-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors no-underline text-white/60" href="#">
+                        <span class="material-symbols-outlined text-sm">alternate_email</span>
+                    </a>
+                    <a class="size-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors no-underline text-white/60" href="#">
+                        <span class="material-symbols-outlined text-sm">language</span>
+                    </a>
+                    <a class="size-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors no-underline text-white/60" href="#">
+                        <span class="material-symbols-outlined text-sm">rss_feed</span>
+                    </a>
                 </div>
             </div>
-
-            <!-- Products -->
-            <div class="footer-column">
-                <h4>Products</h4>
-                <ul class="footer-links">
-                    <li><a href="/calls/">Live Trades</a></li>
-                    <li><a href="/calls/closed/">Closed Trades</a></li>
-                    <li><a href="/pro-trades/">PRO Trades</a></li>
-                    <li><a href="/pro-baskets/">PRO Baskets</a></li>
-                    <li><a href="/ipo/">IPO</a></li>
-                </ul>
-            </div>
-
-            <!-- Markets -->
-            <div class="footer-column">
-                <h4>Markets</h4>
-                <ul class="footer-links">
-                    <li><a href="/sip/">SIP</a></li>
-                    <li><a href="/mutual-funds/">Mutual Funds</a></li>
-                    <li><a href="/etf/">ETFs</a></li>
-                    <li><a href="/bonds/">Bonds</a></li>
-                    <li><a href="/commodity/">Commodities</a></li>
-                    <li><a href="/liquidity/">Liquidity</a></li>
-                    <li><a href="/trades-dashboard/">All Trades</a></li>
-                </ul>
-            </div>
-
-            <!-- Resources -->
-            <div class="footer-column">
-                <h4>Resources</h4>
-                <ul class="footer-links">
-                    <li><a href="/explore/">Explore</a></li>
-                    <li><a href="/blog/">Blog</a></li>
-                    <li><a href="/help/">Help Center</a></li>
-                    <li><a href="/api/">API Docs</a></li>
-                    <li><a href="/contact/">Contact Us</a></li>
-                </ul>
-            </div>
-
-            <!-- Company -->
-            <div class="footer-column">
-                <h4>Company</h4>
-                <ul class="footer-links">
-                    <li><a href="/about/">About Us</a></li>
-                    <li><a href="/careers/">Careers</a></li>
-                    <li><a href="/press/">Press</a></li>
-                    <li><a href="/partners/">Partners</a></li>
-                </ul>
-            </div>
         </div>
-
-        <!-- Footer Bottom -->
-        <div class="footer-bottom">
-            <p>&copy; 2026 StockPro. All rights reserved.</p>
-            <div class="footer-legal">
-                <a href="/privacy/">Privacy Policy</a>
-                <a href="/terms/">Terms of Service</a>
-                <a href="/disclaimer/">Disclaimer</a>
+        <div class="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between gap-4 text-xs">
+            <p class="m-0">&copy; 2026 StockPro. All rights reserved.</p>
+            <div class="flex gap-6">
+                <a class="hover:text-white transition-colors no-underline text-white/60" href="/privacy/">Privacy Policy</a>
+                <a class="hover:text-white transition-colors no-underline text-white/60" href="/terms/">Terms of Service</a>
+                <a class="hover:text-white transition-colors no-underline text-white/60" href="/disclaimer/">Risk Disclosure</a>
             </div>
         </div>
     </div>

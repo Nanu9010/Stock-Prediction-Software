@@ -1,133 +1,107 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}My Watchlist - Stock Research Platform{% endblock %}
+{% block title %}My Watchlist - StockPro{% endblock %}
 
-{% block page_content %}
-<div class="container">
-    <div class="page-header">
-        <h1>My Watchlist</h1>
-        <span class="badge badge-primary">{{ items.count }} calls</span>
+{% block content %}
+<main class="flex-1 max-w-7xl mx-auto w-full px-4 lg:px-6 py-8">
+    
+    <div class="mb-10 text-center max-w-2xl mx-auto">
+        <h1 class="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-2">Saved Research Calls</h1>
+        <p class="text-slate-500 dark:text-slate-400 text-sm">Track specific calls you are interested in.</p>
     </div>
 
-    <div class="watchlist-grid">
-        {% for item in items %}
-        <div class="watchlist-card">
-            <div class="card-header">
-                <div>
-                    <h3>{{ item.research_call.symbol }}</h3>
-                    <span class="badge badge-{{ item.research_call.action|lower }}">{{ item.research_call.action }}</span>
-                    <span class="badge badge-{{ item.research_call.status|lower }}">{{ item.research_call.status }}</span>
-                </div>
-                <button class="btn-icon" onclick="removeFromWatchlist({{ item.id }})" title="Remove">
-                    ❌
-                </button>
-            </div>
-            
-            <div class="card-body">
-                <div class="info-row">
-                    <span class="label">Broker:</span>
-                    <span>{{ item.research_call.broker.name }}</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">Entry:</span>
-                    <span>₹{{ item.research_call.entry_price }}</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">Target:</span>
-                    <span class="text-success">₹{{ item.research_call.target_1 }}</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">Stop Loss:</span>
-                    <span class="text-danger">₹{{ item.research_call.stop_loss }}</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">Expected Return:</span>
-                    <span class="text-success">{{ item.research_call.expected_return_percentage }}%</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">Added:</span>
-                    <span>{{ item.added_at|date:"M d, Y" }}</span>
-                </div>
-            </div>
-            
-            <div class="card-actions">
-                <a href="{% url 'research_calls:detail' item.research_call.pk %}" class="btn btn-sm btn-outline">View Details</a>
-                <button class="btn btn-sm btn-primary" onclick="addToPortfolio({{ item.research_call.id }})">Add to Portfolio</button>
+    <div class="grid grid-cols-1 gap-6">
+        <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Symbol / Broker</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Call Details</th>
+                            <th class="px-6 py-4 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider">Expected Return</th>
+                            <th class="px-6 py-4 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
+                            <th class="px-6 py-4 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider w-16"></th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+                        {% for item in items %}
+                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                            <td class="px-6 py-5 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="size-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center mr-4">
+                                        <span class="text-sm font-bold text-slate-600 dark:text-slate-400">{{ item.research_call.symbol|slice:":2" }}</span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <div class="flex items-center gap-2">
+                                            <span class="text-base font-bold text-slate-900 dark:text-slate-100 uppercase">{{ item.research_call.symbol }}</span>
+                                            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase {% if item.research_call.action == 'BUY' %}bg-emerald-100 text-emerald-700{% else %}bg-rose-100 text-rose-700{% endif %}">{{ item.research_call.action }}</span>
+                                            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-slate-100 text-slate-600">{{ item.research_call.get_call_type_display }}</span>
+                                        </div>
+                                        <div class="text-xs font-medium text-slate-500 mt-0.5">By {{ item.research_call.broker.name }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            
+                            <td class="px-6 py-5 whitespace-nowrap">
+                                <div class="flex items-center gap-4">
+                                    <div class="flex flex-col">
+                                        <span class="text-[10px] text-slate-400 font-bold uppercase">Entry</span>
+                                        <span class="text-sm font-bold text-slate-700 dark:text-slate-300">₹{{ item.research_call.entry_price }}</span>
+                                    </div>
+                                    <div class="h-6 w-px bg-slate-200 dark:bg-slate-700"></div>
+                                    <div class="flex flex-col">
+                                        <span class="text-[10px] text-slate-400 font-bold uppercase">Target</span>
+                                        <span class="text-sm font-bold text-emerald-600 dark:text-emerald-400">₹{{ item.research_call.target_1 }}</span>
+                                    </div>
+                                    <div class="h-6 w-px bg-slate-200 dark:bg-slate-700"></div>
+                                    <div class="flex flex-col">
+                                        <span class="text-[10px] text-slate-400 font-bold uppercase">Stop Loss</span>
+                                        <span class="text-sm font-bold text-rose-500">₹{{ item.research_call.stop_loss }}</span>
+                                    </div>
+                                </div>
+                            </td>
+                            
+                            <td class="px-6 py-5 text-right whitespace-nowrap">
+                                <span class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-bold bg-primary/5 text-primary dark:bg-indigo-900/30 dark:text-indigo-400">
+                                    +{{ item.research_call.expected_return_percentage|floatformat:1 }}%
+                                </span>
+                            </td>
+                            
+                            <td class="px-6 py-5 text-center whitespace-nowrap">
+                                <div class="flex items-center justify-center gap-2">
+                                    <a href="{% url 'research_calls:call_detail' item.research_call.pk %}" class="px-4 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold transition-colors">View</a>
+                                    <button class="px-4 py-1.5 bg-primary text-white rounded hover:opacity-90 text-xs font-bold transition-opacity" onclick="addToPortfolio({{ item.research_call.id }})">Trade</button>
+                                </div>
+                            </td>
+                            
+                            <td class="px-6 py-5 text-right whitespace-nowrap">
+                                <button class="text-slate-400 hover:text-red-500 transition-colors p-2" onclick="removeFromWatchlist({{ item.id }})" title="Remove from Watchlist">
+                                    <span class="material-symbols-outlined text-xl">close</span>
+                                </button>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="py-16 text-center">
+                                <div class="flex flex-col items-center justify-center">
+                                    <span class="material-symbols-outlined text-5xl text-slate-300 dark:text-slate-600 mb-3">bookmark_border</span>
+                                    <p class="text-slate-500 font-medium heading-tight">Your watchlist is currently empty.</p>
+                                    <p class="text-slate-400 text-sm mt-1 mb-6">Save research calls here to track their progression over time.</p>
+                                    <a href="{% url 'research_calls:live_calls' %}" class="px-6 py-2.5 bg-primary text-white rounded-lg font-bold text-sm shadow-sm hover:opacity-90">Browse Calls</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
-        {% empty %}
-        <div class="empty-state">
-            <p>Your watchlist is empty</p>
-            <a href="{% url 'research_calls:live_calls' %}" class="btn btn-primary">Browse Research Calls</a>
-        </div>
-        {% endfor %}
     </div>
-</div>
+</main>
+{% endblock %}
 
-<style>
-.watchlist-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 1.5rem;
-}
-
-.watchlist-card {
-    background: white;
-    border-radius: 12px;
-    padding: 1.5rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: start;
-    margin-bottom: 1rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid var(--border-color);
-}
-
-.card-header h3 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin: 0 0 0.5rem 0;
-}
-
-.btn-icon {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 1.25rem;
-    opacity: 0.6;
-    transition: opacity 0.2s;
-}
-
-.btn-icon:hover {
-    opacity: 1;
-}
-
-.card-body {
-    margin-bottom: 1rem;
-}
-
-.info-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 0.5rem;
-    font-size: 0.875rem;
-}
-
-.info-row .label {
-    color: var(--text-secondary);
-}
-
-.card-actions {
-    display: flex;
-    gap: 0.5rem;
-}
-</style>
-
+{% block extra_js %}
 <script>
 async function removeFromWatchlist(itemId) {
     if (!confirm('Remove this call from watchlist?')) return;
@@ -136,7 +110,7 @@ async function removeFromWatchlist(itemId) {
         const response = await fetch(`/watchlist/${itemId}/remove/`, {
             method: 'POST',
             headers: {
-                'X-CSRFToken': csrftoken,
+                'X-CSRFToken': '{{ csrf_token }}',
                 'X-Requested-With': 'XMLHttpRequest'
             }
         });
@@ -144,14 +118,16 @@ async function removeFromWatchlist(itemId) {
         const data = await response.json();
         
         if (data.success) {
-            showNotification('Removed from watchlist', 'success');
-            setTimeout(() => window.location.reload(), 500);
+            window.location.reload();
         } else {
-            showNotification('Failed to remove from watchlist', 'danger');
+            alert('Failed to remove from watchlist');
         }
     } catch (error) {
-        showNotification('An error occurred', 'danger');
+        alert('An error occurred');
     }
+}
+function addToPortfolio(callId) {
+    alert("Portfolio trade execution logic goes here.");
 }
 </script>
 {% endblock %}

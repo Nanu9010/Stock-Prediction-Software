@@ -1,0 +1,118 @@
+{% extends 'admin_panel/base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}{% if object %}Modify Fund Parameters{% else %}Provision New ETF{% endif %} - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Breadcrumbs -->
+    <div class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 mb-6">
+        <a href="{% url 'admin_panel:etfs_list' %}" class="hover:text-primary transition-colors no-underline">Fund Repository</a>
+        <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+        <span class="text-slate-600">{% if object %}Parameter Adaptation{% else %}Provisional Ingestion{% endif %}</span>
+    </div>
+
+    <!-- Page Header -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+        <div>
+            <h1 class="text-4xl font-black text-slate-900 tracking-tight mb-2">
+                {% if object %}Adapt Fund Parameters{% else %}Provision New ETF{% endif %}
+            </h1>
+            <p class="text-slate-500 font-medium tracking-tight">
+                {% if object %}Optimizing fund metadata for <span class="text-primary font-black">{{ object.name }}</span>.{% else %}Establishing a new diversified basket in the system index.{% endif %}
+            </p>
+        </div>
+        <div class="flex items-center gap-3">
+            <a href="{% url 'admin_panel:etfs_list' %}" class="px-6 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl font-black text-sm hover:bg-slate-50 transition-all no-underline">
+                Cancel
+            </a>
+        </div>
+    </div>
+
+    <form method="post" class="space-y-8">
+        {% csrf_token %}
+        
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+            <!-- Strategic Parameters -->
+            <div class="md:col-span-8 space-y-8">
+                <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+                    <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-8 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[18px]">account_balance_wallet</span>
+                        Fund Intelligence
+                    </h3>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 leading-none">Full Legal Fund Name</label>
+                            {% render_field form.name class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-slate-900 font-bold placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="e.g., Nippon India Nifty 50 BeES" %}
+                            {% if form.name.errors %}<p class="mt-1 text-[10px] font-bold text-rose-500">{{ form.name.errors.0 }}</p>{% endif %}
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 leading-none">Exchange Ticker (yFinance)</label>
+                                {% render_field form.symbol class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-slate-900 font-bold placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="e.g., NIFTYBEES.NS" %}
+                                <p class="mt-2 text-[9px] text-slate-400 font-black italic uppercase">Critical: Must match yFinance API node exactly.</p>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 leading-none">Visual Label (Short)</label>
+                                {% render_field form.short_name class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-slate-900 font-bold placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="e.g., NIFTYBEES" %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+                    <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-8 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[18px]">category</span>
+                        Classification & Logic
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 leading-none">Market Segment / Category</label>
+                            {% render_field form.category class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" placeholder="e.g., Global Equity" %}
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 leading-none">Pipeline Sequence Rank</label>
+                            {% render_field form.display_order class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all" %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Operational Hub -->
+            <div class="md:col-span-4 space-y-8">
+                <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm sticky top-24">
+                    <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-8 flex items-center gap-2">
+                        <span class="material-symbols-outlined text-[18px]">verified_user</span>
+                        Lifecycle State
+                    </h3>
+                    
+                    <div class="space-y-6">
+                        <div class="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-emerald-500">bolt</span>
+                                <span class="text-xs font-bold text-slate-700">Operational Active</span>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                {% render_field form.is_active class="sr-only peer" %}
+                                <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                            </label>
+                        </div>
+                        <p class="text-[10px] text-slate-400 font-medium leading-relaxed">Deactivating will prune this fund from public index views without flushing historical data records.</p>
+                    </div>
+
+                    <div class="mt-10 pt-8 border-t border-slate-100">
+                        <button type="submit" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-sm hover:bg-slate-800 transition-all shadow-xl shadow-slate-200 flex items-center justify-center gap-2 border-none cursor-pointer">
+                            <span class="material-symbols-outlined">dataset_check</span>
+                            Commit Fund Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

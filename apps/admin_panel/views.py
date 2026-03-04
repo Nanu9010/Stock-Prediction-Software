@@ -8,10 +8,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.db.models import Count, Sum, Avg, Q
+from django.db.models.functions import TruncDate, TruncMonth
 from django.utils import timezone
 from datetime import timedelta
-from .forms import ResearchCallForm, BrokerForm, UserForm, PortfolioForm, WatchlistForm, SubscriptionPlanForm
-
+from django.http import JsonResponse
+from django.views import View
+import calendar
 from apps.authentication.models import User
 from apps.brokers.models import Broker
 from apps.research_calls.models import ResearchCall
@@ -19,6 +21,8 @@ from apps.portfolios.models import Portfolio, PortfolioItem
 from apps.watchlists.models import Watchlist, WatchlistItem
 from apps.subscriptions.models import SubscriptionPlan
 from apps.payments.models import Payment
+from apps.market_data.models import IPO, Commodity, ETF
+from .forms import ResearchCallForm, BrokerForm, UserForm, PortfolioForm, WatchlistForm, SubscriptionPlanForm, IPOForm, CommodityForm, ETFForm
 
 
 class AdminRequiredMixin(UserPassesTestMixin):
@@ -83,7 +87,77 @@ class AdminDashboardView(LoginRequiredMixin, AdminRequiredMixin, TemplateView):
         context['pending_approvals'] = pending_qs.count()
         context['pending_approvals_list'] = pending_qs[:20]
 
+        # Chart 1: User registrations over last 7 days
+        last_7_days = today - timedelta(days=7)
+        user_growth = User.objects.filter(created_at__gte=last_7_days) \
+            .annotate(date=TruncDate('created_at')) \
+            .values('date') \
+            .annotate(count=Count('id')) \
+            .order_by('date')
+            
+        dates_7d = [(today - timedelta(days=i)).strftime('%b %d') for i in range(6, -1, -1)]
+        counts_dict = {item['date'].strftime('%b %d'): item['count'] for item in user_growth if item['date']}
+        context['user_growth_labels'] = dates_7d
+        context['user_growth_data'] = [counts_dict.get(d, 0) for d in dates_7d]
+
+        # Chart 2: Research calls by status
+        calls_by_status = ResearchCall.objects.values('status').annotate(count=Count('id'))
+        status_dict = {item['status']: item['count'] for item in calls_by_status}
+        context['calls_status_labels'] = ['Active', 'Pending', 'Closed', 'Rejected']
+        context['calls_status_data'] = [
+            status_dict.get('ACTIVE', 0),
+            status_dict.get('PENDING_APPROVAL', 0),
+            status_dict.get('CLOSED', 0),
+            status_dict.get('REJECTED', 0)
+        ]
+
+        # Chart 3: Payment Revenue (Last 6 Months)
+        six_months_ago = today - timedelta(days=180)
+        revenue_data_qs = Payment.objects.filter(created_at__gte=six_months_ago, status='SUCCESS') \
+            .annotate(month=TruncMonth('created_at')) \
+            .values('month') \
+            .annotate(total=Sum('amount')) \
+            .order_by('month')
+            
+        months_6m_labels = []
+        for i in range(5, -1, -1):
+            m = (today.month - i - 1) % 12 + 1
+            y = today.year + ((today.month - i - 1) // 12)
+            months_6m_labels.append(f"{calendar.month_abbr[m]} {y}")
+            
+        rev_dict = {
+            f"{calendar.month_abbr[item['month'].month]} {item['month'].year}": float(item['total']) 
+            for item in revenue_data_qs if item['month']
+        }
+        context['revenue_labels'] = months_6m_labels
+        context['revenue_data'] = [rev_dict.get(label, 0.0) for label in months_6m_labels]
+
         return context
+
+
+class AdminDashboardStatsAPIView(LoginRequiredMixin, AdminRequiredMixin, View):
+    """API endpoint to fetch live stats for admin dashboard auto-refresh"""
+    
+    def get(self, request, *args, **kwargs):
+        today = timezone.now().date()
+        last_30_days = today - timedelta(days=30)
+        
+        total_closed = ResearchCall.objects.filter(status='CLOSED').count()
+        successful_calls = ResearchCall.objects.filter(status='CLOSED', actual_return_percentage__gt=0).count()
+        success_rate = (successful_calls / total_closed * 100) if total_closed > 0 else 0
+        
+        data = {
+            'total_users': User.objects.count(),
+            'new_users_30d': User.objects.filter(created_at__gte=last_30_days).count(),
+            'total_calls': ResearchCall.objects.count(),
+            'active_calls': ResearchCall.objects.filter(status='ACTIVE').count(),
+            'pending_calls': ResearchCall.objects.filter(status='PENDING_APPROVAL').count(),
+            'success_rate': round(success_rate, 1),
+            'total_brokers': Broker.objects.count(),
+            'total_portfolios': Portfolio.objects.count(),
+            'total_watchlists': Watchlist.objects.count(),
+        }
+        return JsonResponse(data)
 
 
 # ─── Research Calls Management ────────────────────────────────
@@ -442,3 +516,211 @@ class PaymentDetailView(LoginRequiredMixin, AdminRequiredMixin, DetailView):
     model = Payment
     template_name = 'admin_panel/payments/detail.html'
     context_object_name = 'payment'
+
+
+# ─── IPO Management ───────────────────────────────
+
+class IPOListView(LoginRequiredMixin, AdminRequiredMixin, ListView):
+    """List all IPOs"""
+    model = IPO
+    template_name = 'admin_panel/ipos/list.html'
+    context_object_name = 'ipos'
+    paginate_by = 20
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        
+        search = self.request.GET.get('search')
+        if search:
+            queryset = queryset.filter(
+                Q(company_name__icontains=search) | 
+                Q(symbol__icontains=search)
+            )
+            
+        status = self.request.GET.get('status')
+        if status == 'listed':
+            queryset = queryset.filter(is_listed=True)
+        elif status == 'upcoming':
+            queryset = queryset.filter(is_listed=False)
+            
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['search_query'] = self.request.GET.get('search', '')
+        context['selected_status'] = self.request.GET.get('status', '')
+        return context
+
+
+class IPOCreateView(LoginRequiredMixin, AdminRequiredMixin, CreateView):
+    """Create a new IPO"""
+    model = IPO
+    form_class = IPOForm
+    template_name = 'admin_panel/ipos/form.html'
+    success_url = reverse_lazy('admin_panel:ipos_list')
+    
+    def form_valid(self, form):
+        messages.success(self.request, "IPO created successfully.")
+        return super().form_valid(form)
+
+
+class IPOUpdateView(LoginRequiredMixin, AdminRequiredMixin, UpdateView):
+    """Edit an IPO"""
+    model = IPO
+    form_class = IPOForm
+    template_name = 'admin_panel/ipos/form.html'
+    success_url = reverse_lazy('admin_panel:ipos_list')
+    
+    def form_valid(self, form):
+        messages.success(self.request, "IPO updated successfully.")
+        return super().form_valid(form)
+
+
+class IPODeleteView(LoginRequiredMixin, AdminRequiredMixin, DeleteView):
+    """Delete an IPO"""
+    model = IPO
+    template_name = 'admin_panel/ipos/confirm_delete.html'
+    success_url = reverse_lazy('admin_panel:ipos_list')
+    
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, "IPO deleted successfully.")
+        return super().delete(request, *args, **kwargs)
+
+
+# ─── Commodity Management ─────────────────────────────
+
+class CommodityListView(LoginRequiredMixin, AdminRequiredMixin, ListView):
+    """List all Commodities"""
+    model = Commodity
+    template_name = 'admin_panel/commodities/list.html'
+    context_object_name = 'commodities'
+    paginate_by = 20
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        
+        search = self.request.GET.get('search')
+        if search:
+            queryset = queryset.filter(
+                Q(name__icontains=search) | 
+                Q(symbol__icontains=search)
+            )
+            
+        status = self.request.GET.get('status')
+        if status == 'global':
+            queryset = queryset.filter(is_global=True)
+        elif status == 'indian':
+            queryset = queryset.filter(is_global=False)
+            
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['search_query'] = self.request.GET.get('search', '')
+        context['selected_status'] = self.request.GET.get('status', '')
+        return context
+
+
+class CommodityCreateView(LoginRequiredMixin, AdminRequiredMixin, CreateView):
+    """Create a new Commodity"""
+    model = Commodity
+    form_class = CommodityForm
+    template_name = 'admin_panel/commodities/form.html'
+    success_url = reverse_lazy('admin_panel:commodities_list')
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Commodity created successfully.")
+        return super().form_valid(form)
+
+
+class CommodityUpdateView(LoginRequiredMixin, AdminRequiredMixin, UpdateView):
+    """Edit a Commodity"""
+    model = Commodity
+    form_class = CommodityForm
+    template_name = 'admin_panel/commodities/form.html'
+    success_url = reverse_lazy('admin_panel:commodities_list')
+    
+    def form_valid(self, form):
+        messages.success(self.request, "Commodity updated successfully.")
+        return super().form_valid(form)
+
+
+class CommodityDeleteView(LoginRequiredMixin, AdminRequiredMixin, DeleteView):
+    """Delete a Commodity"""
+    model = Commodity
+    template_name = 'admin_panel/commodities/confirm_delete.html'
+    success_url = reverse_lazy('admin_panel:commodities_list')
+    
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, "Commodity deleted successfully.")
+        return super().delete(request, *args, **kwargs)
+
+
+# ─── ETF Management ─────────────────────────────
+
+class ETFListView(LoginRequiredMixin, AdminRequiredMixin, ListView):
+    """List all ETFs"""
+    model = ETF
+    template_name = 'admin_panel/etfs/list.html'
+    context_object_name = 'etfs'
+    paginate_by = 20
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        
+        search = self.request.GET.get('search')
+        if search:
+            queryset = queryset.filter(
+                Q(name__icontains=search) | 
+                Q(symbol__icontains=search) |
+                Q(short_name__icontains=search)
+            )
+            
+        category = self.request.GET.get('category')
+        if category:
+            queryset = queryset.filter(category__icontains=category)
+            
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['search_query'] = self.request.GET.get('search', '')
+        context['selected_category'] = self.request.GET.get('category', '')
+        # Get unique categories for filter dropdown
+        context['categories'] = ETF.objects.values_list('category', flat=True).distinct()
+        return context
+
+
+class ETFCreateView(LoginRequiredMixin, AdminRequiredMixin, CreateView):
+    """Create a new ETF"""
+    model = ETF
+    form_class = ETFForm
+    template_name = 'admin_panel/etfs/form.html'
+    success_url = reverse_lazy('admin_panel:etfs_list')
+    
+    def form_valid(self, form):
+        messages.success(self.request, "ETF created successfully.")
+        return super().form_valid(form)
+
+
+class ETFUpdateView(LoginRequiredMixin, AdminRequiredMixin, UpdateView):
+    """Edit an ETF"""
+    model = ETF
+    form_class = ETFForm
+    template_name = 'admin_panel/etfs/form.html'
+    success_url = reverse_lazy('admin_panel:etfs_list')
+    
+    def form_valid(self, form):
+        messages.success(self.request, "ETF updated successfully.")
+        return super().form_valid(form)
+
+
+class ETFDeleteView(LoginRequiredMixin, AdminRequiredMixin, DeleteView):
+    """Delete an ETF"""
+    model = ETF
+    template_name = 'admin_panel/etfs/confirm_delete.html'
+    success_url = reverse_lazy('admin_panel:etfs_list')
+    
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, "ETF deleted successfully.")
+        return super().delete(request, *args, **kwargs)

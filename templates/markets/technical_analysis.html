@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<main class="flex-1 flex flex-col gap-8 h-[calc(100vh-100px)]">
+    <!-- Breadcrumbs & Title -->
+    <div class="flex flex-col gap-2 px-2">
+        <div class="flex flex-wrap gap-2 items-center text-sm">
+            <a href="{% url 'dashboard:dashboard' %}" class="text-slate-500 hover:text-primary transition-colors">Home</a>
+            <span class="text-slate-400 material-symbols-outlined text-[16px]">chevron_right</span>
+            <span class="text-slate-900 dark:text-slate-100 font-medium">Technical Analysis</span>
+        </div>
+        <h1 class="text-3xl font-bold tracking-tight">Institutional Charting</h1>
+    </div>
+
+    <!-- Advanced Charting Area -->
+    <section class="flex-1 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden relative">
+        <!-- TradingView Widget BEGIN -->
+        <div class="tradingview-widget-container" style="height:100%;width:100%">
+            <div id="technical_analysis_chart" style="height:100%;width:100%"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+            <script type="text/javascript">
+            new TradingView.widget({
+                "autosize": true,
+                "symbol": "NSE:NIFTY",
+                "interval": "D",
+                "timezone": "Asia/Kolkata",
+                "theme": "light",
+                "style": "1",
+                "locale": "in",
+                "toolbar_bg": "#f1f3f6",
+                "enable_publishing": false,
+                "withdateranges": true,
+                "hide_side_toolbar": false,
+                "allow_symbol_change": true,
+                "details": true,
+                "hotlist": true,
+                "calendar": true,
+                "show_popup_button": true,
+                "popup_width": "1000",
+                "popup_height": "650",
+                "container_id": "technical_analysis_chart"
+            });
+            </script>
+        </div>
+        <!-- TradingView Widget END -->
+    </section>
+</main>
+{% endblock %}

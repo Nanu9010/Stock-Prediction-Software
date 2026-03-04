@@ -1,54 +1,110 @@
 {% extends 'admin_panel/base.html' %}
+{% load static %}
 
-{% block title %}Watchlists — Admin{% endblock %}
+{% block title %}Global Watchlist Oversight - Admin Panel{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <h1>Watchlists</h1>
-    <p class="text-secondary">All user watchlists ({{ watchlists.count }} total)</p>
-</div>
+<div class="max-w-7xl mx-auto">
+    <!-- Page Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div>
+            <h1 class="text-3xl font-black text-slate-900 tracking-tight">Watchlist Oversight</h1>
+            <p class="text-slate-500 font-medium">Monitoring {{ watchlists.count }} curator watchlists across the system.</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <button class="px-4 py-2 bg-white border border-slate-200 rounded-xl text-slate-600 font-bold text-sm hover:bg-slate-50 transition-all flex items-center gap-2">
+                <span class="material-symbols-outlined text-[20px]">visibility</span>
+                Live Tracking
+            </button>
+        </div>
+    </div>
 
-<div class="data-table-wrapper">
-    <table class="data-table">
-        <thead>
-            <tr>
-                <th>User</th>
-                <th>Name</th>
-                <th>Items</th>
-                <th>Created</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for watchlist in watchlists %}
-            <tr>
-                <td>{{ watchlist.user.email }}</td>
-                <td>{{ watchlist.name }}</td>
-                <td>{{ watchlist.item_count }}</td>
-                <td>{{ watchlist.created_at|date:"d M Y" }}</td>
-                <td>
-                    <a href="{% url 'admin_panel:watchlist_detail' watchlist.pk %}" class="btn btn-sm btn-outline">View</a>
-                    <form method="post" action="{% url 'admin_panel:watchlist_delete' watchlist.pk %}" style="display:inline;">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-sm btn-danger"
-                            onclick="return confirm('Delete this watchlist?')">Delete</button>
-                    </form>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="5" class="text-center" style="padding:2rem;color:#888;">No watchlists found.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+    <!-- Data Table -->
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-50/50 border-bottom border-slate-100">
+                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Curator</th>
+                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Watchlist Identity</th>
+                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Items</th>
+                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Established</th>
+                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-50">
+                    {% for watchlist in watchlists %}
+                    <tr class="hover:bg-slate-50/50 transition-colors group">
+                        <td class="px-6 py-4">
+                            <div class="flex flex-col">
+                                <span class="text-sm font-bold text-slate-900">{{ watchlist.user.get_full_name|default:"Unnamed User" }}</span>
+                                <span class="text-[11px] text-slate-400 font-medium tracking-tight">{{ watchlist.user.email }}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-primary/20"></span>
+                                <span class="text-sm font-black text-slate-700">{{ watchlist.name }}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="px-2 py-1 rounded-lg bg-slate-100 text-slate-600 text-[10px] font-black">{{ watchlist.item_count }} Tickers</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">{{ watchlist.created_at|date:"M d, Y" }}</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <a href="{% url 'admin_panel:watchlist_detail' watchlist.pk %}" class="p-2 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all" title="Inspect Watchlist">
+                                    <span class="material-symbols-outlined text-[20px]">manage_search</span>
+                                </a>
+                                <form method="post" action="{% url 'admin_panel:watchlist_delete' watchlist.pk %}" class="inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all border-none bg-transparent cursor-pointer"
+                                            onclick="return confirm('WARNING: Are you sure you want to PERMANENTLY delete this watchlist? This cannot be undone.')" title="Destroy Record">
+                                        <span class="material-symbols-outlined text-[20px]">delete_forever</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="px-6 py-20 text-center">
+                            <div class="flex flex-col items-center">
+                                <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4 text-slate-300">
+                                    <span class="material-symbols-outlined text-[32px]">visibility_off</span>
+                                </div>
+                                <h3 class="text-slate-900 font-bold">No watchlists recorded</h3>
+                                <p class="text-slate-500 text-sm">System has not recorded any curator watchlists yet.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
-{% if is_paginated %}
-<div class="pagination">
-    {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" class="btn btn-sm btn-outline">← Prev</a>{% endif %}
-    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
-    {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}" class="btn btn-sm btn-outline">Next →</a>{% endif %}
+        {% if is_paginated %}
+        <div class="px-6 py-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between">
+            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                Segment {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </p>
+            <div class="flex items-center gap-2">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" class="p-2 bg-white border border-slate-200 rounded-lg text-slate-400 hover:text-slate-900 transition-all no-underline">
+                    <span class="material-symbols-outlined text-[20px]">west</span>
+                </a>
+                {% endif %}
+                
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="p-2 bg-white border border-slate-200 rounded-lg text-slate-400 hover:text-slate-900 transition-all no-underline">
+                    <span class="material-symbols-outlined text-[20px]">east</span>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
 </div>
-{% endif %}
 {% endblock %}

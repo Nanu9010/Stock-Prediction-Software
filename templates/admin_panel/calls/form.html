@@ -1,268 +1,267 @@
 {% extends 'admin_panel/base.html' %}
+{% load static %}
 
 {% block title %}
-    {% if form.instance.pk %}Edit Call{% else %}New Call{% endif %}
+    {% if form.instance.pk %}Edit Call - #{{ form.instance.pk }}{% else %}Create Research Call{% endif %}
 {% endblock %}
 
 {% block extra_css %}
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
-<script>
-    tailwind.config = {
-        darkMode: "class",
-        theme: {
-            extend: {
-                colors: {
-                    "bg-dark": "#0b0f17",
-                    "surface-dark": "#131825",
-                    "border-dark": "#1e2433",
-                    "text-secondary": "#94a3b8",
-                },
-                fontFamily: {
-                    display: ["Manrope", "sans-serif"],
-                },
-            },
-        },
-    }
-</script>
 <style>
-    body, .admin-layout { background: #0b0f17 !important; font-family: 'Manrope', sans-serif; }
-    .admin-main { background: #0b0f17 !important; }
-    .admin-container { max-width: 100% !important; }
-    ::-webkit-scrollbar { width: 4px; height: 4px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #475569; border-radius: 2px; }
-    .minimal-input {
-        border: none;
-        border-bottom: 1px solid #334155;
-        border-radius: 0;
-        padding: 0.75rem 0;
+    /* Minimal Input Styles for Stitch Admin */
+    .stitch-input-wrap {
+        border-bottom: 2px solid #e2e8f0;
+        transition: all 0.2s;
         background: transparent;
-        transition: border-color 0.2s;
-        font-family: 'Manrope', sans-serif;
-        color: #e2e8f0;
-        font-size: 1rem;
-        width: 100%;
     }
-    .minimal-input:focus {
-        border-bottom: 1px solid #fff;
-        box-shadow: none;
-        outline: none;
+    .stitch-input-wrap:focus-within {
+        border-bottom-color: #1a2b3d;
     }
-    /* Override Django form widget styles */
-    select.minimal-input { appearance: none; cursor: pointer; }
-    textarea.minimal-input { border: 0; border-radius: 8px; padding: 1.5rem; resize: vertical; min-height: 200px; }
-    input[type=number]::-webkit-inner-spin-button,
-    input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-    /* Make Django-rendered form fields look like minimal inputs */
-    .form-field-wrap input,
-    .form-field-wrap select,
-    .form-field-wrap textarea {
-        border: none;
-        border-bottom: 1px solid #334155;
-        border-radius: 0;
-        padding: 0.75rem 0;
+    .stitch-input {
+        border: none !important;
+        box-shadow: none !important;
         background: transparent !important;
-        color: #e2e8f0 !important;
-        font-family: 'Manrope', sans-serif;
-        font-size: 1rem;
         width: 100%;
-        transition: border-color 0.2s;
+        padding: 0.75rem 0 !important;
+        font-size: 1rem;
+        font-weight: 500;
+        color: #1e293b;
     }
-    .form-field-wrap input:focus,
-    .form-field-wrap select:focus {
-        border-bottom: 1px solid #fff;
-        box-shadow: none;
-        outline: none;
+    .stitch-label {
+        display: block;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #94a3b8;
+        margin-bottom: 0.25rem;
     }
-    .form-field-wrap textarea {
-        border: 0;
-        border-radius: 12px;
-        padding: 1.5rem;
-        background: rgba(255,255,255,0.03) !important;
-        min-height: 200px;
-        resize: vertical;
-        line-height: 1.7;
+    .stitch-select {
+        cursor: pointer;
+        appearance: none;
     }
-    .form-field-wrap textarea:focus {
-        outline: none;
-        box-shadow: none;
-        ring: 1px solid #fff;
+    .stitch-textarea {
+        border: 2px solid #e2e8f0 !important;
+        border-radius: 12px !important;
+        padding: 1.25rem !important;
+        min-height: 180px;
     }
-    .form-field-wrap select { appearance: none; cursor: pointer; }
-    .form-field-wrap option { background: #131825; color: #e2e8f0; }
+    .stitch-textarea:focus {
+        border-color: #1a2b3d !important;
+    }
+    [data-show-for] {
+        transition: opacity 0.3s ease;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="font-display text-slate-100 antialiased">
-    <!-- Breadcrumb Header -->
-    <header class="flex items-center justify-between mb-10">
-        <div class="flex items-center gap-2 text-sm">
-            <a class="text-text-secondary hover:text-white transition-colors no-underline" href="{% url 'admin_panel:calls_list' %}">Calls</a>
-            <span class="text-text-secondary">/</span>
-            <span class="text-white font-medium">{% if form.instance.pk %}Edit{% else %}New Entry{% endif %}</span>
+<div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-10">
+        <div class="flex items-center gap-3">
+            <a href="{% url 'admin_panel:calls_list' %}" class="p-2 bg-white border border-slate-200 rounded-lg text-slate-400 hover:text-slate-600 transition-colors no-underline">
+                <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+            </a>
+            <div>
+                <h2 class="text-2xl font-bold text-slate-900">{% if form.instance.pk %}Edit Trade #{{ form.instance.pk }}{% else %}Create New Research Trade{% endif %}</h2>
+                <p class="text-slate-500 text-sm">Fill in the technical details and rationale for the recommendation.</p>
+            </div>
         </div>
-        <div class="flex gap-4">
-            <a href="{% url 'admin_panel:calls_list' %}" class="text-sm font-medium text-text-secondary hover:text-white transition-colors no-underline">Discard</a>
-            <button type="submit" form="callForm" class="bg-white text-black px-6 py-2 text-sm font-medium rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2">
-                <span>{% if form.instance.pk %}Update{% else %}Publish{% endif %}</span>
-                <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+        <div class="flex gap-3">
+            <a href="{% url 'admin_panel:calls_list' %}" class="px-5 py-2.5 text-sm font-bold text-slate-500 hover:text-slate-700 transition-colors no-underline">Discard</a>
+            <button type="submit" form="callForm" class="bg-primary text-white px-6 py-2.5 text-sm font-bold rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">{% if form.instance.pk %}save{% else %}send{% endif %}</span>
+                {% if form.instance.pk %}Update Call{% else %}Publish Call{% endif %}
             </button>
         </div>
-    </header>
+    </div>
 
-    <div class="max-w-4xl mx-auto">
-        <!-- Title -->
-        <div class="mb-12">
-            <h1 class="text-4xl font-light text-white mb-2 tracking-tight">{% if form.instance.pk %}Edit Research Call{% else %}New Research Call{% endif %}</h1>
-            <p class="text-text-secondary font-light">{% if form.instance.pk %}Updating trade recommendation.{% else %}Drafting a new trade recommendation.{% endif %}</p>
-        </div>
+    <!-- Main Form -->
+    <form method="post" id="callForm" class="space-y-12">
+        {% csrf_token %}
 
-        <form method="post" id="callForm" class="space-y-16">
-            {% csrf_token %}
-
-            {% if form.non_field_errors %}
-            <div class="bg-red-500/10 border border-red-500/20 rounded-lg p-4 text-red-400 text-sm">
+        {% if form.non_field_errors %}
+        <div class="bg-rose-50 border border-rose-100 rounded-xl p-4 text-rose-600 text-sm flex items-start gap-3">
+            <span class="material-symbols-outlined text-rose-500">error</span>
+            <div>
                 {% for error in form.non_field_errors %}
                     {{ error }}<br>
                 {% endfor %}
             </div>
-            {% endif %}
+        </div>
+        {% endif %}
 
-            <!-- Section 1: Ticker & Type -->
-            <section>
-                <div class="grid grid-cols-12 gap-x-8 gap-y-8">
-                    <div class="col-span-8 form-field-wrap">
-                        <label class="block text-[10px] uppercase tracking-widest font-bold text-text-secondary mb-1">Ticker Symbol</label>
+        <!-- Section: Asset Details -->
+        <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
+            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-8 flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">category</span>
+                Asset Identification
+            </h3>
+            <div class="grid grid-cols-12 gap-x-8 gap-y-10">
+                <div class="col-span-12 md:col-span-8">
+                    <label class="stitch-label">Ticker Symbol</label>
+                    <div class="stitch-input-wrap">
                         {{ form.symbol }}
-                        {% if form.symbol.errors %}<span class="text-red-400 text-xs mt-1 block">{{ form.symbol.errors.0 }}</span>{% endif %}
                     </div>
-                    <div class="col-span-4 form-field-wrap">
-                        <label class="block text-[10px] uppercase tracking-widest font-bold text-text-secondary mb-3">Exchange</label>
+                    {% if form.symbol.errors %}<span class="text-rose-500 text-[10px] font-bold mt-1 block">{{ form.symbol.errors.0 }}</span>{% endif %}
+                </div>
+                <div class="col-span-12 md:col-span-4">
+                    <label class="stitch-label">Exchange</label>
+                    <div class="stitch-input-wrap">
                         {{ form.exchange }}
-                        {% if form.exchange.errors %}<span class="text-red-400 text-xs mt-1 block">{{ form.exchange.errors.0 }}</span>{% endif %}
                     </div>
-                    <div class="col-span-6 form-field-wrap">
-                        <label class="block text-[10px] uppercase tracking-widest font-bold text-text-secondary mb-1">Instrument Type</label>
+                </div>
+                <div class="col-span-12 md:col-span-6">
+                    <label class="stitch-label">Instrument Type</label>
+                    <div class="stitch-input-wrap">
                         {{ form.instrument_type }}
-                        {% if form.instrument_type.errors %}<span class="text-red-400 text-xs mt-1 block">{{ form.instrument_type.errors.0 }}</span>{% endif %}
                     </div>
-                    <div class="col-span-6 form-field-wrap">
-                        <label class="block text-[10px] uppercase tracking-widest font-bold text-text-secondary mb-1">Time Horizon</label>
+                </div>
+                <div class="col-span-12 md:col-span-6">
+                    <label class="stitch-label">Time Horizon</label>
+                    <div class="stitch-input-wrap">
                         {{ form.call_type }}
-                        {% if form.call_type.errors %}<span class="text-red-400 text-xs mt-1 block">{{ form.call_type.errors.0 }}</span>{% endif %}
                     </div>
-                    <div class="col-span-6 form-field-wrap" data-show-for="equity">
-                        <label class="block text-[10px] uppercase tracking-widest font-bold text-text-secondary mb-1">Company Name</label>
+                </div>
+                <div class="col-span-12 md:col-span-6" data-show-for="equity">
+                    <label class="stitch-label">Company Name</label>
+                    <div class="stitch-input-wrap">
                         {{ form.company_name }}
                     </div>
-                    <div class="col-span-6 form-field-wrap" data-show-for="equity">
-                        <label class="block text-[10px] uppercase tracking-widest font-bold text-text-secondary mb-1">Sector</label>
+                </div>
+                <div class="col-span-12 md:col-span-6" data-show-for="equity">
+                    <label class="stitch-label">Sector</label>
+                    <div class="stitch-input-wrap">
                         {{ form.sector }}
                     </div>
-                    <div class="col-span-4 form-field-wrap">
-                        <label class="block text-[10px] uppercase tracking-widest font-bold text-text-secondary mb-1">Status</label>
-                        {{ form.status }}
-                        {% if form.status.errors %}<span class="text-red-400 text-xs mt-1 block">{{ form.status.errors.0 }}</span>{% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Section: Recommendation -->
+        <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
+            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-8 flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">trending_up</span>
+                Trade Parameters
+            </h3>
+            <div class="grid grid-cols-12 gap-x-8 gap-y-10">
+                <div class="col-span-12">
+                    <label class="stitch-label">Recommendation Action</label>
+                    <div class="flex gap-4 mt-2">
+                        {% for radio in form.action %}
+                        <label class="flex-1 cursor-pointer">
+                            <input type="radio" name="{{ radio.name }}" value="{{ radio.data.value }}" {% if radio.data.selected %}checked{% endif %} class="peer sr-only">
+                            <div class="w-full text-center py-3 rounded-xl border border-slate-200 peer-checked:border-primary peer-checked:bg-primary/5 transition-all">
+                                <span class="text-sm font-bold text-slate-500 peer-checked:text-primary">{{ radio.choice_label }}</span>
+                            </div>
+                        </label>
+                        {% endfor %}
                     </div>
                 </div>
-            </section>
 
-            <!-- Section 2: Recommendation & Prices -->
-            <section>
-                <div class="grid grid-cols-12 gap-x-8 gap-y-10">
-                    <!-- Action (BUY/SELL) -->
-                    <div class="col-span-12">
-                        <label class="block text-[10px] uppercase tracking-widest font-bold text-text-secondary mb-4">Recommendation</label>
-                        <div class="form-field-wrap">
-                            {{ form.action }}
-                        </div>
-                        {% if form.action.errors %}<span class="text-red-400 text-xs mt-1 block">{{ form.action.errors.0 }}</span>{% endif %}
-                    </div>
-
-                    <!-- Entry Price -->
-                    <div class="col-span-4 form-field-wrap">
-                        <label class="block text-[10px] uppercase tracking-widest font-bold text-text-secondary mb-1" id="entryLabel">Entry Price</label>
+                <div class="col-span-12 md:col-span-4">
+                    <label class="stitch-label" id="entryLabel">Entry Price</label>
+                    <div class="stitch-input-wrap">
                         {{ form.entry_price }}
-                        {% if form.entry_price.errors %}<span class="text-red-400 text-xs mt-1 block">{{ form.entry_price.errors.0 }}</span>{% endif %}
                     </div>
-
-                    <!-- Stop Loss -->
-                    <div class="col-span-4 form-field-wrap">
-                        <label class="block text-[10px] uppercase tracking-widest font-bold text-text-secondary mb-1" id="stoplossLabel">Stop Loss</label>
+                </div>
+                <div class="col-span-12 md:col-span-4">
+                    <label class="stitch-label" id="stoplossLabel">Stop Loss</label>
+                    <div class="stitch-input-wrap">
                         {{ form.stop_loss }}
-                        {% if form.stop_loss.errors %}<span class="text-red-400 text-xs mt-1 block">{{ form.stop_loss.errors.0 }}</span>{% endif %}
                     </div>
+                </div>
+                <div class="col-span-12 md:col-span-4">
+                    <label class="stitch-label">Timeframe (Days)</label>
+                    <div class="stitch-input-wrap">
+                        {{ form.timeframe_days }}
+                    </div>
+                </div>
 
-                    <div class="col-span-4"></div>
-
-                    <!-- Targets -->
-                    <div class="col-span-12">
-                        <label class="block text-[10px] uppercase tracking-widest font-bold text-text-secondary mb-1">Targets</label>
-                        <div class="grid grid-cols-3 gap-8">
-                            <div class="relative form-field-wrap">
-                                <span class="absolute left-0 top-3 text-emerald-500 text-xs font-bold">T1</span>
-                                <div class="pl-8">{{ form.target_1 }}</div>
-                                {% if form.target_1.errors %}<span class="text-red-400 text-xs mt-1 block">{{ form.target_1.errors.0 }}</span>{% endif %}
+                <!-- Targets -->
+                <div class="col-span-12">
+                    <label class="stitch-label mb-4">Target Progression</label>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="relative">
+                            <span class="absolute right-0 top-0 text-[10px] font-black text-emerald-500">T1</span>
+                            <div class="stitch-input-wrap">
+                                {{ form.target_1 }}
                             </div>
-                            <div class="relative form-field-wrap" data-show-for="medium-long">
-                                <span class="absolute left-0 top-3 text-emerald-500 text-xs font-bold opacity-70">T2</span>
-                                <div class="pl-8">{{ form.target_2 }}</div>
+                        </div>
+                        <div class="relative" data-show-for="medium-long">
+                            <span class="absolute right-0 top-0 text-[10px] font-black text-emerald-400">T2</span>
+                            <div class="stitch-input-wrap">
+                                {{ form.target_2 }}
                             </div>
-                            <div class="relative form-field-wrap" data-show-for="long">
-                                <span class="absolute left-0 top-3 text-emerald-500 text-xs font-bold opacity-50">T3</span>
-                                <div class="pl-8">{{ form.target_3 }}</div>
+                        </div>
+                        <div class="relative" data-show-for="long">
+                            <span class="absolute right-0 top-0 text-[10px] font-black text-emerald-300">T3</span>
+                            <div class="stitch-input-wrap">
+                                {{ form.target_3 }}
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
 
-                    <!-- Timeframe -->
-                    <div class="col-span-4 form-field-wrap">
-                        <label class="block text-[10px] uppercase tracking-widest font-bold text-text-secondary mb-1">Timeframe (Days)</label>
-                        {{ form.timeframe_days }}
-                        {% if form.timeframe_days.errors %}<span class="text-red-400 text-xs mt-1 block">{{ form.timeframe_days.errors.0 }}</span>{% endif %}
+        <!-- Section: Rationale -->
+        <div class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
+            <div class="flex items-center justify-between mb-8">
+                <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]">description</span>
+                    Technical Rationale
+                </h3>
+                <div class="text-[10px] font-bold text-slate-300">HTML SUPPORTED</div>
+            </div>
+            <div class="space-y-6">
+                <div class="grid grid-cols-2 gap-8">
+                    <div>
+                        <label class="stitch-label">Attribution Broker</label>
+                        <div class="stitch-input-wrap">
+                            {{ form.broker }}
+                        </div>
+                    </div>
+                    <div>
+                        <label class="stitch-label">Publication Status</label>
+                        <div class="stitch-input-wrap">
+                            {{ form.status }}
+                        </div>
                     </div>
                 </div>
-            </section>
-
-            <!-- Section 3: Broker -->
-            <section>
-                <div class="grid grid-cols-12 gap-x-8">
-                    <div class="col-span-6 form-field-wrap">
-                        <label class="block text-[10px] uppercase tracking-widest font-bold text-text-secondary mb-1">Broker</label>
-                        {{ form.broker }}
-                        {% if form.broker.errors %}<span class="text-red-400 text-xs mt-1 block">{{ form.broker.errors.0 }}</span>{% endif %}
-                    </div>
-                </div>
-            </section>
-
-            <!-- Section 4: Rationale -->
-            <section class="pt-4">
-                <div class="flex justify-between items-end mb-4">
-                    <label class="block text-[10px] uppercase tracking-widest font-bold text-text-secondary">Rationale & Analysis</label>
-                </div>
-                <div class="form-field-wrap">
+                <div>
+                    <label class="stitch-label mb-3">Analysis & Recommendation Logic</label>
                     {{ form.rationale }}
-                    {% if form.rationale.errors %}<span class="text-red-400 text-xs mt-1 block">{{ form.rationale.errors.0 }}</span>{% endif %}
                 </div>
-            </section>
+            </div>
+        </div>
 
-            <!-- Bottom Submit (mobile) -->
-            <section class="border-t border-border-dark pt-8 flex justify-end gap-4 lg:hidden">
-                <a href="{% url 'admin_panel:calls_list' %}" class="text-sm font-medium text-text-secondary hover:text-white transition-colors no-underline px-6 py-2">Cancel</a>
-                <button type="submit" class="bg-white text-black px-6 py-2 text-sm font-medium rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2">
-                    <span>{% if form.instance.pk %}Update{% else %}Publish{% endif %}</span>
-                    <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
-                </button>
-            </section>
-        </form>
-    </div>
+        <!-- Submit Group -->
+        <div class="flex items-center justify-end gap-4 pb-12">
+            <a href="{% url 'admin_panel:calls_list' %}" class="px-8 py-3 text-sm font-bold text-slate-500 hover:text-slate-700 transition-colors no-underline">Cancel Changes</a>
+            <button type="submit" class="bg-primary text-white px-10 py-3.5 text-sm font-black rounded-xl hover:opacity-90 shadow-lg shadow-primary/10 transition-all flex items-center gap-2">
+                <span class="material-symbols-outlined text-[18px]">{% if form.instance.pk %}check_circle{% else %}rocket_launch{% endif %}</span>
+                {% if form.instance.pk %}SAVE CHANGES{% else %}PUBLISH CALL{% endif %}
+            </button>
+        </div>
+    </form>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Apply Stitch styles to Django-rendered inputs
+    const inputs = document.querySelectorAll('input:not([type="radio"]):not([type="checkbox"]), select, textarea');
+    inputs.forEach(input => {
+        if (input.tagName === 'TEXTAREA') {
+            input.classList.add('stitch-textarea', 'w-full', 'focus:ring-0', 'transition-all');
+        } else {
+            input.classList.add('stitch-input', 'focus:ring-0');
+            if (input.tagName === 'SELECT') {
+                input.classList.add('stitch-select');
+            }
+        }
+    });
+
     const callTypeField = document.querySelector('[name="call_type"]');
     const instrumentTypeField = document.querySelector('[name="instrument_type"]');
     const entryLabel = document.getElementById('entryLabel');
@@ -314,7 +313,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (callTypeField) callTypeField.addEventListener('change', updateFieldVisibility);
     if (instrumentTypeField) instrumentTypeField.addEventListener('change', updateFieldVisibility);
+    
+    // Initial Run
     updateFieldVisibility();
 });
 </script>
 {% endblock %}
+

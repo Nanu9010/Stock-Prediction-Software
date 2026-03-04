@@ -1,33 +1,91 @@
 {% extends 'admin_panel/base.html' %}
+{% load static %}
 
-{% block title %}Payment — {{ payment.transaction_id|default:payment.pk }}{% endblock %}
+{% block title %}Ledger Verification — {{ payment.transaction_id|default:payment.pk }} - Admin Panel{% endblock %}
 
 {% block content %}
-<div class="page-header" style="display:flex;justify-content:space-between;align-items:center;">
-    <div>
-        <h1>Payment Detail</h1>
-        <p class="text-secondary">TXN: {{ payment.transaction_id|default:"N/A" }}</p>
+<div class="max-w-4xl mx-auto">
+    <!-- Breadcrumbs -->
+    <div class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 mb-6">
+        <a href="{% url 'admin_panel:payments_list' %}" class="hover:text-primary transition-colors no-underline">Ledger Audit</a>
+        <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+        <span class="text-slate-600">Verification</span>
     </div>
-    <a href="{% url 'admin_panel:payments_list' %}" class="btn btn-secondary">← Back to Payments</a>
-</div>
 
-<div class="dashboard-section" style="max-width:600px;">
-    <table class="data-table" style="border:none;">
-        <tr><th style="width:35%;">User</th><td>{{ payment.user.email }}</td></tr>
-        <tr><th>Amount</th><td><strong style="font-size:1.2rem;">₹{{ payment.amount }}</strong></td></tr>
-        <tr><th>Plan Type</th><td>{{ payment.plan_type|default:"—" }}</td></tr>
-        <tr><th>Status</th>
-            <td>
-                <span class="badge badge-{% if payment.status == 'SUCCESS' %}success{% elif payment.status == 'FAILED' %}danger{% elif payment.status == 'REFUNDED' %}warning{% else %}secondary{% endif %}">
-                    {{ payment.status }}
-                </span>
-            </td>
-        </tr>
-        <tr><th>Transaction ID</th><td><code>{{ payment.transaction_id|default:"—" }}</code></td></tr>
-        <tr><th>Razorpay Order ID</th><td><code>{{ payment.razorpay_order_id|default:"—" }}</code></td></tr>
-        <tr><th>Payment ID</th><td><code>{{ payment.razorpay_payment_id|default:"—" }}</code></td></tr>
-        <tr><th>Date</th><td>{{ payment.created_at|date:"d M Y, H:i" }}</td></tr>
-        <tr><th>Gateway Response</th><td><small style="color:#888;">{{ payment.gateway_response|default:"—" }}</small></td></tr>
-    </table>
+    <!-- Page Header -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+        <div class="flex items-start gap-6">
+            <div class="w-20 h-20 rounded-3xl bg-slate-900 shadow-xl shadow-slate-200/50 flex items-center justify-center text-white font-black text-3xl">
+                <span class="material-symbols-outlined text-[32px]">verified_user</span>
+            </div>
+            <div>
+                <h1 class="text-4xl font-black text-slate-900 tracking-tight mb-2">Transaction Proof</h1>
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-[10px] font-black uppercase tracking-wider">
+                        <span class="material-symbols-outlined text-[14px]">tag</span>
+                        TXN: {{ payment.transaction_id|default:"INTERNAL_RECORD" }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="flex items-center gap-3">
+            <a href="{% url 'admin_panel:payments_list' %}" class="px-6 py-3 bg-white border border-slate-200 text-slate-700 rounded-xl font-black text-sm hover:bg-slate-50 transition-all flex items-center gap-2 no-underline">
+                <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+                Audit Overview
+            </a>
+        </div>
+    </div>
+
+    <div class="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="flex items-center justify-between mb-10">
+            <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest leading-none">Settlement Intelligence</h3>
+            <div class="px-4 py-2 bg-slate-50 border border-slate-100 rounded-xl">
+                 <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Fiscal Status</p>
+                 <p class="text-sm font-black {% if payment.status == 'SUCCESS' %}text-emerald-600{% else %}text-rose-600{% endif %} uppercase tracking-tighter">{{ payment.status }}</p>
+            </div>
+        </div>
+
+        <div class="divide-y divide-slate-50">
+            <div class="py-5 grid grid-cols-1 md:grid-cols-3 gap-2">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Remitter Identity</span>
+                <span class="md:col-span-2 text-sm font-bold text-slate-900">{{ payment.user.email }}</span>
+            </div>
+            <div class="py-5 grid grid-cols-1 md:grid-cols-3 gap-2">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Revenue Impact</span>
+                <span class="md:col-span-2 text-2xl font-black text-slate-900 tracking-tighter">₹{{ payment.amount|floatformat:2 }}</span>
+            </div>
+            <div class="py-5 grid grid-cols-1 md:grid-cols-3 gap-2">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Allocation</span>
+                <span class="md:col-span-2 text-sm font-bold text-slate-700 uppercase tracking-widest">{{ payment.plan_type|default:"Direct Service" }}</span>
+            </div>
+            <div class="py-5 grid grid-cols-1 md:grid-cols-3 gap-2">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Gateway Reference</span>
+                <span class="md:col-span-2 text-xs font-mono text-slate-500 bg-slate-50 px-2 py-1 rounded w-fit">{{ payment.transaction_id|default:"Pending" }}</span>
+            </div>
+            <div class="py-5 grid grid-cols-1 md:grid-cols-3 gap-2">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Processor Keys</span>
+                <div class="md:col-span-2 space-y-2">
+                    <div class="flex items-center gap-2">
+                         <span class="text-[9px] font-black text-slate-400 uppercase w-20">Order ID:</span>
+                         <code class="text-[10px] text-primary">{{ payment.razorpay_order_id|default:"—" }}</code>
+                    </div>
+                    <div class="flex items-center gap-2">
+                         <span class="text-[9px] font-black text-slate-400 uppercase w-20">Payment ID:</span>
+                         <code class="text-[10px] text-primary">{{ payment.razorpay_payment_id|default:"—" }}</code>
+                    </div>
+                </div>
+            </div>
+            <div class="py-5 grid grid-cols-1 md:grid-cols-3 gap-2">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Verification Node</span>
+                <div class="md:col-span-2 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                    <pre class="text-[9px] font-mono text-slate-500 whitespace-pre-wrap leading-tight">{{ payment.gateway_response|default:"No direct response log available." }}</pre>
+                </div>
+            </div>
+            <div class="py-5 grid grid-cols-1 md:grid-cols-3 gap-2 border-none">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Finalization</span>
+                <span class="md:col-span-2 text-xs font-bold text-slate-600">{{ payment.created_at|date:"F d, Y — H:i:s" }}</span>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

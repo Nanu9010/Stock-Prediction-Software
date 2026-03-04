@@ -14,7 +14,7 @@ A comprehensive Django-based platform for managing stock research calls, broker 
 
 ## Tech Stack
 
-- **Backend**: Django 5.0, Django REST Framework
+- **Backend**: Django 4.2, Django REST Framework
 - **Database**: MySQL
 - **Cache/Queue**: Redis, Celery
 - **Frontend**: HTML, CSS, JavaScript
@@ -126,9 +126,9 @@ Analysts can create and manage research calls at `http://localhost:8000/analyst/
 
 ## Testing
 
-Run tests with pytest:
+Run tests with Django test runner:
 ```bash
-pytest
+python manage.py test
 ```
 
 ## License

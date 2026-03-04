@@ -15,21 +15,17 @@ app.autodiscover_tasks()
 
 # Periodic tasks schedule
 app.conf.beat_schedule = {
-    'monitor-active-calls': {
-        'task': 'apps.lifecycle.tasks.monitor_active_calls',
-        'schedule': 300.0,  # Every 5 minutes
+    'update-market-indices': {
+        'task': 'apps.market_data.tasks.task_update_indices',
+        'schedule': 180.0,  # 3 minutes
     },
-    'update-portfolio-values': {
-        'task': 'apps.portfolios.tasks.update_all_portfolio_values',
-        'schedule': 300.0,  # Every 5 minutes
+    'update-gainers-losers-active': {
+        'task': 'apps.market_data.tasks.task_update_gainers_active',
+        'schedule': 300.0,  # 5 minutes
     },
-    'calculate-daily-broker-metrics': {
-        'task': 'apps.analytics.tasks.calculate_daily_broker_metrics',
-        'schedule': crontab(hour=23, minute=0),  # Daily at 11 PM IST
-    },
-    'expire-old-calls': {
-        'task': 'apps.research_calls.tasks.expire_old_calls',
-        'schedule': crontab(hour=0, minute=0),  # Daily at midnight
+    'update-popular-stocks': {
+        'task': 'apps.market_data.tasks.task_update_popular_stocks',
+        'schedule': 600.0,  # 10 minutes
     },
 }
 

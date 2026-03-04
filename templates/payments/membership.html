@@ -1,113 +1,135 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Membership Plans — StockPro{% endblock %}
+{% block title %}Acquisition Tiers - Membership - StockPro{% endblock %}
 
 {% block page_content %}
-<!-- Hero Header -->
-<div class="text-center py-12 px-4">
-    <div class="inline-flex items-center gap-2 bg-accent-teal/10 border border-accent-teal/20 text-accent-teal text-xs font-bold px-4 py-1.5 rounded-full mb-6">
-        <span class="material-symbols-outlined text-[14px]">stars</span>
-        MEMBERSHIP PLANS
-    </div>
-    <h1 class="text-4xl md:text-5xl font-bold text-text-main tracking-tight mb-4">Choose the plan that<br>fits your goals</h1>
-    <p class="text-text-muted text-base max-w-lg mx-auto font-light">Unlock premium research calls, advanced analytics, and expert trading insights.</p>
+<div class="max-w-7xl mx-auto px-4 py-16">
+    <!-- Hero Header -->
+    <div class="text-center mb-16">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-slate-100 rounded-full text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-6 border border-slate-200">
+            <span class="material-symbols-outlined text-[14px]">workspace_premium</span>
+            Operational Tiers
+        </div>
+        <h1 class="text-5xl md:text-6xl font-black text-slate-900 tracking-tighter mb-6">
+            Scale your <span class="text-primary italic">alpha</span> potential.
+        </h1>
+        <p class="text-slate-500 font-medium tracking-tight italic text-lg max-w-2xl mx-auto">
+            Provision advanced research capabilities and institutional-grade market intelligence.
+        </p>
 
-    <!-- Billing Toggle -->
-    <div class="flex items-center justify-center gap-4 mt-10">
-        <span class="text-sm font-semibold text-text-main" id="monthlyLabel">Monthly</span>
-        <button id="billingToggle" class="relative w-14 h-7 rounded-full bg-gray-200 border border-gray-300 transition-all" onclick="toggleBilling()">
-            <div id="toggleDot" class="absolute top-1 left-1 w-5 h-5 rounded-full bg-text-main transition-all duration-300"></div>
-        </button>
-        <span class="text-sm font-semibold text-text-muted" id="yearlyLabel">
-            Yearly
-            <span class="text-[10px] ml-1 bg-accent-teal/10 text-accent-teal font-bold px-2 py-0.5 rounded-full">Save 17%</span>
-        </span>
-    </div>
-</div>
-
-<!-- Pricing Cards -->
-<div class="max-w-5xl mx-auto pb-20">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-        {% for plan in plans %}
-        <div class="relative group">
-            {% if plan.plan_type == 'PRO' %}
-            <!-- PRO badge -->
-            <div class="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
-                <span class="bg-gradient-to-r from-accent-gold to-orange-500 text-white text-[10px] font-bold uppercase tracking-wider px-4 py-1 rounded-full">Most Popular</span>
-            </div>
-            {% endif %}
-
-            <div class="bg-surface border {% if plan.plan_type == 'PRO' %}border-accent-gold/30 ring-1 ring-accent-gold/20{% else %}border-gray-200{% endif %} rounded-2xl p-8 transition-all hover:shadow-soft-hover shadow-soft">
-                <!-- Plan Name -->
-                <div class="flex items-center gap-3 mb-6">
-                    <div class="size-10 rounded-xl {% if plan.plan_type == 'PRO' %}bg-accent-gold/10{% else %}bg-accent-teal/10{% endif %} flex items-center justify-center">
-                        <span class="material-symbols-outlined {% if plan.plan_type == 'PRO' %}text-accent-gold{% else %}text-accent-teal{% endif %} text-[20px]">
-                            {% if plan.plan_type == 'PRO' %}workspace_premium{% else %}person{% endif %}
-                        </span>
-                    </div>
-                    <div>
-                        <h3 class="text-lg font-bold text-text-main">{{ plan.name }}</h3>
-                        <p class="text-xs text-text-muted">{% if plan.plan_type == 'PRO' %}For serious traders{% else %}Get started free{% endif %}</p>
-                    </div>
-                </div>
-
-                <!-- Price -->
-                <div class="mb-8">
-                    <div class="price-monthly">
-                        <span class="text-4xl font-bold text-text-main">₹{{ plan.price_monthly|floatformat:0 }}</span>
-                        <span class="text-text-muted text-sm font-medium">/month</span>
-                    </div>
-                    <div class="price-yearly" style="display:none;">
-                        <span class="text-4xl font-bold text-text-main">₹{{ plan.price_yearly|floatformat:0 }}</span>
-                        <span class="text-text-muted text-sm font-medium">/year</span>
-                    </div>
-                </div>
-
-                <!-- CTA -->
-                {% if current_subscription and current_subscription.plan_type == plan.plan_type %}
-                <button disabled class="w-full py-3.5 rounded-xl text-sm font-bold bg-accent-teal/10 text-accent-teal border border-accent-teal/20 cursor-not-allowed flex items-center justify-center gap-2 mb-8">
-                    <span class="material-symbols-outlined text-[18px]">check_circle</span>
-                    Current Plan
-                </button>
-                {% else %}
-                <button onclick="initiatePayment('{{ plan.plan_type }}')" class="w-full py-3.5 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 mb-8 {% if plan.plan_type == 'PRO' %}bg-gradient-to-r from-accent-gold to-orange-500 text-white hover:opacity-90 shadow-lg{% else %}bg-text-main text-white hover:opacity-90{% endif %}">
-                    Subscribe Now
-                    <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
-                </button>
-                {% endif %}
-
-                <!-- Features -->
-                <div class="border-t border-gray-200 pt-6">
-                    <p class="text-[10px] font-bold uppercase tracking-widest text-text-muted mb-4">What's included</p>
-                    <ul class="space-y-3">
-                        {% for feature in plan.features %}
-                        <li class="flex items-start gap-3 text-sm text-text-main">
-                            <span class="material-symbols-outlined text-accent-teal text-[18px] mt-0.5 flex-shrink-0">check_circle</span>
-                            {{ feature }}
-                        </li>
-                        {% endfor %}
-                    </ul>
-                </div>
+        <!-- Billing Toggle -->
+        <div class="flex items-center justify-center gap-6 mt-12">
+            <span class="text-xs font-black uppercase tracking-widest transition-colors" id="monthlyLabel">Monthly Cycle</span>
+            <button id="billingToggle" class="relative w-16 h-8 rounded-full bg-slate-200 border border-slate-300 transition-all p-1" onclick="toggleBilling()">
+                <div id="toggleDot" class="absolute top-1 left-1 w-6 h-6 rounded-full bg-slate-900 transition-all duration-500 shadow-sm"></div>
+            </button>
+            <div class="flex items-center gap-3">
+                <span class="text-xs font-black uppercase tracking-widest text-slate-400 transition-colors" id="yearlyLabel">Annual Cycle</span>
+                <span class="px-2 py-0.5 bg-emerald-100 text-emerald-600 text-[10px] font-black rounded-lg">SAVE 17%</span>
             </div>
         </div>
-        {% endfor %}
     </div>
 
-    <!-- Trust Bar -->
-    <div class="mt-16 text-center">
-        <div class="flex items-center justify-center gap-8 flex-wrap">
-            <div class="flex items-center gap-2 text-text-muted text-sm">
-                <span class="material-symbols-outlined text-[18px]">lock</span>
-                <span>Secure Payments</span>
+    <!-- Pricing Cards -->
+    <div class="max-w-5xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
+            {% for plan in plans %}
+            <div class="relative flex flex-col">
+                {% if plan.plan_type == 'PRO' %}
+                <!-- PRO badge -->
+                <div class="absolute -top-4 left-1/2 -translate-x-1/2 z-20">
+                    <span class="bg-slate-900 text-white text-[9px] font-black uppercase tracking-[0.3em] px-6 py-1.5 rounded-full shadow-xl">Institutional Choice</span>
+                </div>
+                {% endif %}
+
+                <div class="flex-1 bg-white border {% if plan.plan_type == 'PRO' %}border-slate-900 ring-4 ring-slate-50{% else %}border-slate-200{% endif %} rounded-[48px] p-10 flex flex-col transition-all hover:shadow-2xl hover:-translate-y-1 relative overflow-hidden group">
+                    {% if plan.plan_type == 'PRO' %}
+                    <div class="absolute -right-12 -top-12 w-32 h-32 bg-slate-50 rounded-full opacity-50 group-hover:scale-110 transition-transform"></div>
+                    {% endif %}
+                    
+                    <!-- Plan Identifier -->
+                    <div class="flex items-center gap-4 mb-10 relative z-10">
+                        <div class="w-14 h-14 rounded-2xl {% if plan.plan_type == 'PRO' %}bg-slate-900 text-white shadow-lg shadow-slate-200{% else %}bg-slate-100 text-slate-900{% endif %} flex items-center justify-center">
+                            <span class="material-symbols-outlined text-[28px]">
+                                {% if plan.plan_type == 'PRO' %}dynamic_form{% else %}potted_plant{% endif %}
+                            </span>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-black text-slate-900 tracking-tight">{{ plan.name }}</h3>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                {% if plan.plan_type == 'PRO' %}High Velocity Trading{% else %}Core Market Discovery{% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Price Matrix -->
+                    <div class="mb-10 relative z-10">
+                        <div class="price-monthly">
+                            <div class="flex items-baseline gap-1">
+                                <span class="text-5xl font-black text-slate-900 tracking-tighter">₹{{ plan.price_monthly|floatformat:0 }}</span>
+                                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">/ Individual</span>
+                            </div>
+                        </div>
+                        <div class="price-yearly" style="display:none;">
+                            <div class="flex items-baseline gap-1">
+                                <span class="text-5xl font-black text-slate-900 tracking-tighter">₹{{ plan.price_yearly|floatformat:0 }}</span>
+                                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">/ Annual Node</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Functional Features -->
+                    <div class="flex-1 mb-12 relative z-10">
+                        <p class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-300 mb-6 italic">Provisioned Capabilities</p>
+                        <ul class="space-y-4">
+                            {% for feature in plan.features %}
+                            <li class="flex items-start gap-3">
+                                <span class="material-symbols-outlined {% if plan.plan_type == 'PRO' %}text-slate-900{% else %}text-slate-400{% endif %} text-[18px] mt-0.5">check_circle</span>
+                                <span class="text-sm font-bold text-slate-600 tracking-tight leading-relaxed">{{ feature }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <!-- Deployment Trigger -->
+                    {% if current_subscription and current_subscription.plan_type == plan.plan_type %}
+                    <button disabled class="w-full py-5 rounded-[24px] text-xs font-black uppercase tracking-widest bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed flex items-center justify-center gap-2 relative z-10">
+                        <span class="material-symbols-outlined text-[18px]">lock_open</span>
+                        Active Deployment
+                    </button>
+                    {% else %}
+                    <button onclick="initiatePayment('{{ plan.plan_type }}')" class="w-full py-5 rounded-[24px] text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 relative z-10 {% if plan.plan_type == 'PRO' %}bg-slate-900 text-white shadow-xl shadow-slate-200 hover:bg-slate-800{% else %}bg-white border-2 border-slate-900 text-slate-900 hover:bg-slate-50{% endif %}">
+                        Initialize Access
+                        <span class="material-symbols-outlined text-[18px]">bolt</span>
+                    </button>
+                    {% endif %}
+                </div>
             </div>
-            <div class="flex items-center gap-2 text-text-muted text-sm">
-                <span class="material-symbols-outlined text-[18px]">support_agent</span>
-                <span>24/7 Support</span>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Integrity Markers -->
+    <div class="mt-24 pt-12 border-t border-slate-100">
+        <div class="flex items-center justify-center gap-12 flex-wrap">
+            <div class="flex flex-col items-center gap-3">
+                <div class="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-400">
+                    <span class="material-symbols-outlined text-[20px]">encrypted</span>
+                </div>
+                <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">AES-256 Protocol</span>
             </div>
-            <div class="flex items-center gap-2 text-text-muted text-sm">
-                <span class="material-symbols-outlined text-[18px]">cancel</span>
-                <span>Cancel Anytime</span>
+            <div class="flex flex-col items-center gap-3">
+                <div class="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-400">
+                    <span class="material-symbols-outlined text-[20px]">verified_user</span>
+                </div>
+                <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">Node Immunity</span>
+            </div>
+            <div class="flex flex-col items-center gap-3">
+                <div class="w-10 h-10 bg-slate-50 rounded-full flex items-center justify-center text-slate-400">
+                    <span class="material-symbols-outlined text-[20px]">headset_mic</span>
+                </div>
+                <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">24/7 Ops Support</span>
             </div>
         </div>
     </div>
@@ -125,11 +147,21 @@ function toggleBilling() {
     const monthlyLabel = document.getElementById('monthlyLabel');
     const yearlyLabel = document.getElementById('yearlyLabel');
     
-    dot.style.left = isYearly ? '2rem' : '0.25rem';
-    monthlyLabel.classList.toggle('text-text-main', !isYearly);
-    monthlyLabel.classList.toggle('text-text-muted', isYearly);
-    yearlyLabel.classList.toggle('text-text-main', isYearly);
-    yearlyLabel.classList.toggle('text-text-muted', !isYearly);
+    dot.style.left = isYearly ? '2.1rem' : '0.25rem';
+    
+    if (isYearly) {
+        yearlyLabel.classList.remove('text-slate-400');
+        yearlyLabel.classList.add('text-slate-900');
+        monthlyLabel.classList.add('text-slate-400');
+        monthlyLabel.classList.remove('text-slate-900');
+        dot.classList.add('bg-emerald-500');
+    } else {
+        yearlyLabel.classList.add('text-slate-400');
+        yearlyLabel.classList.remove('text-slate-900');
+        monthlyLabel.classList.remove('text-slate-400');
+        monthlyLabel.classList.add('text-slate-900');
+        dot.classList.remove('bg-emerald-500');
+    }
     
     document.querySelectorAll('.price-monthly').forEach(el => el.style.display = isYearly ? 'none' : 'block');
     document.querySelectorAll('.price-yearly').forEach(el => el.style.display = isYearly ? 'block' : 'none');
@@ -141,7 +173,7 @@ function initiatePayment(planType) {
     fetch('{% url "payments:create_order" %}', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Type': 'application/x-form-urlencoded',
             'X-CSRFToken': '{{ csrf_token }}'
         },
         body: `plan_type=${planType}&billing_cycle=${billingCycle}`
@@ -149,7 +181,7 @@ function initiatePayment(planType) {
     .then(response => response.json())
     .then(data => {
         if (data.error) {
-            alert('Error: ' + data.error);
+            alert('Provisioning Error: ' + data.error);
             return;
         }
         
@@ -161,7 +193,7 @@ function initiatePayment(planType) {
             description: data.description,
             order_id: data.order_id,
             prefill: data.prefill,
-            theme: { color: '#38B2AC' },
+            theme: { color: '#0F172A' }, // Slate 900
             handler: function(response) {
                 verifyPayment(response);
             }
@@ -171,8 +203,8 @@ function initiatePayment(planType) {
         rzp.open();
     })
     .catch(error => {
-        console.error('Error:', error);
-        alert('Failed to initiate payment');
+        console.error('Network failure:', error);
+        alert('Connectivity failed during negotiation');
     });
 }
 
@@ -188,16 +220,21 @@ function verifyPayment(response) {
     .then(res => res.json())
     .then(data => {
         if (data.success) {
-            alert(data.message);
+            alert('Authentication successful. Your access tier has been updated.');
             window.location.href = '/';
         } else {
-            alert('Payment verification failed: ' + data.error);
+            alert('Encryption verification failed: ' + data.error);
         }
     })
     .catch(error => {
-        console.error('Error:', error);
-        alert('Payment verification failed');
+        console.error('Finalization failure:', error);
+        alert('Critical error during payment verification');
     });
 }
+// Initialize default state
+document.addEventListener('DOMContentLoaded', () => {
+    const monthlyLabel = document.getElementById('monthlyLabel');
+    monthlyLabel.classList.add('text-slate-900');
+});
 </script>
 {% endblock %}

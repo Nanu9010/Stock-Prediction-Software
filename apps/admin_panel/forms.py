@@ -6,6 +6,92 @@ from apps.research_calls.models import ResearchCall
 from apps.brokers.models import Broker
 from apps.authentication.models import User
 from apps.subscriptions.models import SubscriptionPlan
+from apps.market_data.models import IPO, Commodity, ETF, SIP
+
+
+class CommodityForm(forms.ModelForm):
+    """Form for creating and editing Commodities"""
+    
+    class Meta:
+        model = Commodity
+        fields = [
+            'name', 'symbol', 'unit', 'icon', 'is_global', 
+            'mcx_multiplier', 'is_active', 'display_order'
+        ]
+        widgets = {
+            'mcx_multiplier': forms.NumberInput(attrs={'step': '0.0001'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            if not isinstance(field.widget, forms.CheckboxInput):
+                field.widget.attrs.update({'class': 'form-control'})
+
+
+class ETFForm(forms.ModelForm):
+    """Form for creating and editing ETFs"""
+    
+    class Meta:
+        model = ETF
+        fields = [
+            'name', 'symbol', 'short_name', 'category', 
+            'is_active', 'display_order'
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            if not isinstance(field.widget, forms.CheckboxInput):
+                field.widget.attrs.update({'class': 'form-control'})
+
+
+class SIPForm(forms.ModelForm):
+    """Form for creating and editing SIPs"""
+    
+    class Meta:
+        model = SIP
+        fields = [
+            'name', 'category', 'min_sip', 'returns_1y', 
+            'returns_3y', 'returns_5y', 'popularity', 
+            'is_active', 'display_order'
+        ]
+        widgets = {
+            'returns_1y': forms.NumberInput(attrs={'step': '0.01'}),
+            'returns_3y': forms.NumberInput(attrs={'step': '0.01'}),
+            'returns_5y': forms.NumberInput(attrs={'step': '0.01'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            if not isinstance(field.widget, forms.CheckboxInput):
+                field.widget.attrs.update({'class': 'form-control'})
+
+
+class IPOForm(forms.ModelForm):
+    """Form for creating and editing IPOs"""
+    
+    class Meta:
+        model = IPO
+        fields = [
+            'company_name', 'symbol', 'sector', 'price_band', 'issue_price',
+            'issue_size', 'lot_size', 'open_date', 'close_date', 'listing_date',
+            'gmp', 'listing_price', 'is_listed'
+        ]
+        widgets = {
+            'open_date': forms.DateInput(attrs={'type': 'date'}),
+            'close_date': forms.DateInput(attrs={'type': 'date'}),
+            'listing_date': forms.DateInput(attrs={'type': 'date'}),
+            'issue_price': forms.NumberInput(attrs={'step': '0.01'}),
+            'listing_price': forms.NumberInput(attrs={'step': '0.01'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            if not isinstance(field.widget, forms.CheckboxInput):
+                field.widget.attrs.update({'class': 'form-control'})
 
 
 class ResearchCallForm(forms.ModelForm):

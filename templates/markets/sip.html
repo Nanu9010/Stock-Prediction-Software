@@ -1,67 +1,75 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Top SIP Funds — StockPro{% endblock %}
+{% block title %}Systematic Accumulation - SIP Funds - StockPro{% endblock %}
 
 {% block page_content %}
-<div class="space-y-8">
+<div class="max-w-7xl mx-auto px-4 py-12">
     <!-- Page Header -->
-    <div class="flex items-center gap-3">
-        <span class="size-10 rounded-xl bg-accent-teal/10 flex items-center justify-center">
-            <span class="material-symbols-outlined text-accent-teal text-xl">payments</span>
-        </span>
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
         <div>
-            <h1 class="text-2xl font-extrabold text-text-main m-0">Top SIP Funds</h1>
-            <p class="text-sm text-text-muted m-0">Start small, grow big. Top SIP funds with consistent returns.</p>
+            <h1 class="text-4xl font-black text-slate-900 tracking-tight mb-2">Systematic Accumulation</h1>
+            <p class="text-slate-500 font-medium tracking-tight italic">Incremental wealth generation vehicles with consistent alpha tracks.</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 shadow-sm border border-emerald-100">
+                <span class="material-symbols-outlined text-[24px]">savings</span>
+            </div>
+            <div>
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block leading-none mb-1">Entry Threshold</span>
+                <span class="text-sm font-black text-slate-900">₹500 / Month</span>
+            </div>
         </div>
     </div>
 
     <!-- Funds Table Card -->
-    <div class="bg-surface rounded-2xl shadow-soft overflow-hidden">
+    <div class="bg-white rounded-[40px] border border-slate-200 shadow-sm overflow-hidden mb-12">
         <div class="overflow-x-auto">
-            <table class="w-full">
+            <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="border-b border-gray-100">
-                        <th class="text-left px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Fund Name</th>
-                        <th class="text-left px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Category</th>
-                        <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Min SIP</th>
-                        <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">1Y Return</th>
-                        <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">3Y Return</th>
-                        <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">5Y Return</th>
-                        <th class="text-center px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">Popularity</th>
+                    <tr class="bg-slate-50/50">
+                        <th class="px-8 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Accumulation Vehicle</th>
+                        <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Classification</th>
+                        <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest text-right">Min Instalment</th>
+                        <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest text-center">Avg 1Y Yield</th>
+                        <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest text-center">Avg 3Y Yield</th>
+                        <th class="px-8 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest text-center">Social Trust</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-50">
+                <tbody class="divide-y divide-slate-50">
                     {% for sip in sip_funds %}
-                    <tr class="hover:bg-gray-50/50 transition-colors">
-                        <td class="px-6 py-4">
-                            <span class="font-bold text-text-main text-sm">{{ sip.name }}</span>
+                    <tr class="hover:bg-slate-50/50 transition-colors group">
+                        <td class="px-8 py-6">
+                            <span class="text-sm font-black text-slate-900 group-hover:text-primary transition-colors leading-tight">{{ sip.name }}</span>
                         </td>
-                        <td class="px-6 py-4">
-                            <span class="text-sm text-text-muted">{{ sip.category }}</span>
+                        <td class="px-6 py-6 font-bold text-slate-500 text-xs">
+                            {{ sip.category }}
                         </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="text-sm font-bold text-text-main">₹{{ sip.min_sip }}</span>
+                        <td class="px-6 py-6 text-right font-black text-slate-900 text-sm">
+                            ₹{{ sip.min_sip }}
                         </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="text-sm font-bold text-green-500">{{ sip.returns_1y }}%</span>
+                        <td class="px-6 py-6 text-center">
+                            <span class="text-sm font-black text-emerald-500">{{ sip.returns_1y }}%</span>
                         </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="text-sm font-bold text-green-500">{{ sip.returns_3y }}%</span>
+                        <td class="px-6 py-6 text-center">
+                            <span class="text-sm font-black text-emerald-600 italic">{{ sip.returns_3y }}%</span>
                         </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="text-sm font-bold text-green-500">{{ sip.returns_5y }}%</span>
-                        </td>
-                        <td class="px-6 py-4 text-center">
-                            <span class="px-3 py-1 rounded-full bg-green-50 text-green-600 text-xs font-bold">
-                                {{ sip.popularity }}
+                        <td class="px-8 py-6 text-center">
+                            <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-widest">
+                                {{ sip.popularity }} Velocity
                             </span>
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="7" class="px-6 py-12 text-center">
-                            <span class="material-symbols-outlined text-5xl text-gray-300 mb-3 block">account_balance_wallet</span>
-                            <p class="text-text-muted text-sm m-0">No SIP fund data available right now</p>
+                        <td colspan="6" class="px-8 py-24 text-center">
+                            <div class="flex flex-col items-center">
+                                <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-4 text-slate-200">
+                                    <span class="material-symbols-outlined text-[40px]">payments</span>
+                                </div>
+                                <h3 class="text-slate-900 font-black text-lg">Stream Inactivity</h3>
+                                <p class="text-slate-400 text-sm font-medium italic">No systematic accumulation plans are currently indexed.</p>
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}

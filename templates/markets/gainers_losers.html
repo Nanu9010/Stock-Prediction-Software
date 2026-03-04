@@ -1,82 +1,152 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Today's Top Gainers & Losers — StockPro{% endblock %}
+{% block title %}Market Velocity - Gainers & Losers - StockPro{% endblock %}
 
 {% block page_content %}
-<div class="space-y-8">
+<div class="max-w-7xl mx-auto px-4 py-12">
     <!-- Page Header -->
-    <div class="flex items-center gap-3">
-        <span class="size-10 rounded-xl bg-accent-teal/10 flex items-center justify-center">
-            <span class="material-symbols-outlined text-accent-teal text-xl">trending_up</span>
-        </span>
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
         <div>
-            <h1 class="text-2xl font-extrabold text-text-main m-0">Today's Top Gainers & Losers</h1>
-            <p class="text-sm text-text-muted m-0">Real-time market movers at a glance</p>
+            <h1 class="text-4xl font-black text-slate-900 tracking-tight mb-2">Market Velocity</h1>
+            <p class="text-slate-500 font-medium tracking-tight italic">Real-time institutional liquidity movements and volatility triggers.</p>
+        </div>
+        <div class="flex items-center gap-2 px-4 py-2 bg-slate-100 rounded-xl text-slate-500 text-[10px] font-black uppercase tracking-widest border border-slate-200">
+            <span class="material-symbols-outlined text-[16px] animate-pulse">sensors</span>
+            Live Stream Active
         </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <!-- Top Gainers -->
-        <div class="bg-surface rounded-2xl shadow-soft overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-2">
-                <span class="material-symbols-outlined text-green-500">arrow_upward</span>
-                <h2 class="text-lg font-bold text-text-main m-0">Top 10 Gainers</h2>
+        <!-- Momentum Leaders (Gainers) -->
+        <div class="bg-white rounded-[40px] border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+            <div class="px-8 py-6 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600">
+                        <span class="material-symbols-outlined text-[24px]">trending_up</span>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-black text-slate-900 leading-none">Momentum Leaders</h2>
+                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Top 10 Performers</span>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <span class="text-2xl font-black text-emerald-500 leading-none">{% if top_gainers %}+{{ top_gainers.0.change_pct|floatformat:1 }}%{% else %}0.0%{% endif %}</span>
+                    <span class="block text-[8px] font-bold text-slate-400 uppercase">Max Variance</span>
+                </div>
             </div>
-            <div class="divide-y divide-gray-50">
-                {% for stock in top_gainers %}
-                <div class="flex items-center justify-between px-6 py-4 hover:bg-gray-50/50 transition-colors">
-                    <div class="flex items-center gap-4">
-                        <div class="size-10 rounded-xl bg-green-50 flex items-center justify-center text-green-600 font-bold text-sm">
-                            {{ forloop.counter }}
-                        </div>
-                        <div>
-                            <p class="font-bold text-text-main text-sm m-0">{{ stock.symbol|default:stock.name }}</p>
-                            <p class="text-xs text-text-muted m-0">{{ stock.sector|default:"Equity" }}</p>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-bold text-text-main text-sm m-0">₹{{ stock.price|default:stock.ltp|floatformat:2 }}</p>
-                        <p class="text-xs font-semibold text-green-500 m-0">+{{ stock.change_pct|default:stock.pct_change|floatformat:2 }}%</p>
-                    </div>
-                </div>
-                {% empty %}
-                <div class="px-6 py-12 text-center text-text-muted text-sm">
-                    <span class="material-symbols-outlined text-4xl text-gray-300 mb-2 block">bar_chart</span>
-                    Market data will appear here during trading hours
-                </div>
-                {% endfor %}
+
+            <div class="flex-1">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50/30">
+                            <th class="px-8 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest"># Entity</th>
+                            <th class="px-6 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-right">LTP Node</th>
+                            <th class="px-8 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-right">Delta %</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-50">
+                        {% for stock in top_gainers %}
+                        <tr class="hover:bg-slate-50/50 transition-colors group">
+                            <td class="px-8 py-5">
+                                <div class="flex items-center gap-4">
+                                    <span class="text-[10px] font-black text-slate-300 w-4 group-hover:text-emerald-500 transition-colors">{{ forloop.counter }}</span>
+                                    <div class="flex flex-col">
+                                        <span class="text-sm font-black text-slate-900 leading-tight">{{ stock.symbol|default:stock.name }}</span>
+                                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ stock.sector|default:"Equity" }}</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-5 text-right font-black text-slate-900 text-sm">
+                                ₹{{ stock.price|default:stock.ltp|floatformat:2 }}
+                            </td>
+                            <td class="px-8 py-5 text-right">
+                                <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-600 text-[10px] font-black tracking-tighter">
+                                    +{{ stock.change_pct|default:stock.pct_change|floatformat:2 }}%
+                                </span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="px-8 py-20 text-center">
+                                <div class="flex flex-col items-center">
+                                    <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4 text-slate-300">
+                                        <span class="material-symbols-outlined text-[32px]">query_stats</span>
+                                    </div>
+                                    <h3 class="text-slate-900 font-bold">Stagnant Market</h3>
+                                    <p class="text-slate-500 text-xs font-medium max-w-[200px] mx-auto">Movement patterns will populate once the trade floor opens.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
 
-        <!-- Top Losers -->
-        <div class="bg-surface rounded-2xl shadow-soft overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-100 flex items-center gap-2">
-                <span class="material-symbols-outlined text-red-500">arrow_downward</span>
-                <h2 class="text-lg font-bold text-text-main m-0">Top 10 Losers</h2>
+        <!-- Volatility Triggers (Losers) -->
+        <div class="bg-white rounded-[40px] border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+            <div class="px-8 py-6 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-rose-50 rounded-xl flex items-center justify-center text-rose-600">
+                        <span class="material-symbols-outlined text-[24px]">trending_down</span>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-black text-slate-900 leading-none">Volatility Triggers</h2>
+                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Top 10 Decliners</span>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <span class="text-2xl font-black text-rose-500 leading-none">{% if top_losers %}{{ top_losers.0.change_pct|floatformat:1 }}%{% else %}0.0%{% endif %}</span>
+                    <span class="block text-[8px] font-bold text-slate-400 uppercase">Max Drawdown</span>
+                </div>
             </div>
-            <div class="divide-y divide-gray-50">
-                {% for stock in top_losers %}
-                <div class="flex items-center justify-between px-6 py-4 hover:bg-gray-50/50 transition-colors">
-                    <div class="flex items-center gap-4">
-                        <div class="size-10 rounded-xl bg-red-50 flex items-center justify-center text-red-500 font-bold text-sm">
-                            {{ forloop.counter }}
-                        </div>
-                        <div>
-                            <p class="font-bold text-text-main text-sm m-0">{{ stock.symbol|default:stock.name }}</p>
-                            <p class="text-xs text-text-muted m-0">{{ stock.sector|default:"Equity" }}</p>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-bold text-text-main text-sm m-0">₹{{ stock.price|default:stock.ltp|floatformat:2 }}</p>
-                        <p class="text-xs font-semibold text-red-500 m-0">{{ stock.change_pct|default:stock.pct_change|floatformat:2 }}%</p>
-                    </div>
-                </div>
-                {% empty %}
-                <div class="px-6 py-12 text-center text-text-muted text-sm">
-                    <span class="material-symbols-outlined text-4xl text-gray-300 mb-2 block">bar_chart</span>
-                    Market data will appear here during trading hours
-                </div>
-                {% endfor %}
+
+            <div class="flex-1">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50/30">
+                            <th class="px-8 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest"># Entity</th>
+                            <th class="px-6 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-right">LTP Node</th>
+                            <th class="px-8 py-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-right">Delta %</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-50">
+                        {% for stock in top_losers %}
+                        <tr class="hover:bg-slate-50/50 transition-colors group">
+                            <td class="px-8 py-5">
+                                <div class="flex items-center gap-4">
+                                    <span class="text-[10px] font-black text-slate-300 w-4 group-hover:text-rose-500 transition-colors">{{ forloop.counter }}</span>
+                                    <div class="flex flex-col">
+                                        <span class="text-sm font-black text-slate-900 leading-tight">{{ stock.symbol|default:stock.name }}</span>
+                                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ stock.sector|default:"Equity" }}</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-5 text-right font-black text-slate-900 text-sm">
+                                ₹{{ stock.price|default:stock.ltp|floatformat:2 }}
+                            </td>
+                            <td class="px-8 py-5 text-right">
+                                <span class="px-2.5 py-1 rounded-lg bg-rose-50 text-rose-600 text-[10px] font-black tracking-tighter">
+                                    {{ stock.change_pct|default:stock.pct_change|floatformat:2 }}%
+                                </span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="px-8 py-20 text-center">
+                                <div class="flex flex-col items-center">
+                                    <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4 text-slate-300">
+                                        <span class="material-symbols-outlined text-[32px]">query_stats</span>
+                                    </div>
+                                    <h3 class="text-slate-900 font-bold">Stagnant Market</h3>
+                                    <p class="text-slate-500 text-xs font-medium max-w-[200px] mx-auto">Movement patterns will populate once the trade floor opens.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

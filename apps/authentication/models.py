@@ -31,6 +31,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     
     ROLE_CHOICES = [
         ('ADMIN', 'Admin'),
+        ('ANALYST', 'Analyst'),
         ('CUSTOMER', 'Customer'),
     ]
     
@@ -71,7 +72,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name_plural = 'Users'
     
     def __str__(self):
-        return f"{self.email} ({self.get_role_display()})"
+        full_name = self.get_full_name()
+        return full_name if full_name else self.email
     
     def get_full_name(self):
         return f"{self.first_name} {self.last_name}".strip()
@@ -86,6 +88,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     @property
     def is_customer(self):
         return self.role == 'CUSTOMER'
+
+    @property
+    def is_analyst(self):
+        return self.role == 'ANALYST'
 
     @property
     def subscription(self):

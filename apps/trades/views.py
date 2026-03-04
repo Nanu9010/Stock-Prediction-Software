@@ -57,16 +57,16 @@ def trade_list_view(request, trade_type):
     if config['filter']:
         calls = calls.filter(**config['filter'])
     elif trade_type == 'futures':
-        calls = calls.filter(Q(symbol__icontains='FUT') | Q(notes__icontains='futures'))
+        calls = calls.filter(Q(symbol__icontains='FUT') | Q(rationale__icontains='futures'))
     elif trade_type == 'options':
         calls = calls.filter(
             Q(symbol__icontains='OPT') | Q(symbol__icontains='CE') |
-            Q(symbol__icontains='PE') | Q(notes__icontains='option')
+            Q(symbol__icontains='PE') | Q(rationale__icontains='option')
         )
     elif trade_type == 'commodity':
         calls = calls.filter(
             Q(symbol__icontains='GOLD') | Q(symbol__icontains='SILVER') |
-            Q(symbol__icontains='CRUDE') | Q(notes__icontains='commodity')
+            Q(symbol__icontains='CRUDE') | Q(rationale__icontains='commodity')
         )
 
     # Common filters (broker, action, search)

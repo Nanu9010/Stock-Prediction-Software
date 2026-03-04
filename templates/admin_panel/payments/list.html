@@ -1,73 +1,128 @@
 {% extends 'admin_panel/base.html' %}
+{% load static %}
 
-{% block title %}Payments — Admin{% endblock %}
+{% block title %}Revenue Audit - Admin Panel{% endblock %}
 
 {% block content %}
-<div class="page-header" style="display:flex;justify-content:space-between;align-items:center;">
-    <div>
-        <h1>Payments</h1>
-        <p class="text-secondary">All transactions (read-only)</p>
+<div class="max-w-7xl mx-auto">
+    <!-- Page Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+        <div>
+            <h1 class="text-3xl font-black text-slate-900 tracking-tight">Revenue Audit</h1>
+            <p class="text-slate-500 font-medium tracking-tight">System-wide transaction monitoring and fiscal verification.</p>
+        </div>
+        
+        <!-- Filter Engine -->
+        <form method="get" class="flex flex-wrap items-center gap-3">
+            <div class="relative min-w-[240px]">
+                <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
+                <input type="text" name="search" value="{{ request.GET.search }}" placeholder="TXN ID or Member Account..."
+                       class="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-slate-300">
+            </div>
+            <select name="status" class="px-4 py-3 bg-white border border-slate-200 rounded-xl text-xs font-black focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
+                <option value="">Status: All Audit</option>
+                <option value="SUCCESS" {% if request.GET.status == 'SUCCESS' %}selected{% endif %}>Audit: Success</option>
+                <option value="PENDING" {% if request.GET.status == 'PENDING' %}selected{% endif %}>Audit: Pending</option>
+                <option value="FAILED" {% if request.GET.status == 'FAILED' %}selected{% endif %}>Audit: Failed</option>
+                <option value="REFUNDED" {% if request.GET.status == 'REFUNDED' %}selected{% endif %}>Audit: Refunded</option>
+            </select>
+            <button type="submit" class="px-6 py-3 bg-slate-900 text-white rounded-xl font-black text-[11px] uppercase tracking-widest hover:bg-slate-800 transition-all border-none cursor-pointer">Apply Filter</button>
+            <a href="{% url 'admin_panel:payments_list' %}" class="p-3 bg-slate-100 text-slate-400 hover:text-slate-600 rounded-xl transition-all" title="Reset Filters">
+                <span class="material-symbols-outlined text-[20px]">restart_alt</span>
+            </a>
+        </form>
     </div>
-    <!-- Search / Filter -->
-    <form method="get" style="display:flex;gap:8px;align-items:center;">
-        <input type="text" name="search" value="{{ request.GET.search }}" placeholder="Search email or TXN ID…"
-            class="form-input" style="width:220px;">
-        <select name="status" class="form-input" style="width:140px;">
-            <option value="">All Statuses</option>
-            <option value="SUCCESS" {% if request.GET.status == 'SUCCESS' %}selected{% endif %}>Success</option>
-            <option value="PENDING" {% if request.GET.status == 'PENDING' %}selected{% endif %}>Pending</option>
-            <option value="FAILED" {% if request.GET.status == 'FAILED' %}selected{% endif %}>Failed</option>
-            <option value="REFUNDED" {% if request.GET.status == 'REFUNDED' %}selected{% endif %}>Refunded</option>
-        </select>
-        <button type="submit" class="btn btn-sm btn-secondary">Filter</button>
-        <a href="{% url 'admin_panel:payments_list' %}" class="btn btn-sm btn-outline">Reset</a>
-    </form>
-</div>
 
-<div class="data-table-wrapper">
-    <table class="data-table">
-        <thead>
-            <tr>
-                <th>User</th>
-                <th>Plan</th>
-                <th>Amount</th>
-                <th>Status</th>
-                <th>TXN ID</th>
-                <th>Date</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for payment in payments %}
-            <tr>
-                <td>{{ payment.user.email }}</td>
-                <td>{{ payment.plan_type|default:"—" }}</td>
-                <td>₹{{ payment.amount }}</td>
-                <td>
-                    <span class="badge badge-{% if payment.status == 'SUCCESS' %}success{% elif payment.status == 'FAILED' %}danger{% elif payment.status == 'REFUNDED' %}warning{% else %}secondary{% endif %}">
-                        {{ payment.status }}
-                    </span>
-                </td>
-                <td><small>{{ payment.transaction_id|default:"—" }}</small></td>
-                <td>{{ payment.created_at|date:"d M Y, H:i" }}</td>
-                <td>
-                    <a href="{% url 'admin_panel:payment_detail' payment.pk %}" class="btn btn-sm btn-outline">View</a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="7" class="text-center" style="padding:2rem;color:#888;">No payments found.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+    <!-- Data Table -->
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-50/50 border-bottom border-slate-100">
+                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Remitter</th>
+                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Service Segment</th>
+                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Settlement</th>
+                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Audit Status</th>
+                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Reference ID</th>
+                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Timestamp</th>
+                        <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Verification</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-50">
+                    {% for payment in payments %}
+                    <tr class="hover:bg-slate-50/50 transition-colors group">
+                        <td class="px-6 py-5">
+                            <span class="text-xs font-black text-slate-900 tracking-tight">{{ payment.user.email }}</span>
+                        </td>
+                        <td class="px-6 py-5">
+                            <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">{{ payment.plan_type|default:"Direct" }}</span>
+                        </td>
+                        <td class="px-6 py-5">
+                            <span class="text-sm font-black text-slate-900 tracking-tighter">₹{{ payment.amount }}</span>
+                        </td>
+                        <td class="px-6 py-5 text-center">
+                            {% if payment.status == 'SUCCESS' %}
+                            <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-600 text-[9px] font-black uppercase tracking-wider">Settled</span>
+                            {% elif payment.status == 'FAILED' %}
+                            <span class="px-2.5 py-1 rounded-lg bg-rose-50 text-rose-600 text-[9px] font-black uppercase tracking-wider">Aborted</span>
+                            {% elif payment.status == 'REFUNDED' %}
+                            <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-500 text-[9px] font-black uppercase tracking-wider">Reversed</span>
+                            {% else %}
+                            <span class="px-2.5 py-1 rounded-lg bg-amber-50 text-amber-600 text-[9px] font-black uppercase tracking-wider">Processing</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-5">
+                            <span class="text-[10px] font-mono text-slate-400 tracking-tight">{{ payment.transaction_id|default:"N/A" }}</span>
+                        </td>
+                        <td class="px-6 py-5">
+                            <div class="flex flex-col">
+                                <span class="text-[10px] font-black text-slate-600 uppercase">{{ payment.created_at|date:"M d, Y" }}</span>
+                                <span class="text-[10px] text-slate-400 font-medium">{{ payment.created_at|date:"H:i:s" }}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-5 text-right">
+                            <a href="{% url 'admin_panel:payment_detail' payment.pk %}" class="p-2 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-lg transition-all inline-flex" title="Detailed Audit">
+                                <span class="material-symbols-outlined text-[20px]">description</span>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="px-6 py-20 text-center">
+                            <div class="flex flex-col items-center">
+                                <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4 text-slate-300">
+                                    <span class="material-symbols-outlined text-[32px]">account_balance</span>
+                                </div>
+                                <h3 class="text-slate-900 font-bold">Zero Transaction Data</h3>
+                                <p class="text-slate-500 text-sm">No financial records detected in the audit logs.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
-{% if is_paginated %}
-<div class="pagination">
-    {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}" class="btn btn-sm btn-outline">← Prev</a>{% endif %}
-    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
-    {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}" class="btn btn-sm btn-outline">Next →</a>{% endif %}
+        {% if is_paginated %}
+        <div class="px-6 py-4 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between">
+            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                Ledger Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </p>
+            <div class="flex items-center gap-2">
+                {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" class="p-2 bg-white border border-slate-200 rounded-lg text-slate-400 hover:text-slate-900 transition-all no-underline">
+                    <span class="material-symbols-outlined text-[20px]">west</span>
+                </a>
+                {% endif %}
+                
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="p-2 bg-white border border-slate-200 rounded-lg text-slate-400 hover:text-slate-900 transition-all no-underline">
+                    <span class="material-symbols-outlined text-[20px]">east</span>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
 </div>
-{% endif %}
 {% endblock %}

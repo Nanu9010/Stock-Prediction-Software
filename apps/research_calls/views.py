@@ -14,7 +14,7 @@ from apps.authentication.decorators import role_required
 
 
 @login_required
-@role_required(['ANALYST', 'ADMIN'])
+@role_required('ANALYST', 'ADMIN')
 def call_create_view(request):
     """Create new research call"""
     from .forms import ResearchCallForm
@@ -36,7 +36,7 @@ def call_create_view(request):
 
 
 @login_required
-@role_required(['ANALYST', 'ADMIN'])
+@role_required('ANALYST', 'ADMIN')
 def call_edit_view(request, pk):
     """Edit existing research call"""
     from .forms import ResearchCallForm
@@ -58,7 +58,7 @@ def call_edit_view(request, pk):
 
 
 @login_required
-@role_required(['ADMIN'])
+@role_required('ADMIN')
 def call_approve_view(request, pk):
     """Approve a research call"""
     call = get_object_or_404(ResearchCall, pk=pk)
@@ -69,7 +69,7 @@ def call_approve_view(request, pk):
 
 
 @login_required
-@role_required(['ADMIN'])
+@role_required('ADMIN')
 def call_publish_view(request, pk):
     """Publish a research call"""
     call = get_object_or_404(ResearchCall, pk=pk)
