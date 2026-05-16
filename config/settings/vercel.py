@@ -1,5 +1,8 @@
 from .production import *
 
+# Vercel-specific settings
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['.vercel.app', 'localhost', '127.0.0.1', 'now.sh'])
+
 # Logging to console for Vercel
 LOGGING = {
     'version': 1,
@@ -42,6 +45,17 @@ if not os.environ.get('REDIS_URL'):
         }
     }
     SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
+# Database fallback for build time (Vercel build doesn't always have DB)
+if os.environ.get('VERCEL'):
+    # If DB vars are missing, use a dummy DB for build time
+    if not os.environ.get('DB_NAME'):
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': BASE_DIR / 'db.sqlite3',
+            }
+        }
 
 # Vercel handles SSL termination
 SECURE_SSL_REDIRECT = os.environ.get('SECURE_SSL_REDIRECT', 'False') == 'True'
