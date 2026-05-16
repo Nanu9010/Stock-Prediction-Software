@@ -8,6 +8,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from apps.brokers.models import Broker, BrokerPerformanceMetrics
 from apps.brokers.serializers import (
     BrokerSerializer,
+    BrokerListSerializer,
     BrokerCreateUpdateSerializer,
     BrokerPerformanceMetricsSerializer,
 )
@@ -27,7 +28,7 @@ class BrokerListView(generics.ListAPIView):
     GET /api/brokers/
     Public list of all active, verified brokers.
     """
-    serializer_class = BrokerSerializer
+    serializer_class = BrokerListSerializer
     permission_classes = [permissions.AllowAny]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['name', 'sebi_registration_no']
@@ -35,7 +36,9 @@ class BrokerListView(generics.ListAPIView):
     ordering = ['-overall_accuracy']
 
     def get_queryset(self):
-        return Broker.objects.filter(is_active=True, is_verified=True)
+        return Broker.objects.filter(
+            is_active=True, is_verified=True
+        ).only('id', 'name', 'slug', 'logo', 'overall_accuracy', 'total_calls_published', 'is_verified')
 
 
 class BrokerDetailView(generics.RetrieveAPIView):

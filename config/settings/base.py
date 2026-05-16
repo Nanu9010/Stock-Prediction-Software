@@ -28,7 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+
     # Third-party apps
     'rest_framework',
     'django_filters',
@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django_celery_beat',
     'django_celery_results',
     'widget_tweaks',
-    
+
     # Project apps
     'apps.authentication',
     'apps.brokers',
@@ -56,6 +56,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'django.middleware.gzip.GZipMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -63,6 +64,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'apps.core.middleware.ApiTimingMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -94,6 +96,7 @@ DATABASES = {
         'PASSWORD': env('DB_PASSWORD', default=''),
         'HOST': env('DB_HOST', default='localhost'),
         'PORT': env('DB_PORT', default='3306'),
+        'CONN_MAX_AGE': 60,
         'OPTIONS': {
             'charset': 'utf8mb4',
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
@@ -154,11 +157,14 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
-# Cache Configuration
+# Cache Configuration — Redis for cross-worker shared cache
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'unique-snowflake',
+        'BACKEND': env(
+            'DJANGO_CACHE_BACKEND',
+            default='django.core.cache.backends.redis.RedisCache'
+        ),
+        'LOCATION': env('DJANGO_CACHE_LOCATION', default='redis://localhost:6379/1'),
     }
 }
 
@@ -217,6 +223,11 @@ LOGGING = {
             'level': env('DJANGO_LOG_LEVEL', default='INFO'),
             'propagate': False,
         },
+        'performance.api': {
+            'handlers': ['console', 'file'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
     },
 }
 
@@ -229,7 +240,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 50,
+    'PAGE_SIZE': 20,
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend',
         'rest_framework.filters.SearchFilter',
@@ -259,15 +270,13 @@ RAZORPAY_WEBHOOK_SECRET = os.getenv('RAZORPAY_WEBHOOK_SECRET')
 try:
     from django.db.backends.mysql.base import DatabaseWrapper
     from django.db.backends.mysql import features
-    
+
     # Disable version check
     DatabaseWrapper.check_database_version_supported = lambda self: None
-    
+
     # Disable RETURNING clause support (not available in MariaDB 10.4)
     # Override the properties at class level
     features.DatabaseFeatures.can_return_columns_from_insert = False
     features.DatabaseFeatures.can_return_rows_from_bulk_insert = False
 except Exception:
     pass
-
-

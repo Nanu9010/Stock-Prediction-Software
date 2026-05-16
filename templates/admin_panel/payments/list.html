@@ -5,24 +5,23 @@
 
 {% block content %}
 <div class="max-w-7xl mx-auto">
-    <!-- Page Header -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
         <div>
             <h1 class="text-3xl font-black text-slate-900 tracking-tight">Revenue Audit</h1>
             <p class="text-slate-500 font-medium tracking-tight">System-wide transaction monitoring and fiscal verification.</p>
         </div>
-        
-        <!-- Filter Engine -->
+
         <form method="get" class="flex flex-wrap items-center gap-3">
             <div class="relative min-w-[240px]">
                 <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
-                <input type="text" name="search" value="{{ request.GET.search }}" placeholder="TXN ID or Member Account..."
+                <input type="text" name="search" value="{{ request.GET.search }}" placeholder="Receipt, gateway ID, or member..."
                        class="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-slate-300">
             </div>
             <select name="status" class="px-4 py-3 bg-white border border-slate-200 rounded-xl text-xs font-black focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer">
                 <option value="">Status: All Audit</option>
-                <option value="SUCCESS" {% if request.GET.status == 'SUCCESS' %}selected{% endif %}>Audit: Success</option>
-                <option value="PENDING" {% if request.GET.status == 'PENDING' %}selected{% endif %}>Audit: Pending</option>
+                <option value="CAPTURED" {% if request.GET.status == 'CAPTURED' %}selected{% endif %}>Audit: Captured</option>
+                <option value="CREATED" {% if request.GET.status == 'CREATED' %}selected{% endif %}>Audit: Created</option>
+                <option value="AUTHORIZED" {% if request.GET.status == 'AUTHORIZED' %}selected{% endif %}>Audit: Authorized</option>
                 <option value="FAILED" {% if request.GET.status == 'FAILED' %}selected{% endif %}>Audit: Failed</option>
                 <option value="REFUNDED" {% if request.GET.status == 'REFUNDED' %}selected{% endif %}>Audit: Refunded</option>
             </select>
@@ -33,7 +32,6 @@
         </form>
     </div>
 
-    <!-- Data Table -->
     <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
@@ -58,11 +56,13 @@
                             <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">{{ payment.plan_type|default:"Direct" }}</span>
                         </td>
                         <td class="px-6 py-5">
-                            <span class="text-sm font-black text-slate-900 tracking-tighter">₹{{ payment.amount }}</span>
+                            <span class="text-sm font-black text-slate-900 tracking-tighter">INR {{ payment.amount }}</span>
                         </td>
                         <td class="px-6 py-5 text-center">
-                            {% if payment.status == 'SUCCESS' %}
+                            {% if payment.status == 'CAPTURED' %}
                             <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-600 text-[9px] font-black uppercase tracking-wider">Settled</span>
+                            {% elif payment.status == 'AUTHORIZED' %}
+                            <span class="px-2.5 py-1 rounded-lg bg-sky-50 text-sky-600 text-[9px] font-black uppercase tracking-wider">Authorized</span>
                             {% elif payment.status == 'FAILED' %}
                             <span class="px-2.5 py-1 rounded-lg bg-rose-50 text-rose-600 text-[9px] font-black uppercase tracking-wider">Aborted</span>
                             {% elif payment.status == 'REFUNDED' %}
@@ -114,7 +114,7 @@
                     <span class="material-symbols-outlined text-[20px]">west</span>
                 </a>
                 {% endif %}
-                
+
                 {% if page_obj.has_next %}
                 <a href="?page={{ page_obj.next_page_number }}" class="p-2 bg-white border border-slate-200 rounded-lg text-slate-400 hover:text-slate-900 transition-all no-underline">
                     <span class="material-symbols-outlined text-[20px]">east</span>

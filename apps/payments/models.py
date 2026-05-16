@@ -1,6 +1,8 @@
 """
 Payment models for subscription and transaction management
 """
+import json
+
 from django.db import models
 from django.utils import timezone
 from apps.authentication.models import User
@@ -84,6 +86,18 @@ class Payment(models.Model):
     def __str__(self):
         return f"{self.user.email} - ₹{self.amount} - {self.status}"
 
+    @property
+    def plan_type(self):
+        return self.metadata.get('plan_type')
+
+    @property
+    def transaction_id(self):
+        return self.razorpay_payment_id or self.razorpay_order_id or self.receipt
+
+    @property
+    def gateway_response(self):
+        return json.dumps(self.metadata or {}, indent=2, sort_keys=True)
+
 
 class Subscription(models.Model):
     """User subscription management"""
@@ -133,3 +147,4 @@ class Subscription(models.Model):
     def is_active(self):
         """Check if subscription is currently active"""
         return self.status == 'ACTIVE' and self.end_date > timezone.now()
+

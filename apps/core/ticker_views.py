@@ -1,32 +1,30 @@
 """
-Live market ticker API — uses yfinance (free, no API key needed).
-Returns NIFTY 50, SENSEX, BANKNIFTY, NIFTY IT, NIFTY BANK with live prices.
-Cached for 60 seconds to avoid hammering Yahoo Finance.
+Live market ticker API — DB-first, no yfinance in request path.
+Returns NIFTY 50, SENSEX, BANKNIFTY, NIFTY IT, MIDCAP with live prices.
+Data is populated by Celery background task; this view only reads from DB/cache.
 """
-import json
 from django.http import JsonResponse
 from django.views import View
 from django.core.cache import cache
 
 
-TICKER_SYMBOLS = [
-    {"label": "NIFTY 50",    "symbol": "^NSEI"},
-    {"label": "SENSEX",      "symbol": "^BSESN"},
-    {"label": "BANKNIFTY",   "symbol": "^NSEBANK"},
-    {"label": "NIFTY IT",    "symbol": "^CNXIT"},
-    {"label": "MIDCAP 100",  "symbol": "^NSEMDCP50"},
-    {"label": "USD/INR",     "symbol": "USDINR=X"},
-    {"label": "GOLD",        "symbol": "GC=F"},
-]
-
 CACHE_KEY = "live_ticker_data"
 CACHE_TTL = 60  # seconds
+
+TICKER_DISPLAY = {
+    'NIFTY50':    'NIFTY 50',
+    'SENSEX':     'SENSEX',
+    'BANKNIFTY':  'BANKNIFTY',
+    'FINNIFTY':   'FIN NIFTY',
+    'MIDCPNIFTY': 'MIDCAP 100',
+}
 
 
 class LiveTickerView(View):
     """
     GET /api/core/live-ticker/
     Returns JSON list of live market data for the ticker bar.
+    Reads from DB — never calls yfinance during a user request.
     """
 
     def get(self, request):
@@ -34,63 +32,46 @@ class LiveTickerView(View):
         if data:
             return JsonResponse({"results": data, "cached": True})
 
-        data = self._fetch_live()
-        cache.set(CACHE_KEY, data, CACHE_TTL)
-        return JsonResponse({"results": data, "cached": False})
+        data = self._from_db()
+        if data:
+            cache.set(CACHE_KEY, data, CACHE_TTL)
+        return JsonResponse({"results": data or self._fallback(), "cached": False})
 
-    def _fetch_live(self):
-        try:
-            import yfinance as yf
-        except ImportError:
-            return self._fallback()
+    def _from_db(self):
+        """Read indices from MarketIndex table (populated by Celery task)."""
+        from apps.market_data.models import MarketIndex
+
+        priority = list(TICKER_DISPLAY.keys())
+        db_indices = {
+            idx.symbol: idx
+            for idx in MarketIndex.objects.filter(symbol__in=priority)
+        }
+
+        if not db_indices:
+            return None  # DB not yet populated — use fallback
 
         results = []
-        symbols = [t["symbol"] for t in TICKER_SYMBOLS]
+        for sym in priority:
+            if sym not in db_indices:
+                continue
+            idx = db_indices[sym]
+            price = float(idx.current_price)
+            change = float(idx.change)
+            prev = float(idx.previous_close) if idx.previous_close else price
+            change_pct = (change / prev * 100) if prev else 0
 
-        try:
-            tickers = yf.Tickers(" ".join(symbols))
-            for item in TICKER_SYMBOLS:
-                sym = item["symbol"]
-                try:
-                    info = tickers.tickers[sym].fast_info
-                    price = info.last_price
-                    prev  = info.previous_close
-                    if price is None or prev is None:
-                        # fallback: try history
-                        hist = tickers.tickers[sym].history(period="2d")
-                        if not hist.empty:
-                            price = float(hist["Close"].iloc[-1])
-                            prev  = float(hist["Close"].iloc[-2]) if len(hist) > 1 else price
-                        else:
-                            continue
+            results.append({
+                "label":      TICKER_DISPLAY.get(sym, sym),
+                "price":      f"₹{price:,.2f}",
+                "change":     f"{'+' if change >= 0 else ''}{change:,.2f}",
+                "change_pct": f"{'+' if change_pct >= 0 else ''}{change_pct:.2f}%",
+                "direction":  "up" if change >= 0 else "down",
+            })
 
-                    change     = price - prev
-                    change_pct = (change / prev) * 100 if prev else 0
-
-                    # Format price: currency pairs show 4 decimals, indices/commodities 2
-                    if "=X" in sym:
-                        price_str = f"₹{price:.2f}" if "INR" in sym else f"${price:.4f}"
-                    elif "GC=F" in sym or "CL=F" in sym:
-                        price_str = f"${price:.2f}"
-                    else:
-                        price_str = f"₹{price:,.2f}"
-
-                    results.append({
-                        "label":      item["label"],
-                        "price":      price_str,
-                        "change":     f"{'+' if change >= 0 else ''}{change:,.2f}",
-                        "change_pct": f"{'+' if change_pct >= 0 else ''}{change_pct:.2f}%",
-                        "direction":  "up" if change >= 0 else "down",
-                    })
-                except Exception:
-                    continue
-        except Exception:
-            return self._fallback()
-
-        return results if results else self._fallback()
+        return results if results else None
 
     def _fallback(self):
-        """Static fallback if yfinance fails (never shows stale hardcoded data forever)."""
+        """Static fallback if DB has no data yet."""
         return [
             {"label": "NIFTY 50",  "price": "—",  "change": "—", "change_pct": "—", "direction": "neutral"},
             {"label": "SENSEX",    "price": "—",  "change": "—", "change_pct": "—", "direction": "neutral"},

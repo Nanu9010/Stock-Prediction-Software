@@ -6,10 +6,11 @@ Admins can manage all subscriptions.
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from apps.subscriptions.models import SubscriptionPlan, UserSubscription
+
+from apps.payments.models import Subscription, SubscriptionPlan
 from apps.subscriptions.serializers import (
     SubscriptionPlanSerializer,
-    UserSubscriptionSerializer,
+    SubscriptionRecordSerializer,
 )
 
 
@@ -19,8 +20,6 @@ class IsAdminUser(permissions.BasePermission):
     def has_permission(self, request, view):
         return request.user and request.user.is_authenticated and request.user.role == 'ADMIN'
 
-
-# ─── Plan Views ─────────────────────────────────────────────────────────────
 
 class SubscriptionPlanListView(generics.ListAPIView):
     """
@@ -44,18 +43,16 @@ class SubscriptionPlanDetailView(generics.RetrieveAPIView):
     queryset = SubscriptionPlan.objects.filter(is_active=True)
 
 
-# ─── User Subscription Views ─────────────────────────────────────────────────
-
 class MySubscriptionsView(generics.ListAPIView):
     """
     GET /api/subscriptions/my/
     Authenticated users can view all their own subscriptions.
     """
-    serializer_class = UserSubscriptionSerializer
+    serializer_class = SubscriptionRecordSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return UserSubscription.objects.filter(user=self.request.user).select_related('plan')
+        return Subscription.objects.filter(user=self.request.user).select_related('payment')
 
 
 class ActiveSubscriptionView(APIView):
@@ -66,26 +63,18 @@ class ActiveSubscriptionView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
-        from django.utils import timezone
-        subscription = UserSubscription.objects.filter(
-            user=request.user,
-            status='ACTIVE',
-            end_date__gt=timezone.now().date(),
-        ).select_related('plan').first()
-
+        subscription = request.user.subscription
         if not subscription:
             return Response({'detail': 'No active subscription found.'}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = UserSubscriptionSerializer(subscription)
+        serializer = SubscriptionRecordSerializer(subscription)
         return Response(serializer.data)
 
 
-# ─── Admin Views ─────────────────────────────────────────────────────────────
-
 class AdminSubscriptionPlanListCreateView(generics.ListCreateAPIView):
     """
-    GET  /api/subscriptions/admin/plans/   — list all plans (including inactive)
-    POST /api/subscriptions/admin/plans/   — create a new plan
+    GET  /api/subscriptions/admin/plans/   - list all plans (including inactive)
+    POST /api/subscriptions/admin/plans/   - create a new plan
     Admin only.
     """
     serializer_class = SubscriptionPlanSerializer
@@ -110,8 +99,8 @@ class AdminUserSubscriptionsView(generics.ListAPIView):
     GET /api/subscriptions/admin/users/
     Admin: View all user subscriptions.
     """
-    serializer_class = UserSubscriptionSerializer
+    serializer_class = SubscriptionRecordSerializer
     permission_classes = [IsAdminUser]
 
     def get_queryset(self):
-        return UserSubscription.objects.select_related('user', 'plan').all()
+        return Subscription.objects.select_related('user', 'payment').all()

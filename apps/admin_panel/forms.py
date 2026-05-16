@@ -1,11 +1,13 @@
 """
 Forms for Admin Panel
 """
+import json
+
 from django import forms
 from apps.research_calls.models import ResearchCall
 from apps.brokers.models import Broker
 from apps.authentication.models import User
-from apps.subscriptions.models import SubscriptionPlan
+from apps.payments.models import SubscriptionPlan
 from apps.market_data.models import IPO, Commodity, ETF, SIP
 
 
@@ -176,24 +178,49 @@ class UserForm(forms.ModelForm):
 
 class SubscriptionPlanForm(forms.ModelForm):
     """Form for creating/editing subscription plans"""
+
+    features_text = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={'rows': 5}),
+        help_text='Enter one feature per line.',
+        label='Plan Features',
+    )
     
     class Meta:
         model = SubscriptionPlan
         fields = [
-            'name', 'slug', 'description', 'price_monthly', 'price_yearly',
-            'access_intraday', 'access_swing', 'access_shortterm', 'access_longterm',
-            'access_futures', 'access_options', 'display_order', 'is_active', 'is_featured'
+            'name', 'plan_type', 'price_monthly', 'price_yearly',
+            'max_calls_per_month', 'display_order', 'is_active'
         ]
         widgets = {
-            'description': forms.Textarea(attrs={'rows': 3}),
             'price_monthly': forms.NumberInput(attrs={'step': '0.01'}),
             'price_yearly': forms.NumberInput(attrs={'step': '0.01'}),
         }
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['features_text'].initial = '\n'.join(self.instance.features or [])
         for field in self.fields.values():
             field.widget.attrs.update({'class': 'form-control'})
+
+    def clean_features_text(self):
+        raw_value = self.cleaned_data.get('features_text', '')
+        if not raw_value:
+            return []
+        try:
+            parsed = json.loads(raw_value)
+        except json.JSONDecodeError:
+            parsed = None
+        if isinstance(parsed, list):
+            return [str(item).strip() for item in parsed if str(item).strip()]
+        return [line.strip() for line in raw_value.splitlines() if line.strip()]
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.features = self.cleaned_data['features_text']
+        if commit:
+            instance.save()
+        return instance
 
 
 # PortfolioForm and WatchlistForm are not needed since admin only views/deletes them

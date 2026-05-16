@@ -20,8 +20,20 @@ class BrokerPerformanceMetricsSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
 
+class BrokerListSerializer(serializers.ModelSerializer):
+    """Lightweight serializer for broker list views — trimmed payload."""
+
+    class Meta:
+        model = Broker
+        fields = [
+            'id', 'name', 'slug', 'logo',
+            'overall_accuracy', 'total_calls_published', 'is_verified',
+        ]
+        read_only_fields = fields
+
+
 class BrokerSerializer(serializers.ModelSerializer):
-    """Serializer for Broker — used for list and detail views."""
+    """Serializer for Broker — used for detail views."""
 
     class Meta:
         model = Broker
@@ -45,3 +57,4 @@ class BrokerCreateUpdateSerializer(serializers.ModelSerializer):
             'website_url', 'sebi_registration_no',
             'is_active', 'is_verified',
         ]
+

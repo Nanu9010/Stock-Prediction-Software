@@ -4,7 +4,7 @@ A comprehensive Django-based platform for managing stock research calls, broker 
 
 ## Features
 
-- **Role-Based Access Control**: Admin, Analyst, and Customer roles
+- **Role-Based Access Control**: Admin, and Customer
 - **Research Call Management**: Create, approve, and track stock research calls with targets and stop-losses
 - **Real-Time Lifecycle Tracking**: Automatic monitoring of price levels and call status updates
 - **Portfolio Management**: Track investments with real-time P&L calculations

@@ -42,20 +42,23 @@ def dashboard_home_view(request):
         from apps.portfolios.models import Portfolio, PortfolioItem
         from services.recommendation_service import get_user_recommendations, get_market_sentiment
 
-        today = timezone.now().date()
+        now = timezone.localtime()
+        day_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        day_end = day_start + timezone.timedelta(days=1)
         today_calls = ResearchCall.objects.filter(
             status='ACTIVE',
-            published_at__date=today
-        ).select_related('broker', 'created_by').order_by('-published_at')
+            published_at__gte=day_start,
+            published_at__lt=day_end,
+        ).select_related('broker', 'created_by').order_by('-published_at')[:8]
 
         try:
             portfolio = Portfolio.objects.get(user=request.user)
-            active_items = PortfolioItem.objects.filter(
+            active_items_count = PortfolioItem.objects.filter(
                 portfolio=portfolio, status='ACTIVE'
-            ).select_related('research_call')
+            ).count()
         except Portfolio.DoesNotExist:
             portfolio = None
-            active_items = []
+            active_items_count = 0
 
         top_brokers = Broker.objects.annotate(
             total_calls=Count('research_calls'),
@@ -69,14 +72,16 @@ def dashboard_home_view(request):
         from apps.watchlists.models import Watchlist, WatchlistItem
         try:
             watchlist = Watchlist.objects.get(user=request.user)
-            watchlist_items = WatchlistItem.objects.filter(watchlist=watchlist)[:5]
+            watchlist_items = WatchlistItem.objects.filter(
+                watchlist=watchlist
+            ).select_related('research_call')[:5]
         except Watchlist.DoesNotExist:
             watchlist_items = []
 
         context = {
             'today_calls': today_calls,
             'portfolio': portfolio,
-            'active_items': active_items,
+            'active_items_count': active_items_count,
             'top_brokers': top_brokers,
             'recommendations': recommendations,
             'sentiment': sentiment,
@@ -94,17 +99,12 @@ def dashboard_home_view(request):
 
 def markets_view(request):
     """Markets overview page with live data"""
-    from apps.market_data.models import MarketIndex, StockPrice
-    from services.market_hero_service import get_today_top10_gainers, get_today_top10_losers
+    from apps.market_data.services import get_live_indices
 
-    indices = MarketIndex.objects.all()
-    top_gainers = get_today_top10_gainers()
-    top_losers = get_today_top10_losers()
+    indices = get_live_indices()
 
     context = {
         'indices': indices,
-        'top_gainers': top_gainers,
-        'top_losers': top_losers,
     }
     return render(request, 'markets/overview_v2.html', context)
 
@@ -264,3 +264,8 @@ def top_brokers_view(request):
         'top_brokers': top_brokers,
     }
     return render(request, 'markets/top_brokers.html', context)
+
+
+def technical_analysis_view(request):
+    """Technical analysis chart page."""
+    return render(request, 'markets/technical_analysis.html')

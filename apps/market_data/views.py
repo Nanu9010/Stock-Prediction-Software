@@ -38,7 +38,10 @@ def market_data_api(request):
     type param options: indices | ticker | gainers | losers | active | stocks | etfs | commodities | mf_navs
     """
     data_type = request.GET.get('type', 'indices')
-    limit = int(request.GET.get('limit', 20))
+    try:
+        limit = max(1, min(int(request.GET.get('limit', 20)), 50))
+    except (TypeError, ValueError):
+        limit = 20
 
     if data_type == 'ticker':
         data = get_ticker_data()
@@ -76,7 +79,10 @@ def market_data_api(request):
     else:
         data = {'error': f'Unknown type: {data_type}'}
 
-    return JsonResponse(data, safe=False)
+    response = JsonResponse(data, safe=False)
+    if data_type in {'ticker', 'indices', 'gainers', 'losers', 'active', 'stocks'}:
+        response['Cache-Control'] = 'public, max-age=60, stale-while-revalidate=120'
+    return response
 
 
 def update_market_data_view(request):

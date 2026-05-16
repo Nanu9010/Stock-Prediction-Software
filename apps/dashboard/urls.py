@@ -1,5 +1,6 @@
 from django.urls import path
 from apps.dashboard import views
+from apps.dashboard.api_views import CustomerDashboardSummaryView, MarketTickerLiteView
 
 app_name = 'dashboard'
 
@@ -24,4 +25,9 @@ urlpatterns = [
     path('recently-listed/', views.recently_listed_view, name='recently_listed'),
     path('top-brokers/', views.top_brokers_view, name='top_brokers'),
     path('technical-analysis/', views.technical_analysis_view, name='technical_analysis'),
+
+    # Lightweight JSON APIs for dashboard widgets
+    path('api/dashboard/customer-summary/', CustomerDashboardSummaryView.as_view(), name='customer_summary_api'),
+    path('api/dashboard/ticker-lite/', MarketTickerLiteView.as_view(), name='ticker_lite_api'),
 ]
+

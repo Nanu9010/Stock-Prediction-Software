@@ -14,6 +14,7 @@ from rest_framework.views import APIView
 from apps.notifications.models import Notification, NotificationPreferences
 from apps.notifications.serializers import (
     NotificationSerializer,
+    NotificationListSerializer,
     NotificationMarkReadSerializer,
     NotificationPreferencesSerializer,
 )
@@ -34,11 +35,13 @@ class NotificationListView(generics.ListAPIView):
     GET /api/notifications/
     Returns current user's notifications (paginated), newest first.
     """
-    serializer_class = NotificationSerializer
+    serializer_class = NotificationListSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        qs = Notification.objects.filter(user=self.request.user)
+        qs = Notification.objects.filter(
+            user=self.request.user
+        ).defer('message', 'related_type', 'related_id', 'read_at')
         # Optional ?unread=1 filter
         if self.request.query_params.get('unread') == '1':
             qs = qs.filter(is_read=False)

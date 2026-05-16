@@ -23,10 +23,10 @@
                     {{ user.email }}
                 </p>
                 <div class="flex items-center gap-2 mt-4">
-                    {% if user.role == 'PRO' or current_subscription.is_active %}
+                    {% if current_subscription and current_subscription.is_active %}
                     <span class="px-2.5 py-1 rounded-lg bg-amber-50 text-amber-600 text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
                         <span class="material-symbols-outlined text-[14px]">stars</span>
-                        PRO Member
+                        {{ current_subscription.plan_type }} Member
                     </span>
                     {% else %}
                     <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
@@ -79,7 +79,7 @@
             </div>
 
             <!-- Promotion Hook -->
-            {% if not current_subscription.is_active %}
+            {% if not current_subscription or not current_subscription.is_active %}
             <div class="bg-indigo-600 p-8 rounded-[32px] text-white shadow-xl shadow-indigo-100 relative overflow-hidden group">
                 <div class="relative z-10">
                     <h3 class="text-xl font-black mb-2 leading-tight">Unlock Market Intelligence</h3>
@@ -131,14 +131,14 @@
                         <span class="material-symbols-outlined text-[18px]">workspace_premium</span>
                         Subscription Lifecycle
                     </h3>
-                    {% if current_subscription.is_active %}
+                    {% if current_subscription and current_subscription.is_active %}
                     <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-wider">Active Stream</span>
                     {% else %}
                     <span class="px-2.5 py-1 rounded-lg bg-slate-50 text-slate-400 text-[10px] font-black uppercase tracking-wider">Inactive</span>
                     {% endif %}
                 </div>
 
-                {% if current_subscription.is_active %}
+                {% if current_subscription and current_subscription.is_active %}
                 <div class="space-y-6">
                     <div class="flex items-center justify-between p-6 bg-slate-900 rounded-[24px] text-white">
                         <div>

@@ -102,34 +102,16 @@
                         <th class="px-6 py-4 font-medium text-right">Volume</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
-                    {% for stock in top_gainers|slice:":10" %}
-                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/20 transition-colors">
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">{{ stock.symbol|slice:":2" }}</div>
-                                <div>
-                                    <p class="font-semibold text-slate-900 dark:text-slate-100">{{ stock.symbol }}</p>
-                                </div>
+                <tbody class="divide-y divide-slate-100 dark:divide-slate-800" id="gainers-tbody">
+                    <tr>
+                        <td colspan="4" class="px-6 py-8">
+                            <div class="space-y-3" id="gainers-loading">
+                                <div class="h-12 rounded-lg bg-slate-100 animate-pulse"></div>
+                                <div class="h-12 rounded-lg bg-slate-100 animate-pulse"></div>
+                                <div class="h-12 rounded-lg bg-slate-100 animate-pulse"></div>
                             </div>
                         </td>
-                        <td class="px-6 py-4 text-right font-medium">{{ stock.price|default:"--" }}</td>
-                        <td class="px-6 py-4 text-right text-emerald-600 font-medium">+{{ stock.change_pct|default:"--" }}%</td>
-                        <td class="px-6 py-4 text-right text-slate-500">
-                            {% if stock.volume %}
-                                {% if stock.volume > 1000000 %}
-                                    {{ stock.volume|floatformat:1 }}M
-                                {% else %}
-                                    {{ stock.volume }}
-                                {% endif %}
-                            {% else %}
-                                --
-                            {% endif %}
-                        </td>
                     </tr>
-                    {% empty %}
-                    <tr><td colspan="4" class="px-6 py-8 text-center text-slate-500">No data available today.</td></tr>
-                    {% endfor %}
                 </tbody>
             </table>
         </div>
@@ -145,34 +127,16 @@
                         <th class="px-6 py-4 font-medium text-right">Volume</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
-                    {% for stock in top_losers|slice:":10" %}
-                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/20 transition-colors">
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">{{ stock.symbol|slice:":2" }}</div>
-                                <div>
-                                    <p class="font-semibold text-slate-900 dark:text-slate-100">{{ stock.symbol }}</p>
-                                </div>
+                <tbody class="divide-y divide-slate-100 dark:divide-slate-800" id="losers-tbody">
+                    <tr>
+                        <td colspan="4" class="px-6 py-8">
+                            <div class="space-y-3" id="losers-loading">
+                                <div class="h-12 rounded-lg bg-slate-100 animate-pulse"></div>
+                                <div class="h-12 rounded-lg bg-slate-100 animate-pulse"></div>
+                                <div class="h-12 rounded-lg bg-slate-100 animate-pulse"></div>
                             </div>
                         </td>
-                        <td class="px-6 py-4 text-right font-medium">{{ stock.price|default:"--" }}</td>
-                        <td class="px-6 py-4 text-right text-rose-600 font-medium">{{ stock.change_pct|default:"--" }}%</td>
-                        <td class="px-6 py-4 text-right text-slate-500">
-                            {% if stock.volume %}
-                                {% if stock.volume > 1000000 %}
-                                    {{ stock.volume|floatformat:1 }}M
-                                {% else %}
-                                    {{ stock.volume }}
-                                {% endif %}
-                            {% else %}
-                                --
-                            {% endif %}
-                        </td>
                     </tr>
-                    {% empty %}
-                    <tr><td colspan="4" class="px-6 py-8 text-center text-slate-500">No data available today.</td></tr>
-                    {% endfor %}
                 </tbody>
             </table>
         </div>
@@ -202,19 +166,23 @@
 
 {% block extra_js %}
 <script>
+const tabState = {
+    gainers: { loaded: false, endpoint: '/market/api/?type=gainers&limit=10', tbody: 'gainers-tbody' },
+    losers:  { loaded: false, endpoint: '/market/api/?type=losers&limit=10',  tbody: 'losers-tbody' },
+    active:  { loaded: false, endpoint: '/market/api/?type=active&limit=10',  tbody: 'active-tbody' },
+};
+
 function switchTab(tabId) {
     const tabs = ['gainers', 'losers', 'active'];
-    
+
     tabs.forEach(t => {
         const btn = document.getElementById(`tab-${t}`);
         const content = document.getElementById(`content-${t}`);
-        
+
         if (t === tabId) {
             btn.className = "flex flex-col items-center justify-center border-b-[3px] border-b-primary text-slate-900 dark:text-slate-100 pb-3 font-semibold";
             content.classList.remove('hidden');
-            if (t === 'active') {
-                fetchActive();
-            }
+            ensureTabData(tabId);
         } else {
             btn.className = "flex flex-col items-center justify-center border-b-[3px] border-b-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 pb-3 font-medium transition-colors";
             content.classList.add('hidden');
@@ -222,50 +190,124 @@ function switchTab(tabId) {
     });
 }
 
-function fetchActive() {
-    const tbody = document.getElementById('active-tbody');
-    const table = document.getElementById('active-table');
-    const loading = document.getElementById('active-loading');
-    
-    if (tbody.children.length > 0) return; // already fetched
-    
-    fetch('/market/api/?type=active')
+function cacheKey(tabId) {
+    return `market-overview:${tabId}`;
+}
+
+function getCached(tabId) {
+    try {
+        const cached = JSON.parse(sessionStorage.getItem(cacheKey(tabId)));
+        if (!cached || !cached.expiresAt || Date.now() > cached.expiresAt) return null;
+        return cached.data;
+    } catch (error) {
+        return null;
+    }
+}
+
+function setCached(tabId, data) {
+    try {
+        sessionStorage.setItem(cacheKey(tabId), JSON.stringify({
+            data,
+            expiresAt: Date.now() + 60_000,
+        }));
+    } catch (error) {
+        console.warn('sessionStorage unavailable', error);
+    }
+}
+
+function renderRows(tabId, data) {
+    const tbody = document.getElementById(tabState[tabId].tbody);
+    const rows = Array.isArray(data) ? data : [];
+
+    if (!rows.length) {
+        tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-center text-slate-500">No data available today.</td></tr>';
+        return;
+    }
+
+    const html = rows.map(stock => {
+        const rawPct = parseFloat(stock.change_pct ?? stock.change_percent ?? 0);
+        const isPos = rawPct >= 0;
+        const colorCls = isPos ? 'text-emerald-600' : 'text-rose-600';
+        const sign = isPos ? '+' : '';
+        const volume = parseInt(stock.volume || 0, 10);
+        const formattedVolume = volume > 1000000 ? `${(volume / 1000000).toFixed(1)}M` : (volume || '--');
+        const price = parseFloat(stock.ltp ?? stock.price ?? 0).toFixed(2);
+        const symbol = stock.symbol || '--';
+
+        return `
+            <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/20 transition-colors">
+                <td class="px-6 py-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">${symbol.substring(0, 2)}</div>
+                        <div><p class="font-semibold text-slate-900 dark:text-slate-100">${symbol}</p></div>
+                    </div>
+                </td>
+                <td class="px-6 py-4 text-right font-medium">${price}</td>
+                <td class="px-6 py-4 text-right font-medium ${colorCls}">${sign}${rawPct.toFixed(2)}%</td>
+                <td class="px-6 py-4 text-right text-slate-500">${formattedVolume}</td>
+            </tr>
+        `;
+    }).join('');
+
+    tbody.innerHTML = html;
+}
+
+function ensureTabData(tabId) {
+    const state = tabState[tabId];
+    if (!state || state.loaded) return;
+
+    if (tabId === 'active') {
+        document.getElementById('active-loading').classList.remove('hidden');
+        document.getElementById('active-table').classList.add('hidden');
+    }
+
+    const cached = getCached(tabId);
+    if (cached) {
+        renderRows(tabId, cached);
+        state.loaded = true;
+        if (tabId === 'active') {
+            document.getElementById('active-loading').classList.add('hidden');
+            document.getElementById('active-table').classList.remove('hidden');
+        }
+        return;
+    }
+
+    fetch(state.endpoint, { credentials: 'same-origin' })
         .then(res => res.json())
         .then(data => {
-            loading.classList.add('hidden');
-            table.classList.remove('hidden');
-            
-            if (!data || !data.length) {
-                tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-center text-slate-500">No data available today.</td></tr>';
-                return;
+            renderRows(tabId, data);
+            setCached(tabId, data);
+            state.loaded = true;
+            if (tabId === 'active') {
+                document.getElementById('active-loading').classList.add('hidden');
+                document.getElementById('active-table').classList.remove('hidden');
             }
-            
-            data.forEach(stock => {
-                const isPos = parseFloat(stock.change_percent) >= 0;
-                const colorCls = isPos ? 'text-emerald-600' : 'text-rose-600';
-                const sign = isPos ? '+' : '';
-                const formatVol = (parseInt(stock.volume) > 1000000) ? (parseInt(stock.volume)/1000000).toFixed(1) + 'M' : stock.volume;
-                
-                tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/20 transition-colors">
-                        <td class="px-6 py-4">
-                            <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">${stock.symbol.substring(0,2)}</div>
-                                <div>
-                                    <p class="font-semibold text-slate-900 dark:text-slate-100">${stock.symbol}</p>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 text-right font-medium">${parseFloat(stock.ltp).toFixed(2)}</td>
-                        <td class="px-6 py-4 text-right font-medium ${colorCls}">${sign}${parseFloat(stock.change_percent).toFixed(2)}%</td>
-                        <td class="px-6 py-4 text-right text-slate-500">${formatVol}</td>
-                    </tr>
-                `;
-            });
         })
-        .catch(err => {
-            loading.innerHTML = '<span class="material-symbols-outlined text-rose-500 text-2xl">error</span><p class="mt-2 text-sm text-rose-500">Failed to load active stocks.</p>';
+        .catch(() => {
+            const tbody = document.getElementById(state.tbody);
+            tbody.innerHTML = '<tr><td colspan="4" class="px-6 py-8 text-center text-rose-500">Failed to load market data.</td></tr>';
+            if (tabId === 'active') {
+                document.getElementById('active-loading').classList.add('hidden');
+                document.getElementById('active-table').classList.remove('hidden');
+            }
         });
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const section = document.getElementById('content-gainers');
+    if (!section) return;
+
+    if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries) => {
+            if (entries.some(entry => entry.isIntersecting)) {
+                ensureTabData('gainers');
+                observer.disconnect();
+            }
+        }, { rootMargin: '200px 0px' });
+        observer.observe(section);
+    } else {
+        ensureTabData('gainers');
+    }
+});
 </script>
 {% endblock %}

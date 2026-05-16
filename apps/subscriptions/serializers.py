@@ -2,48 +2,41 @@
 Serializers for the subscriptions app.
 """
 from rest_framework import serializers
-from apps.subscriptions.models import SubscriptionPlan, UserSubscription
+
+from apps.payments.models import Subscription, SubscriptionPlan
 
 
 class SubscriptionPlanSerializer(serializers.ModelSerializer):
-    """Serializer for subscription plan display."""
+    """Serializer for public/admin subscription plan display."""
 
     class Meta:
         model = SubscriptionPlan
         fields = [
-            'id', 'name', 'slug', 'description',
+            'id', 'name', 'plan_type',
             'price_monthly', 'price_yearly',
-            'access_intraday', 'access_swing', 'access_shortterm',
-            'access_longterm', 'access_futures', 'access_options',
-            'features_json', 'display_order',
-            'is_active', 'is_featured',
+            'features', 'max_calls_per_month',
+            'display_order', 'is_active',
         ]
-        read_only_fields = ['id', 'slug']
+        read_only_fields = ['id']
 
 
-class UserSubscriptionSerializer(serializers.ModelSerializer):
+class SubscriptionRecordSerializer(serializers.ModelSerializer):
     """Serializer for a user's subscription record."""
 
-    plan = SubscriptionPlanSerializer(read_only=True)
-    plan_id = serializers.PrimaryKeyRelatedField(
-        queryset=SubscriptionPlan.objects.filter(is_active=True),
-        source='plan',
-        write_only=True,
-    )
     user_email = serializers.EmailField(source='user.email', read_only=True)
-    is_expired = serializers.SerializerMethodField()
+    payment_id = serializers.IntegerField(source='payment_id', read_only=True)
+    is_currently_active = serializers.SerializerMethodField()
 
     class Meta:
-        model = UserSubscription
+        model = Subscription
         fields = [
-            'id', 'user_email', 'plan', 'plan_id',
-            'status', 'start_date', 'end_date',
-            'payment_id', 'amount_paid',
-            'auto_renewal', 'is_expired',
+            'id', 'user_email', 'plan_type', 'billing_cycle',
+            'amount', 'status', 'start_date', 'end_date',
+            'payment_id', 'auto_renew',
+            'is_currently_active',
             'created_at',
         ]
-        read_only_fields = ['id', 'user_email', 'status', 'created_at']
+        read_only_fields = ['id', 'user_email', 'created_at']
 
-    def get_is_expired(self, obj):
-        from django.utils import timezone
-        return obj.end_date < timezone.now().date() if obj.end_date else True
+    def get_is_currently_active(self, obj):
+        return obj.is_active()

@@ -55,11 +55,12 @@
 
 <script>
 (function () {
-    const TICKER_URL = '/api/market/data/?type=ticker';
+    const TICKER_URL = '/api/core/live-ticker/';
     const POLL_MS    = 60_000;   // refresh every 60s
     const track      = document.getElementById('tickerTrack');
     const statusEl   = document.getElementById('tickerStatus');
     let   lastFetch  = 0;
+    const CACHE_KEY  = 'market-ticker-cache';
 
     function buildItems(results) {
         if (!results || !results.length) return '';
@@ -101,6 +102,27 @@
         track.style.animation = '';
     }
 
+    function readCache() {
+        try {
+            const cached = JSON.parse(sessionStorage.getItem(CACHE_KEY));
+            if (!cached || Date.now() > cached.expiresAt) return null;
+            return cached.results;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function writeCache(results) {
+        try {
+            sessionStorage.setItem(CACHE_KEY, JSON.stringify({
+                results,
+                expiresAt: Date.now() + POLL_MS,
+            }));
+        } catch (e) {
+            console.warn('ticker cache unavailable', e);
+        }
+    }
+
     async function fetchTicker() {
         try {
             const res  = await fetch(TICKER_URL, {credentials: 'same-origin'});
@@ -115,6 +137,7 @@
                 injectAndDuplicate(html);
                 setStatus(true); // Always treat as live for ticker
                 lastFetch = Date.now();
+                writeCache(results);
             }
         } catch (e) {
             console.error('Ticker fetch error:', e);
@@ -122,8 +145,23 @@
         }
     }
 
+    const cached = readCache();
+    if (cached && cached.length > 0) {
+        injectAndDuplicate(buildItems(cached));
+        setStatus(true);
+        lastFetch = Date.now();
+    }
+
+    function scheduleInitialFetch() {
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(() => fetchTicker(), {timeout: 1500});
+        } else {
+            setTimeout(fetchTicker, 250);
+        }
+    }
+
     // Initial fetch
-    fetchTicker();
+    scheduleInitialFetch();
 
     // Poll every 60s
     setInterval(() => {

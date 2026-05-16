@@ -19,8 +19,7 @@ from apps.brokers.models import Broker
 from apps.research_calls.models import ResearchCall
 from apps.portfolios.models import Portfolio, PortfolioItem
 from apps.watchlists.models import Watchlist, WatchlistItem
-from apps.subscriptions.models import SubscriptionPlan
-from apps.payments.models import Payment
+from apps.payments.models import Payment, SubscriptionPlan
 from apps.market_data.models import IPO, Commodity, ETF
 from .forms import ResearchCallForm, BrokerForm, UserForm, PortfolioForm, WatchlistForm, SubscriptionPlanForm, IPOForm, CommodityForm, ETFForm
 
@@ -113,7 +112,7 @@ class AdminDashboardView(LoginRequiredMixin, AdminRequiredMixin, TemplateView):
 
         # Chart 3: Payment Revenue (Last 6 Months)
         six_months_ago = today - timedelta(days=180)
-        revenue_data_qs = Payment.objects.filter(created_at__gte=six_months_ago, status='SUCCESS') \
+        revenue_data_qs = Payment.objects.filter(created_at__gte=six_months_ago, status='CAPTURED') \
             .annotate(month=TruncMonth('created_at')) \
             .values('month') \
             .annotate(total=Sum('amount')) \
@@ -505,7 +504,9 @@ class PaymentListView(LoginRequiredMixin, AdminRequiredMixin, ListView):
         if search:
             queryset = queryset.filter(
                 Q(user__email__icontains=search) |
-                Q(transaction_id__icontains=search)
+                Q(receipt__icontains=search) |
+                Q(razorpay_order_id__icontains=search) |
+                Q(razorpay_payment_id__icontains=search)
             )
         
         return queryset

@@ -5,8 +5,17 @@ from rest_framework import serializers
 from apps.notifications.models import Notification, NotificationPreferences
 
 
+class NotificationListSerializer(serializers.ModelSerializer):
+    """Lightweight serializer for notification list views — trimmed payload."""
+
+    class Meta:
+        model = Notification
+        fields = ['id', 'type', 'title', 'is_read', 'created_at']
+        read_only_fields = fields
+
+
 class NotificationSerializer(serializers.ModelSerializer):
-    """Serializer for user notifications."""
+    """Full serializer for notification detail views."""
 
     class Meta:
         model = Notification
